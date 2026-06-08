@@ -1,0 +1,113 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/*
+  POWERHOUSE360 — Design tokens
+  Architectural Premium PropTech / EnergyTech.
+  Palette extracted from the stacked-building brand mark.
+  Swap brand colors here; everything downstream uses these tokens.
+*/
+@theme {
+  /* --- Brand: deep navy / anthracite base --- */
+  --color-navy-900: #0d1626;
+  --color-navy-800: #16243f;
+  --color-navy-700: #1b2a4a;
+  --color-navy-600: #20344f;
+
+  /* --- Slate blue-gray (structure / secondary text) --- */
+  --color-slate-blue-500: #4a6075;
+  --color-slate-blue-400: #5a7184;
+  --color-slate-blue-300: #8499ab;
+
+  /* --- Brand green accent --- */
+  --color-brand-green: #43b649;
+  --color-brand-green-soft: #3db36a;
+
+  /* --- Brand teal / cyan accent --- */
+  --color-brand-teal: #2bb6b0;
+  --color-brand-teal-soft: #3aa8a0;
+  --color-brand-aqua: #80cec1;
+
+  /* --- Warm window light (evening mood, sparingly) --- */
+  --color-warm-light: #f5be75;
+  --color-warm-amber: #ec7b13;
+
+  /* --- Surfaces / text --- */
+  --color-ink: #eef3f8;
+  --color-ink-dim: #aebccb;
+  --color-ink-faint: #6f8294;
+
+  /* --- Type --- */
+  --font-sans: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+
+  /* --- Motion --- */
+  --ease-calm: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  --background: #0d1626;
+  --foreground: #eef3f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+/* Reduced motion: settle everything, no pinning/parallax surprises */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Headlines always read over the 3D scene */
+.text-legible {
+  text-shadow: 0 2px 30px rgba(8, 14, 26, 0.55), 0 1px 2px rgba(8, 14, 26, 0.4);
+}
+
+/* Thin brand divider line */
+.hairline {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-brand-teal) 55%, transparent),
+    transparent
+  );
+}
+
+/* Focus ring */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-teal);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-brand-teal) 35%, transparent);
+  color: #fff;
+}
