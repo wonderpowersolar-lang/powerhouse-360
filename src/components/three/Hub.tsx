@@ -2,181 +2,475 @@
 
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Text } from "@react-three/drei";
+import { Text, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { SCENE } from "./palette";
 import { emphasisWeight, smooth01 } from "./emphasis";
 
 /**
- * POWERHOUSE Hub v1 — the recognizable hero device of the technical room.
+ * POWERHOUSE Hub v1 — rebuilt to faithfully match the real product photo (REF-G).
  *
- * Stylised but faithful to the real product:
- *  - White rectangular wall-mounted enclosure
- *  - "POWERHOUSE 360" wordmark at the top
- *  - Black recessed display area in the centre
- *  - Large "HUB v1" lettering
- *  - Two round latches/locks on the right edge
- *  - Wall mount with cables/conduits, a small router/gateway beside it,
- *    and subtle status LEDs
+ * Portrait white enclosure, rounded, slightly glossy. Top→bottom:
+ *  - TOP: stacked-chevron "building" logo mark (5 angled bars) + "POWERHOUSE 360"
+ *    wordmark ("POWER" bold + "HOUSE 360" regular), black on white.
+ *  - CENTRE: a black recessed landscape touchscreen with a live UI —
+ *      status bar ("POWERHOUSE 360 · 10:42 · wifi"),
+ *      a row of 4 tiles: SOLAR (yellow sun) / HAUS (orange house) /
+ *      BATTERIE (green %) / NETZ (blue pylon),
+ *      a bottom bar: green-check "STATUS Alles in Ordnung", VERLAUF, gear.
+ *  - BOTTOM: large black "HUB v1".
+ *  - RIGHT EDGE: two round metallic latches with small connector pictograms.
  *
- * Mounted on the rear interior wall of the technical room (-z, ground-ish).
+ * Z layering: white box front face at z≈0.11; all UI sits between 0.111..0.14.
  */
 
-// Local frame; the whole room group is positioned by TechRoom.
+/**
+ * SWAP-IN POINT for the real product photo.
+ * Drop the real Hub v1 photo into /public/brand/ (e.g. hub-v1.png), then set this
+ * to its path (e.g. "/brand/hub-v1.png"). The photo is mapped onto a plane that
+ * covers the enclosure front, replacing the stylised face — no other change
+ * needed. While null, the faithful stylised model below is shown.
+ * For best results use a straight-on, cropped photo of the white portrait face
+ * (logo top, black landscape display centre, "HUB v1", two right-side latches).
+ */
+const HUB_PHOTO_SRC: string | null = null;
+
+// Enclosure face dimensions (portrait). Front face plane at z = FACE_Z.
+const W = 1.46;
+const H = 2.18;
+const FACE_Z = 0.11;
+
+// UI palette to match the photo's screen.
+const UI = {
+  screenBg: "#0a0e15",
+  bar: "#10151f",
+  tile: "#141a26",
+  text: "#e8eef6",
+  textDim: "#9fb0c4",
+  sun: "#f5c542",
+  house: "#ef8b3a",
+  battery: "#3ec46b",
+  grid: "#5b9bd5",
+  ok: "#3ec46b",
+};
+
+/** Stacked-chevron "building" logo mark: 5 angled bars forming an upward arrow. */
+function ChevronMark({
+  x,
+  y,
+  z,
+  s = 1,
+  color = "#0d1626",
+}: {
+  x: number;
+  y: number;
+  z: number;
+  s?: number;
+  color?: string;
+}) {
+  // Each chevron = two short bars meeting at the apex (an inverted V / ^).
+  const rows = [0, 1, 2, 3, 4];
+  const barLen = 0.12 * s;
+  const barTh = 0.028 * s;
+  const stepY = 0.055 * s;
+  const apexDX = 0.085 * s; // horizontal half-span of each chevron
+  const tilt = 0.62; // radians, the bar's lean
+  return (
+    <group position={[x, y, z]}>
+      {rows.map((r) => {
+        // higher rows are slightly narrower → nested "building" look
+        const span = apexDX * (1 - r * 0.08);
+        const yy = -r * stepY;
+        return (
+          <group key={r} position={[0, yy, 0]}>
+            <mesh position={[-span * 0.55, 0, 0]} rotation={[0, 0, tilt]}>
+              <boxGeometry args={[barLen, barTh, 0.02]} />
+              <meshStandardMaterial color={color} roughness={0.5} />
+            </mesh>
+            <mesh position={[span * 0.55, 0, 0]} rotation={[0, 0, -tilt]}>
+              <boxGeometry args={[barLen, barTh, 0.02]} />
+              <meshStandardMaterial color={color} roughness={0.5} />
+            </mesh>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
+/** A small flat pictogram tile icon drawn from primitive planes (low-poly, crisp). */
+function TileIcon({ kind, color }: { kind: string; color: string }) {
+  // Rendered at the tile's local origin, ~0.12 wide.
+  if (kind === "sun") {
+    return (
+      <group>
+        <mesh>
+          <circleGeometry args={[0.045, 18]} />
+          <meshBasicMaterial color={color} toneMapped={false} />
+        </mesh>
+        {Array.from({ length: 8 }).map((_, i) => {
+          const a = (i / 8) * Math.PI * 2;
+          return (
+            <mesh
+              key={i}
+              position={[Math.cos(a) * 0.075, Math.sin(a) * 0.075, 0]}
+              rotation={[0, 0, a]}
+            >
+              <planeGeometry args={[0.04, 0.014]} />
+              <meshBasicMaterial color={color} toneMapped={false} />
+            </mesh>
+          );
+        })}
+      </group>
+    );
+  }
+  if (kind === "house") {
+    return (
+      <group>
+        <mesh position={[0, -0.02, 0]}>
+          <planeGeometry args={[0.11, 0.075]} />
+          <meshBasicMaterial color={color} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, 0.045, 0]} rotation={[0, 0, Math.PI / 4]}>
+          <planeGeometry args={[0.072, 0.072]} />
+          <meshBasicMaterial color={color} toneMapped={false} />
+        </mesh>
+      </group>
+    );
+  }
+  if (kind === "battery") {
+    return (
+      <group>
+        <mesh>
+          <planeGeometry args={[0.085, 0.12]} />
+          <meshBasicMaterial color={color} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, 0.072, 0]}>
+          <planeGeometry args={[0.035, 0.018]} />
+          <meshBasicMaterial color={color} toneMapped={false} />
+        </mesh>
+        <mesh position={[0, -0.01, 0.001]}>
+          <planeGeometry args={[0.055, 0.075]} />
+          <meshBasicMaterial color={UI.screenBg} toneMapped={false} />
+        </mesh>
+      </group>
+    );
+  }
+  // pylon / grid
+  return (
+    <group>
+      <mesh position={[0, 0, 0]} rotation={[0, 0, 0.18]}>
+        <planeGeometry args={[0.016, 0.14]} />
+        <meshBasicMaterial color={color} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 0, 0]} rotation={[0, 0, -0.18]}>
+        <planeGeometry args={[0.016, 0.14]} />
+        <meshBasicMaterial color={color} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 0.03, 0]}>
+        <planeGeometry args={[0.075, 0.014]} />
+        <meshBasicMaterial color={color} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, -0.03, 0]}>
+        <planeGeometry args={[0.05, 0.014]} />
+        <meshBasicMaterial color={color} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
+interface TileDef {
+  kind: string;
+  color: string;
+  label: string;
+  value: string;
+  hint: string;
+}
+
+const TILES: TileDef[] = [
+  { kind: "sun", color: UI.sun, label: "SOLAR", value: "2.45 kW", hint: "Produktion" },
+  { kind: "house", color: UI.house, label: "HAUS", value: "1.28 kW", hint: "Verbrauch" },
+  { kind: "battery", color: UI.battery, label: "BATTERIE", value: "78 %", hint: "2.10 kW Laden" },
+  { kind: "grid", color: UI.grid, label: "NETZ", value: "0.83 kW", hint: "Bezug" },
+];
+
+/** The black recessed touchscreen UI, rendered with planes + drei <Text>. */
+function Display({
+  matRef,
+}: {
+  matRef: React.RefObject<THREE.MeshStandardMaterial | null>;
+}) {
+  const DW = 1.16;
+  const DH = 0.86;
+  const z0 = FACE_Z + 0.004; // screen surface
+  const zt = z0 + 0.004; // content layer
+
+  // 4 tiles laid out across the screen
+  const tileW = 0.26;
+  const tileH = 0.46;
+  const gap = (DW - 0.08 - tileW * 4) / 3;
+  const startX = -DW / 2 + 0.04 + tileW / 2;
+  const tileY = 0.0;
+
+  return (
+    <group position={[0, 0.2, 0]}>
+      {/* screen glass */}
+      <mesh position={[0, 0, z0]}>
+        <planeGeometry args={[DW, DH]} />
+        <meshStandardMaterial
+          ref={matRef}
+          color={UI.screenBg}
+          emissive={UI.grid}
+          emissiveIntensity={0.25}
+          roughness={0.25}
+          metalness={0.1}
+        />
+      </mesh>
+
+      {/* ── top status bar ── */}
+      <mesh position={[0, DH / 2 - 0.06, zt]}>
+        <planeGeometry args={[DW - 0.04, 0.1]} />
+        <meshBasicMaterial color={UI.bar} toneMapped={false} />
+      </mesh>
+      <Text
+        position={[-DW / 2 + 0.07, DH / 2 - 0.06, zt + 0.002]}
+        fontSize={0.05}
+        color={UI.text}
+        anchorX="left"
+        anchorY="middle"
+        letterSpacing={0.01}
+      >
+        POWERHOUSE 360
+      </Text>
+      <Text
+        position={[DW / 2 - 0.21, DH / 2 - 0.06, zt + 0.002]}
+        fontSize={0.05}
+        color={UI.textDim}
+        anchorX="right"
+        anchorY="middle"
+      >
+        10:42
+      </Text>
+      {/* wifi dot */}
+      <mesh position={[DW / 2 - 0.1, DH / 2 - 0.06, zt + 0.002]}>
+        <circleGeometry args={[0.018, 12]} />
+        <meshBasicMaterial color={UI.battery} toneMapped={false} />
+      </mesh>
+
+      {/* ── 4 tiles ── */}
+      {TILES.map((t, i) => {
+        const x = startX + i * (tileW + gap);
+        return (
+          <group key={t.label} position={[x, tileY, zt]}>
+            {/* tile bg */}
+            <mesh>
+              <planeGeometry args={[tileW, tileH]} />
+              <meshBasicMaterial color={UI.tile} toneMapped={false} />
+            </mesh>
+            {/* accent top strip */}
+            <mesh position={[0, tileH / 2 - 0.012, 0.001]}>
+              <planeGeometry args={[tileW, 0.022]} />
+              <meshBasicMaterial color={t.color} toneMapped={false} />
+            </mesh>
+            {/* icon */}
+            <group position={[0, tileH / 2 - 0.16, 0.002]} scale={0.82}>
+              <TileIcon kind={t.kind} color={t.color} />
+            </group>
+            {/* label */}
+            <Text
+              position={[0, -0.02, 0.002]}
+              fontSize={0.044}
+              color={UI.text}
+              anchorX="center"
+              anchorY="middle"
+              letterSpacing={0.02}
+              fontWeight={700}
+            >
+              {t.label}
+            </Text>
+            {/* value */}
+            <Text
+              position={[0, -0.09, 0.002]}
+              fontSize={0.052}
+              color={t.color}
+              anchorX="center"
+              anchorY="middle"
+              fontWeight={700}
+            >
+              {t.value}
+            </Text>
+            {/* hint */}
+            <Text
+              position={[0, -0.16, 0.002]}
+              fontSize={0.034}
+              color={UI.textDim}
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={tileW - 0.02}
+            >
+              {t.hint}
+            </Text>
+          </group>
+        );
+      })}
+
+      {/* ── bottom status bar ── */}
+      <mesh position={[0, -DH / 2 + 0.075, zt]}>
+        <planeGeometry args={[DW - 0.04, 0.12]} />
+        <meshBasicMaterial color={UI.bar} toneMapped={false} />
+      </mesh>
+      {/* green check chip */}
+      <mesh position={[-DW / 2 + 0.1, -DH / 2 + 0.075, zt + 0.002]}>
+        <circleGeometry args={[0.025, 14]} />
+        <meshBasicMaterial color={UI.ok} toneMapped={false} />
+      </mesh>
+      <Text
+        position={[-DW / 2 + 0.15, -DH / 2 + 0.075, zt + 0.002]}
+        fontSize={0.04}
+        color={UI.text}
+        anchorX="left"
+        anchorY="middle"
+      >
+        STATUS · Alles in Ordnung
+      </Text>
+      {/* VERLAUF button */}
+      <mesh position={[DW / 2 - 0.3, -DH / 2 + 0.075, zt + 0.001]}>
+        <planeGeometry args={[0.26, 0.07]} />
+        <meshBasicMaterial color={UI.tile} toneMapped={false} />
+      </mesh>
+      <Text
+        position={[DW / 2 - 0.3, -DH / 2 + 0.075, zt + 0.003]}
+        fontSize={0.038}
+        color={UI.textDim}
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.02}
+      >
+        VERLAUF
+      </Text>
+      {/* gear dot */}
+      <mesh position={[DW / 2 - 0.08, -DH / 2 + 0.075, zt + 0.002]}>
+        <circleGeometry args={[0.022, 8]} />
+        <meshBasicMaterial color={UI.textDim} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
 export default function Hub() {
-  const ledRef = useRef<THREE.Group>(null);
   const displayMat = useRef<THREE.MeshStandardMaterial>(null);
+  const latchRef = useRef<THREE.Group>(null);
 
   useFrame(({ clock }) => {
     const w = smooth01(emphasisWeight("hub", 1.0));
     const t = clock.elapsedTime;
     if (displayMat.current) {
-      displayMat.current.emissiveIntensity = 0.2 + w * 0.9;
-    }
-    // status LEDs blink gently
-    if (ledRef.current) {
-      ledRef.current.children.forEach((c, i) => {
-        const m = (c as THREE.Mesh).material as THREE.MeshBasicMaterial;
-        const phase = Math.sin(t * (1.4 + i * 0.4) + i) * 0.5 + 0.5;
-        m.opacity = 0.35 + phase * 0.65 * (0.5 + w * 0.5);
-      });
+      // gentle screen breathing, brighter when the chapter is active
+      displayMat.current.emissiveIntensity =
+        0.22 + w * 0.5 + Math.sin(t * 1.2) * 0.04;
     }
   });
 
   return (
     <group>
       {/* mounting backplate on wall */}
-      <mesh position={[0, 0, -0.05]}>
-        <boxGeometry args={[1.55, 2.05, 0.06]} />
+      <mesh position={[0, 0, -0.06]}>
+        <boxGeometry args={[W + 0.16, H + 0.16, 0.06]} />
         <meshStandardMaterial color={SCENE.slate} roughness={0.7} />
       </mesh>
 
-      {/* white enclosure */}
-      <mesh castShadow>
-        <boxGeometry args={[1.4, 1.9, 0.22]} />
-        <meshStandardMaterial color="#f3f5f7" roughness={0.45} metalness={0.05} />
+      {/* white enclosure body */}
+      <mesh castShadow position={[0, 0, 0.0]}>
+        <boxGeometry args={[W, H, 0.2]} />
+        <meshStandardMaterial color="#f4f6f8" roughness={0.4} metalness={0.04} />
+      </mesh>
+      {/* subtle glossy front bevel */}
+      <mesh position={[0, 0, FACE_Z - 0.002]}>
+        <planeGeometry args={[W - 0.03, H - 0.03]} />
+        <meshStandardMaterial color="#fbfcfd" roughness={0.28} metalness={0.06} />
       </mesh>
 
-      {/* top brand bar */}
-      <Text
-        position={[-0.05, 0.74, 0.12]}
-        fontSize={0.13}
-        color={SCENE.navy800}
-        anchorX="center"
-        anchorY="middle"
-        letterSpacing={0.02}
-        maxWidth={1.2}
-      >
-        POWERHOUSE 360
-      </Text>
-      {/* tiny stacked-mark hint left of wordmark */}
-      <mesh position={[-0.58, 0.74, 0.12]}>
-        <boxGeometry args={[0.1, 0.1, 0.02]} />
-        <meshStandardMaterial color={SCENE.teal} emissive={SCENE.teal} emissiveIntensity={0.5} />
-      </mesh>
+      {/* Real product photo, when provided, mapped onto the enclosure front. */}
+      {HUB_PHOTO_SRC && <HubPhoto src={HUB_PHOTO_SRC} />}
 
-      {/* black recessed display */}
-      <mesh position={[-0.12, 0.18, 0.111]}>
-        <boxGeometry args={[0.92, 0.74, 0.02]} />
-        <meshStandardMaterial
-          ref={displayMat}
-          color="#05080d"
-          emissive={SCENE.teal}
-          emissiveIntensity={0.2}
-          roughness={0.2}
-          metalness={0.1}
-        />
-      </mesh>
-      {/* faint display readout line */}
-      <Text
-        position={[-0.12, 0.32, 0.125]}
-        fontSize={0.07}
-        color={SCENE.aqua}
-        anchorX="center"
-        anchorY="middle"
-      >
-        SYSTEM · ONLINE
-      </Text>
-      <mesh position={[-0.12, 0.16, 0.124]}>
-        <planeGeometry args={[0.7, 0.012]} />
-        <meshBasicMaterial color={SCENE.teal} transparent opacity={0.6} />
-      </mesh>
-      <mesh position={[-0.12, 0.08, 0.124]}>
-        <planeGeometry args={[0.5, 0.012]} />
-        <meshBasicMaterial color={SCENE.green} transparent opacity={0.5} />
-      </mesh>
+      {!HUB_PHOTO_SRC && (
+        <>
+          {/* ── TOP: chevron mark + wordmark ── */}
+          <ChevronMark x={0} y={H / 2 - 0.18} z={FACE_Z + 0.004} s={1.0} />
+          <Text
+            position={[0, H / 2 - 0.5, FACE_Z + 0.004]}
+            fontSize={0.085}
+            color="#0d1626"
+            anchorX="center"
+            anchorY="middle"
+            letterSpacing={0.04}
+            fontWeight={800}
+          >
+            POWERHOUSE
+          </Text>
+          <Text
+            position={[0, H / 2 - 0.59, FACE_Z + 0.004]}
+            fontSize={0.06}
+            color={SCENE.slate}
+            anchorX="center"
+            anchorY="middle"
+            letterSpacing={0.16}
+          >
+            360
+          </Text>
 
-      {/* large HUB v1 lettering */}
-      <Text
-        position={[-0.12, -0.52, 0.12]}
-        fontSize={0.26}
-        color={SCENE.navy800}
-        anchorX="center"
-        anchorY="middle"
-        fontWeight={700}
-        letterSpacing={0.01}
-      >
-        HUB v1
-      </Text>
+          {/* ── CENTRE: black touchscreen UI ── */}
+          <Display matRef={displayMat} />
 
-      {/* two round latches on the right edge */}
-      {[0.42, -0.42].map((y, i) => (
-        <group key={i} position={[0.56, y, 0.115]}>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.1, 0.1, 0.04, 24]} />
-            <meshStandardMaterial color={SCENE.slateLight} metalness={0.6} roughness={0.35} />
-          </mesh>
-          <mesh position={[0, 0, 0.025]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.045, 0.045, 0.03, 16]} />
-            <meshStandardMaterial color={SCENE.navy700} metalness={0.5} roughness={0.4} />
-          </mesh>
-        </group>
-      ))}
+          {/* ── BOTTOM: HUB v1 ── */}
+          <Text
+            position={[0, -H / 2 + 0.26, FACE_Z + 0.004]}
+            fontSize={0.2}
+            color="#0d1626"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight={800}
+            letterSpacing={0.01}
+          >
+            HUB v1
+          </Text>
+        </>
+      )}
 
-      {/* status LEDs strip (bottom-left of enclosure) */}
-      <group ref={ledRef} position={[-0.5, -0.78, 0.115]}>
-        {[SCENE.green, SCENE.teal, SCENE.warm].map((col, i) => (
-          <mesh key={i} position={[i * 0.12, 0, 0]}>
-            <circleGeometry args={[0.025, 16]} />
-            <meshBasicMaterial color={col} transparent opacity={0.6} toneMapped={false} />
-          </mesh>
-        ))}
-      </group>
-
-      {/* conduits / cables running down from the enclosure */}
-      {[-0.35, 0, 0.3].map((x, i) => (
-        <mesh key={i} position={[x, -1.4, -0.02]}>
-          <cylinderGeometry args={[0.035, 0.035, 1.2, 8]} />
-          <meshStandardMaterial color={SCENE.navy600} roughness={0.6} />
-        </mesh>
-      ))}
-      {/* cable gland tray under hub */}
-      <mesh position={[0, -1.02, 0.02]}>
-        <boxGeometry args={[1.2, 0.12, 0.18]} />
-        <meshStandardMaterial color={SCENE.navy700} roughness={0.7} />
-      </mesh>
-
-      {/* small router / gateway beside the hub (to the left) */}
-      <group position={[-1.15, -0.3, 0.05]}>
-        <mesh>
-          <boxGeometry args={[0.5, 0.16, 0.34]} />
-          <meshStandardMaterial color={SCENE.navy600} roughness={0.5} metalness={0.2} />
-        </mesh>
-        {/* antennas */}
-        {[-0.12, 0.12].map((x, i) => (
-          <mesh key={i} position={[x, 0.18, -0.1]} rotation={[0.2, 0, 0]}>
-            <cylinderGeometry args={[0.012, 0.012, 0.3, 8]} />
-            <meshStandardMaterial color={SCENE.navy800} />
-          </mesh>
-        ))}
-        {/* router LEDs */}
-        {[0, 1, 2].map((i) => (
-          <mesh key={i} position={[-0.15 + i * 0.08, 0.02, 0.18]}>
-            <circleGeometry args={[0.012, 12]} />
-            <meshBasicMaterial color={SCENE.green} toneMapped={false} />
-          </mesh>
+      {/* ── RIGHT EDGE: two round metallic latches + connector pictograms ── */}
+      <group ref={latchRef}>
+        {[0.52, -0.52].map((y, i) => (
+          <group key={i} position={[W / 2 - 0.02, y, FACE_Z - 0.005]}>
+            {/* metallic latch ring */}
+            <mesh rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.075, 0.075, 0.03, 24]} />
+              <meshStandardMaterial color="#c2ccd6" metalness={0.85} roughness={0.25} />
+            </mesh>
+            <mesh position={[0, 0, 0.018]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.04, 0.04, 0.02, 16]} />
+              <meshStandardMaterial color="#7d8a98" metalness={0.7} roughness={0.35} />
+            </mesh>
+            {/* small connector/arrow pictogram beside the latch (toward centre) */}
+            <mesh position={[-0.14, 0, 0.01]} rotation={[0, 0, Math.PI]}>
+              <coneGeometry args={[0.028, 0.05, 3]} />
+              <meshStandardMaterial color={SCENE.slate} roughness={0.5} />
+            </mesh>
+          </group>
         ))}
       </group>
     </group>
+  );
+}
+
+/** Maps the real Hub photo onto a plane on the enclosure front (z just proud of
+ * the white box). Suspends while the texture loads — caught by the scene's
+ * <Suspense> boundary. Only mounted when HUB_PHOTO_SRC is set. */
+function HubPhoto({ src }: { src: string }) {
+  const tex = useTexture(src);
+  return (
+    <mesh position={[0, 0, FACE_Z + 0.006]}>
+      <planeGeometry args={[W, H]} />
+      <meshBasicMaterial map={tex} toneMapped={false} />
+    </mesh>
   );
 }

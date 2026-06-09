@@ -1,7 +1,13 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { AdaptiveDpr, BakeShadows } from "@react-three/drei";
+import {
+  AdaptiveDpr,
+  Environment,
+  Lightformer,
+  ContactShadows,
+  BakeShadows,
+} from "@react-three/drei";
 import { Suspense } from "react";
 import * as THREE from "three";
 import { SCENE } from "./palette";
@@ -13,10 +19,76 @@ import MeterCabinet from "./MeterCabinet";
 import Apartment from "./Apartment";
 import EnergyFlow from "./EnergyFlow";
 import CameraRig from "./CameraRig";
+import Effects from "./Effects";
 import { SECTIONS } from "@/content/sections";
 
-const { FLOORS, FLOOR_H, WIDTH } = BUILDING_DIMS;
-const ROOF_Y = FLOORS * FLOOR_H + 0.7;
+const { WIDTH, DEPTH, ROOF_Y } = BUILDING_DIMS;
+const DEPTH_HALF = DEPTH / 2;
+
+/**
+ * Offline image-based lighting built entirely from in-scene Lightformers, so
+ * there is NO CDN/.hdr fetch. The Environment renders these emissive planes to
+ * a cubemap that every MeshStandard/MeshPhysicalMaterial samples for real glass
+ * + metal reflections. `background={false}` → it lights the materials but does
+ * NOT overwrite the dark navy scene background.
+ *
+ *  • a large soft COOL sky panel high above (the dominant reflection),
+ *  • two warm low RECTs at street level (window / lobby bounce, dusk warmth),
+ *  • two teal RIM strips far back to give edges a cold reflective sheen.
+ *
+ * `resolution` kept modest (128) — these are soft sources, high res is wasted.
+ */
+function IBL() {
+  return (
+    <Environment resolution={128} frames={1} background={false}>
+      {/* cool soft sky dome above */}
+      <Lightformer
+        form="rect"
+        intensity={1.4}
+        color="#aac4dc"
+        scale={[40, 40, 1]}
+        position={[0, 22, 0]}
+        rotation={[Math.PI / 2, 0, 0]}
+      />
+      {/* warm low bounce, front-left (window/lobby glow) */}
+      <Lightformer
+        form="rect"
+        intensity={1.1}
+        color="#f6c178"
+        scale={[16, 6, 1]}
+        position={[-10, 3, 12]}
+        rotation={[0, Math.PI / 6, 0]}
+      />
+      {/* warm low bounce, front-right */}
+      <Lightformer
+        form="rect"
+        intensity={0.8}
+        color="#f3b25e"
+        scale={[14, 5, 1]}
+        position={[11, 2.5, 10]}
+        rotation={[0, -Math.PI / 6, 0]}
+      />
+      {/* teal rim, back-left */}
+      <Lightformer
+        form="rect"
+        intensity={0.9}
+        color="#2bb6b0"
+        scale={[6, 20, 1]}
+        position={[-16, 8, -10]}
+        rotation={[0, Math.PI / 2, 0]}
+      />
+      {/* teal rim, back-right */}
+      <Lightformer
+        form="rect"
+        intensity={0.7}
+        color="#3aa8a0"
+        scale={[6, 20, 1]}
+        position={[16, 8, -10]}
+        rotation={[0, -Math.PI / 2, 0]}
+      />
+    </Environment>
+  );
+}
 
 /**
  * The persistent building world. Pinned full-viewport behind the scrolling
@@ -28,29 +100,70 @@ const ROOF_Y = FLOORS * FLOOR_H + 0.7;
 function World() {
   return (
     <>
-      {/* Evening ambient + cool key + warm fill from the building */}
-      <ambientLight intensity={0.35} color={SCENE.navy600} />
+      {/* In-scene IBL for reflections (offline, no HDR fetch). */}
+      <IBL />
+
+      {/* Evening three-point rig: cool key + warm-ish fill + teal rim, over a
+          soft sky/ground hemisphere. Tuned to keep the calm dark mood while
+          giving PBR surfaces (PV glass, Hub latches, window mullions) believable
+          falloff and edge definition. */}
+      <ambientLight intensity={0.42} color={SCENE.navy600} />
       <hemisphereLight
-        intensity={0.5}
+        intensity={0.62}
         color={SCENE.aqua}
         groundColor={SCENE.navy900}
       />
+      {/* KEY — cool moonlight from upper-front-right. NOW the single
+          shadow-caster: soft PCSS-ish shadows ground the tower + trees. */}
       <directionalLight
-        position={[8, 14, 6]}
-        intensity={1.0}
-        color="#bcd3e0"
+        position={[9, 17, 8]}
+        intensity={1.15}
+        color="#c3d6e2"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-near={1}
+        shadow-camera-far={60}
+        shadow-camera-left={-18}
+        shadow-camera-right={18}
+        shadow-camera-top={28}
+        shadow-camera-bottom={-6}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.04}
+        shadow-radius={6}
       />
+      {/* FILL — soft warm bounce from lower-left so shadow sides don't crush */}
       <directionalLight
-        position={[-6, 4, -8]}
-        intensity={0.4}
+        position={[-7, 3, 5]}
+        intensity={0.34}
+        color={SCENE.warm}
+      />
+      {/* RIM — teal back-light to separate the tower from the navy void */}
+      <directionalLight
+        position={[-6, 6, -9]}
+        intensity={0.5}
         color={SCENE.teal}
       />
 
-      {/* Ground plane */}
+      {/* Ground plane (receives the soft key shadow) */}
       <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[120, 120]} />
         <meshStandardMaterial color="#0a1220" roughness={1} metalness={0} />
       </mesh>
+
+      {/* Soft contact shadow that GROUNDS the tower + plaza planting on the
+          plaza tile. Sits just above the reflective street so the building reads
+          as planted, not floating. Cheap (single render, blurred). */}
+      <ContactShadows
+        position={[0, 0.02, 0.5]}
+        scale={26}
+        far={9}
+        blur={2.6}
+        opacity={0.55}
+        resolution={512}
+        color="#04070d"
+        frames={1}
+      />
 
       <Building />
       <RoofPV />
@@ -59,37 +172,42 @@ function World() {
       <MeterCabinet />
       <Apartment />
 
-      {/* Subtle energy flows — roof→technical room, heat pump→building,
-          meters→building. Calm, only visible during their chapters. */}
+      {/* Subtle energy flows — roof PV → tech riser, heat pump → building.
+          Calm, only visible during their chapters. */}
       <EnergyFlow
-        from={[0, ROOF_Y, 0]}
-        to={[-0.1, 2.4, -1.6]}
+        from={[0, ROOF_Y + 0.4, DEPTH_HALF - 1.4]}
+        to={[-0.2, 4.0, -2.4]}
         color={SCENE.green}
         activeOn="pv"
-        bow={1.6}
+        bow={2.2}
         speed={0.16}
       />
       <EnergyFlow
-        from={[-WIDTH / 2 - 1.4, 1.2, 0.6]}
-        to={[-WIDTH / 2 + 0.5, 2.4, 0.4]}
+        from={[-WIDTH / 2 - 1.6, 1.4, 1.2]}
+        to={[-WIDTH / 2 + 0.4, 3.0, 0.8]}
         color={SCENE.teal}
         activeOn="heatpump"
         bow={0.8}
         speed={0.2}
       />
       <EnergyFlow
-        from={[1.9, 2.6, -1.6]}
-        to={[1.9, 5.4, -1.4]}
-        color={SCENE.aqua}
+        from={[2.9, 3.9, -2.7]}
+        to={[2.9, 5.4, -2.7]}
+        color={SCENE.teal}
         activeOn="meters"
-        bow={0.6}
+        bow={0.3}
         speed={0.22}
+        dots={2}
       />
 
       <CameraRig />
 
       {/* Distance fog blends the building into the navy void */}
       <fog attach="fog" args={[SCENE.navy900, 18, 52]} />
+
+      {/* Cinematic post: AO, selective bloom, chapter-aware tilt-shift DoF,
+          vignette. Interiors stay sharp (see Effects.tsx). */}
+      <Effects />
     </>
   );
 }
@@ -101,8 +219,8 @@ export default function BuildingScene({
 }) {
   return (
     <Canvas
-      dpr={[1, 1.8]}
-      shadows={false}
+      dpr={[1, 1.5]}
+      shadows="soft"
       gl={{
         antialias: true,
         powerPreference: "high-performance",
@@ -116,7 +234,7 @@ export default function BuildingScene({
       }}
       onCreated={({ gl, scene }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = 1.05;
+        gl.toneMappingExposure = 1.0;
         scene.background = new THREE.Color(SCENE.navy900);
         // Give the first frame a beat to render, then signal ready.
         requestAnimationFrame(() => requestAnimationFrame(() => onReady?.()));
@@ -127,6 +245,9 @@ export default function BuildingScene({
         <World />
       </Suspense>
       <AdaptiveDpr pixelated={false} />
+      {/* Light + geometry are static → bake the directional shadow map after
+          the first frames so the per-frame shadow cost drops to ~0 while the
+          camera keeps moving. */}
       <BakeShadows />
     </Canvas>
   );

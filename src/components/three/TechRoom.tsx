@@ -12,10 +12,10 @@ import Hub from "./Hub";
  * holds the POWERHOUSE Hub v1. The room is only dimly lit until the Hub
  * chapter activates, then a cool task light brings the Hub forward.
  *
- * Positioned so the Hub sits at world ≈ (-0.1, 2.0, -2.2), matching the
- * hub camera target in sections.ts.
+ * Positioned so the Hub sits on the rear (-z) interior wall of a lower floor,
+ * at world ≈ (-0.2, 3.0, -2.7), matching the hub camera target in sections.ts.
  */
-const ROOM_POS: [number, number, number] = [-0.1, 2.0, -2.2];
+const ROOM_POS: [number, number, number] = [-0.2, 3.0, -2.7];
 
 export default function TechRoom() {
   const lightRef = useRef<THREE.PointLight>(null);
@@ -23,7 +23,10 @@ export default function TechRoom() {
 
   useFrame(() => {
     const w = smooth01(emphasisWeight("hub", 1.1));
-    if (lightRef.current) lightRef.current.intensity = 0.3 + w * 6;
+    // Keep a higher floor so the white Hub enclosure never crushes to black in
+    // the recessed niche (AO + shadows darken the niche otherwise), and ramp up
+    // brighter when the hub chapter is active.
+    if (lightRef.current) lightRef.current.intensity = 1.1 + w * 7;
     if (wallMat.current) {
       (wallMat.current.color as THREE.Color).setStyle(SCENE.navy700);
       wallMat.current.emissiveIntensity = w * 0.08;
@@ -58,13 +61,24 @@ export default function TechRoom() {
         <meshStandardMaterial color={SCENE.navy800} roughness={0.9} />
       </mesh>
 
-      {/* task light */}
+      {/* task light — sits just in FRONT of (and slightly above) the Hub face
+          so the white enclosure is clearly washed. The building shell now casts
+          shadows, so the exterior directional key no longer leaks inside; this
+          light + the warm fill below carry the interior. */}
       <pointLight
         ref={lightRef}
-        position={[0.4, 1.4, 1.6]}
-        intensity={0.3}
-        color={SCENE.aqua}
-        distance={7}
+        position={[0.0, 0.9, 1.4]}
+        intensity={0.8}
+        color="#dfeef0"
+        distance={8}
+        decay={2}
+      />
+      {/* steady warm fill so the niche never reads black between chapters */}
+      <pointLight
+        position={[-0.2, -0.2, 1.2]}
+        intensity={0.7}
+        color={SCENE.warm}
+        distance={6}
         decay={2}
       />
 

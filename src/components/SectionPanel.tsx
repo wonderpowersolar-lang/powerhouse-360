@@ -50,7 +50,11 @@ export default function SectionPanel({
       <div className={`relative mx-auto flex w-full max-w-7xl px-5 sm:px-8 ${alignClasses}`}>
         <div
           className={`reveal-inner max-w-xl ${
-            section.align === "center" ? "max-w-3xl" : ""
+            section.align === "center"
+              ? section.id === "dashboard"
+                ? "max-w-6xl"
+                : "max-w-3xl"
+              : ""
           }`}
         >
           <p className="mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">

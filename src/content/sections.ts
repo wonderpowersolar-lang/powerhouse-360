@@ -54,8 +54,10 @@ export const SECTIONS: SectionDef[] = [
       { label: "Demo ansehen", href: "#cta", variant: "secondary" },
     ],
     emphasis: "building",
-    camPos: [9.5, 5.2, 13.5],
-    camTarget: [0, 4.5, 0],
+    // whole TOWER with headroom (frontal three-quarter, elevated) — pushes in.
+    // Tower is ~18u tall (7 floors + setback penthouse), centred ~y8.
+    camPos: [15, 11, 19],
+    camTarget: [0, 8.0, 0],
   },
   {
     id: "pv",
@@ -66,8 +68,11 @@ export const SECTIONS: SectionDef[] = [
       "Powermaker verbindet PV, Speicher und Monitoring zu einer wirtschaftlichen Stromlösung für Mehrfamilienhäuser.",
     align: "right",
     emphasis: "pv",
-    camPos: [5.5, 12.5, 8.5],
-    camTarget: [0, 9.6, 0],
+    // steep, CLOSE look down onto the rooftop array (centred ~y16.1, z≈1.6).
+    // Camera sits high/front so the tilted modules fill the left/centre of the
+    // frame (text block on the right). Target on the array keeps it framed.
+    camPos: [-2.2, 20.5, 7.0],
+    camTarget: [-1.0, 15.9, 1.4],
   },
   {
     id: "heat",
@@ -78,8 +83,11 @@ export const SECTIONS: SectionDef[] = [
       "Heatmaker integriert Wärmepumpen in bestehende Mehrfamilienhäuser – inklusive Planung, Umsetzung und Betriebsdaten.",
     align: "left",
     emphasis: "heatpump",
-    camPos: [-7.5, 2.6, 7.5],
-    camTarget: [-3.4, 1.4, 0.5],
+    // Proven front-left three-quarter of the outdoor unit (at ≈-4.7,0.9,1.2; fan
+    // faces -x), tower mass behind it. Low, close, slightly elevated. Headline
+    // is left-aligned; this lands the unit centre/right where it reads clearly.
+    camPos: [-9.2, 2.8, 4.8],
+    camTarget: [-4.7, 1.0, 1.2],
   },
   {
     id: "hub",
@@ -90,8 +98,15 @@ export const SECTIONS: SectionDef[] = [
       "Der POWERHOUSE Hub verbindet Zähler, Wärmepumpe, Wechselrichter, LoRaWAN-Sensorik und lokale Gebäudedaten.",
     align: "right",
     emphasis: "hub",
-    camPos: [0.4, 2.0, 4.1],
-    camTarget: [-0.1, 2.0, -2.2],
+    // INSIDE the tower envelope (outward faces back-face-cull away) so the
+    // wall-mounted Hub (≈-0.2,3.05,-2.7) reads as the LARGE hero. Headline is
+    // RIGHT-aligned, so we TARGET THE HUB ITSELF (x≈-0.2) and pull the camera
+    // close + slightly right of the Hub. This lands the portrait device big and
+    // left-of-centre, clear of the right copy, and pushes the meter cabinet
+    // (x≈1.6) off the right edge so it no longer intrudes. Near-frontal, gentle
+    // three-quarter so the latches + chevron mark + "HUB v1" read.
+    camPos: [0.25, 3.12, 1.5],
+    camTarget: [-0.15, 3.0, -2.6],
   },
   {
     id: "meters",
@@ -102,8 +117,11 @@ export const SECTIONS: SectionDef[] = [
       "Powermieter bildet Mieterstrom, Gebäudestrom, Teilnehmerlogik und Abrechnung in einem klaren Prozess ab.",
     align: "left",
     emphasis: "meters",
-    camPos: [3.0, 2.4, 4.4],
-    camTarget: [1.9, 2.2, -1.8],
+    // INSIDE the envelope, LEVEL with the cabinet centre (≈1.6,3.0,-2.5) so the
+    // full Zählerschrank reads straight-on. Staying level keeps any accent band
+    // edge-on / out of frame.
+    camPos: [1.6, 3.05, 0.3],
+    camTarget: [1.6, 3.0, -2.5],
   },
   {
     id: "residents",
@@ -114,8 +132,10 @@ export const SECTIONS: SectionDef[] = [
       "Paula begleitet Nutzer durch Vertrag, Verbrauch, Einsparung und Abrechnung – einfach und verständlich.",
     align: "right",
     emphasis: "apartment",
-    camPos: [3.6, 6.4, 5.2],
-    camTarget: [1.4, 6.2, -1.6],
+    // INSIDE the apartment on an upper floor (≈1.2,8.6,-2.2), front-left angle:
+    // warm lounge to the left, energy display + Paula card to the right.
+    camPos: [-0.2, 8.95, 0.7],
+    camTarget: [1.3, 8.6, -2.0],
   },
   {
     id: "dashboard",
@@ -126,8 +146,9 @@ export const SECTIONS: SectionDef[] = [
       "POWERHOUSE360 macht Betrieb, Abrechnung, Monitoring und Dokumentation steuerbar – über alle Energie- und Gebäudedaten hinweg.",
     align: "center",
     emphasis: "dashboard",
-    camPos: [0, 7.5, 22],
-    camTarget: [0, 6, 0],
+    // pulled back, frontal, full tower reads as a digital twin behind the cards
+    camPos: [0, 9.0, 25],
+    camTarget: [0, 8, 0],
   },
   {
     id: "cta",
@@ -142,8 +163,9 @@ export const SECTIONS: SectionDef[] = [
       { label: "Demo buchen", href: "#cta", variant: "secondary" },
     ],
     emphasis: "all",
-    camPos: [11, 6, 15],
-    camTarget: [0, 4.8, 0],
+    // pull back out to the whole connected tower (mirrors the hero, other side)
+    camPos: [13.5, 11, 19.5],
+    camTarget: [0, 8.0, 0],
   },
 ];
 
