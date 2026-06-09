@@ -32,13 +32,13 @@ import { SECTIONS } from "@/content/sections";
  *  • SMAA      — cheap edge AA so the post chain doesn't re-introduce jaggies.
  */
 
-// Chapters that sit INSIDE the building envelope, close to a hero asset →
-// must stay SHARP (no miniature blur).
-const INTERIOR = new Set(["hub", "meters", "residents"]);
+// Chapters that sit INSIDE the building / garage / stairwell envelope, close to
+// a hero asset → must stay SHARP (no miniature blur).
+const INTERIOR = new Set(["hub", "chargemieter", "smokemieter", "residents"]);
 // Chapters that frame a CLOSE exterior hero asset (PV array, heat pump). The
 // tilt-shift miniature look would smear these, so they get a SHARP subject and
 // only a whisper of background bokeh.
-const CLOSE_SUBJECT = new Set(["pv", "heat"]);
+const CLOSE_SUBJECT = new Set(["powermieter", "heatmieter"]);
 // The wide architectural shots where the full miniature tilt-shift reads best.
 const WIDE = new Set(["hero", "dashboard", "cta"]);
 

@@ -8,7 +8,19 @@ const fs = require("fs");
 const OUT = "/tmp/ph360-anchor";
 const URL = process.env.PH_URL || "http://localhost:3000";
 const want = process.argv.slice(2);
-const SECTIONS = want.length ? want : ["dashboard", "residents", "meters"];
+const SECTIONS = want.length
+  ? want
+  : [
+      "hero",
+      "powermieter",
+      "heatmieter",
+      "hub",
+      "chargemieter",
+      "smokemieter",
+      "residents",
+      "dashboard",
+      "cta",
+    ];
 
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -46,7 +58,7 @@ const SECTIONS = want.length ? want : ["dashboard", "residents", "meters"];
       await page.mouse.wheel(0, Math.max(-700, Math.min(700, d)));
       await page.waitForTimeout(55);
     }
-    await page.waitForTimeout(1800);
+    await page.waitForTimeout(3200);
     const file = `${OUT}/${id}.png`;
     await page.screenshot({ path: file });
     console.log(`shot #${id} @ y=${await page.evaluate(() => Math.round(window.scrollY))}`);

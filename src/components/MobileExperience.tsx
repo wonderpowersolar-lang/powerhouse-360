@@ -4,6 +4,8 @@ import { SECTIONS } from "@/content/sections";
 import { ButtonLink } from "./ui/Button";
 import BuildingArt from "./BuildingArt";
 import DashboardOverlay from "./DashboardOverlay";
+import ProductPanel from "./ProductPanel";
+import ResidentsOverlay from "./ResidentsOverlay";
 
 /**
  * Mobile / reduced-motion experience.
@@ -80,6 +82,22 @@ export default function MobileExperience() {
             <p className="mt-3 text-[15px] leading-relaxed text-ink-dim">
               {s.subline}
             </p>
+
+            {/* simplified, static product card (no scroll coupling on mobile) */}
+            {s.panel && (
+              <ProductPanel
+                panel={s.panel}
+                index={s.index}
+                side="left"
+                reduceCoupling
+              />
+            )}
+
+            {s.id === "residents" && (
+              <div className="mt-5">
+                <ResidentsOverlay />
+              </div>
+            )}
 
             {s.id === "dashboard" && (
               <div className="mt-5 [&_*]:text-left">

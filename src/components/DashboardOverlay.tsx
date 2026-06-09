@@ -1,15 +1,16 @@
 "use client";
 
 import EnergyFlowOverlay from "./EnergyFlowOverlay";
+import { PRODUCT_WORLDS, DASHBOARD_KPIS } from "@/content/sections";
 
 /**
- * Section 7 — PowerPilot management dashboard.
+ * Section 7 — "Ein System. Vier Produktwelten. Ein Gebäude."
  *
- * A polished, light "app window" floating over the dark digital-twin scene
- * (on-brand per REF-F, which ships light screens). It reads as a real PropTech
- * product: window chrome + POWERHOUSE360 branding, the energy-flow building hero
- * (with the Vermieter/Mieter toggle), a column of KPI cards + an
- * Abrechnungsfortschritt donut, and an Abrechnungsübersicht table.
+ * A polished, light "app window" floating over the dark digital-twin scene. It
+ * reads as a real PropTech platform: window chrome + POWERHOUSE360 branding, a
+ * row of FOUR product-world modules (Powermieter / Heatmieter / Chargemieter /
+ * Smokemieter), the live energy-flow building hero, a column of platform KPI
+ * tiles + an Abrechnungsfortschritt donut, and an Abrechnungsübersicht table.
  *
  * Token-driven, responsive, keyboard-accessible. The window is the only
  * interactive surface; the rest of the panel passes scroll through.
@@ -71,6 +72,50 @@ export default function DashboardOverlay() {
             </span>
             <span className="hidden md:inline">Hausverwaltung</span>
           </div>
+        </div>
+
+        {/* ── FOUR PRODUCT WORLDS module row ── */}
+        <div className="grid grid-cols-2 gap-3 border-b border-slate-200 bg-slate-50/60 p-5 sm:p-6 lg:grid-cols-4">
+          {PRODUCT_WORLDS.map((m) => (
+            <div
+              key={m.name}
+              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-3.5 shadow-[0_8px_24px_-16px_rgba(15,30,60,0.25)]"
+            >
+              <span
+                className="absolute left-0 top-0 h-full w-1"
+                style={{ background: m.accent }}
+              />
+              <div className="flex items-center gap-2">
+                <span
+                  className="grid h-7 w-7 place-items-center rounded-lg"
+                  style={{ background: `${m.accent}1f` }}
+                >
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: m.accent }} />
+                </span>
+                <div className="leading-tight">
+                  <p className="text-sm font-bold text-navy-900">{m.name}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: m.accent }}>
+                    {m.domain}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-2.5 text-xs leading-snug text-slate-500">{m.desc}</p>
+              <span className="mt-2.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> aktiv
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* ── platform KPI strip ── */}
+        <div className="grid grid-cols-2 gap-2.5 border-b border-slate-200 px-5 py-4 sm:px-6 md:grid-cols-5">
+          {DASHBOARD_KPIS.map((k) => (
+            <div key={k.label} className="rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
+              <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">{k.label}</p>
+              <p className="mt-0.5 text-base font-bold tabular-nums text-navy-900">{k.value}</p>
+              <p className="text-[10px] text-slate-400">{k.trend}</p>
+            </div>
+          ))}
         </div>
 
         {/* body */}
@@ -158,8 +203,8 @@ export default function DashboardOverlay() {
 
       {/* caption */}
       <p className="mt-4 text-center text-xs text-ink-faint">
-        PowerPilot — ein System für Eigentümer, Hausverwaltung und Bewohner. Betrieb,
-        Abrechnung, Monitoring und Dokumentation auf einer Plattform.
+        Ein System. Vier Produktwelten. Ein Gebäude. POWERHOUSE360 verbindet Betrieb,
+        Abrechnung und Gebäudedaten auf einer Plattform.
       </p>
     </div>
   );

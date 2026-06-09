@@ -15,9 +15,10 @@ import Building, { BUILDING_DIMS } from "./Building";
 import RoofPV from "./RoofPV";
 import HeatPump from "./HeatPump";
 import TechRoom from "./TechRoom";
-import MeterCabinet from "./MeterCabinet";
 import Apartment from "./Apartment";
 import EnergyFlow from "./EnergyFlow";
+import { Garage } from "./Wallbox";
+import { Stairwell } from "./SmokeDetector";
 import CameraRig from "./CameraRig";
 import Effects from "./Effects";
 import { SECTIONS } from "@/content/sections";
@@ -169,10 +170,16 @@ function World() {
       <RoofPV />
       <HeatPump />
       <TechRoom />
-      <MeterCabinet />
       <Apartment />
 
-      {/* Subtle energy flows — roof PV → tech riser, heat pump → building.
+      {/* Chargemieter — underground garage with wallbox wall + parked car. Sits
+          below grade so it never intrudes on the exterior shots. */}
+      <Garage pos={[0, -2.0, -1.0]} />
+
+      {/* Smokemieter — mid-floor stairwell landing with ceiling detector. */}
+      <Stairwell pos={[0, 6.4, -2.4]} />
+
+      {/* Subtle energy flows — roof PV → building riser, heat pump → wall.
           Calm, only visible during their chapters. */}
       <EnergyFlow
         from={[0, ROOF_Y + 0.4, DEPTH_HALF - 1.4]}
@@ -183,21 +190,12 @@ function World() {
         speed={0.16}
       />
       <EnergyFlow
-        from={[-WIDTH / 2 - 1.6, 1.4, 1.2]}
-        to={[-WIDTH / 2 + 0.4, 3.0, 0.8]}
+        from={[-WIDTH / 2 - 1.9, 2.0, 1.4]}
+        to={[-WIDTH / 2 + 0.4, 3.2, 0.8]}
         color={SCENE.teal}
         activeOn="heatpump"
-        bow={0.8}
+        bow={0.9}
         speed={0.2}
-      />
-      <EnergyFlow
-        from={[2.9, 3.9, -2.7]}
-        to={[2.9, 5.4, -2.7]}
-        color={SCENE.teal}
-        activeOn="meters"
-        bow={0.3}
-        speed={0.22}
-        dots={2}
       />
 
       <CameraRig />

@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { ButtonLink } from "./ui/Button";
+import ProductPanel from "./ProductPanel";
 import type { SectionDef } from "@/content/sections";
 
 /**
@@ -41,14 +42,20 @@ export default function SectionPanel({
       id={section.id}
       ref={ref}
       data-section={section.index}
-      className="reveal relative flex min-h-dvh w-full snap-start"
+      className="reveal relative w-full"
+      style={{ minHeight: "165vh" }}
       aria-labelledby={`${section.id}-h`}
     >
-      {/* directional scrim */}
-      <div className={`pointer-events-none absolute inset-0 ${scrim}`} />
+      {/* Sticky inner viewport so the copy + product card stay centred and in
+          view through the whole tall section — this is what makes each station
+          HOLD: the camera plateaus (scrollProgress) while this panel rests on
+          screen for the extra scroll distance. */}
+      <div className={`sticky top-0 flex h-dvh w-full ${alignClasses}`}>
+        {/* directional scrim */}
+        <div className={`pointer-events-none absolute inset-0 ${scrim}`} />
 
-      <div className={`relative mx-auto flex w-full max-w-7xl px-5 sm:px-8 ${alignClasses}`}>
-        <div
+        <div className={`relative mx-auto flex w-full max-w-7xl px-5 sm:px-8 ${alignClasses}`}>
+          <div
           className={`reveal-inner max-w-xl ${
             section.align === "center"
               ? section.id === "dashboard"
@@ -87,7 +94,17 @@ export default function SectionPanel({
             </div>
           )}
 
+          {/* Data-driven floating product card (scroll-coupled reveal). */}
+          {section.panel && (
+            <ProductPanel
+              panel={section.panel}
+              index={section.index}
+              side={section.align}
+            />
+          )}
+
           {children}
+          </div>
         </div>
       </div>
     </section>

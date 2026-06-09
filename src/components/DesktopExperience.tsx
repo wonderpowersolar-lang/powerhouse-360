@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { SECTIONS } from "@/content/sections";
 import SectionPanel from "./SectionPanel";
 import DashboardOverlay from "./DashboardOverlay";
-import ResidentsOverlay from "./ResidentsOverlay";
 import SceneLoader from "./SceneLoader";
 import BuildingArt from "./BuildingArt";
 
@@ -104,7 +103,6 @@ export default function DesktopExperience() {
         {SECTIONS.map((s) => (
           <SectionPanel key={s.id} section={s}>
             {s.id === "dashboard" && <DashboardOverlay />}
-            {s.id === "residents" && <ResidentsOverlay />}
           </SectionPanel>
         ))}
       </div>

@@ -2,7 +2,39 @@
 
 import { ReactLenis, useLenis } from "lenis/react";
 import { useEffect } from "react";
-import { setProgress } from "@/lib/scrollProgress";
+import { setProgress, setSectionRaw } from "@/lib/scrollProgress";
+
+/**
+ * Compute the DOM-anchored raw section float from the actual `[data-section]`
+ * elements: find the section whose band the viewport TOP currently sits in, and
+ * return `index + (scrollY - top) / height`. Robust to unequal section heights,
+ * Nav and Footer offsets — unlike a flat `progress * (N-1)` map.
+ */
+function computeSectionRaw(): number | null {
+  const els = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-section]")
+  );
+  if (!els.length) return null;
+  const y = window.scrollY;
+  // sort by document position
+  const tops = els
+    .map((el) => ({
+      index: Number(el.getAttribute("data-section")) || 0,
+      top: y + el.getBoundingClientRect().top,
+      height: el.offsetHeight || window.innerHeight,
+    }))
+    .sort((a, b) => a.top - b.top);
+
+  // before the first section
+  if (y <= tops[0].top) return tops[0].index;
+  for (let k = 0; k < tops.length; k++) {
+    const s = tops[k];
+    if (y >= s.top && y < s.top + s.height) {
+      return s.index + Math.min(0.9999, (y - s.top) / s.height);
+    }
+  }
+  return tops[tops.length - 1].index;
+}
 
 /**
  * Single Lenis smooth-scroll root for the whole app.
@@ -17,8 +49,12 @@ import { setProgress } from "@/lib/scrollProgress";
  */
 function ScrollBridge() {
   useLenis((lenis) => {
-    // lenis.progress is 0..1 across the full scrollable height.
+    // lenis.progress is 0..1 across the full scrollable height (kept for the
+    // mobile/static path + as a fallback), but the camera follows the
+    // DOM-anchored section float so unequal heights never desync the story.
     setProgress(lenis.progress ?? 0);
+    const raw = computeSectionRaw();
+    if (raw != null) setSectionRaw(raw);
   });
 
   // Keep the store in sync even before the first Lenis tick (e.g. SSR hydration).
@@ -27,6 +63,8 @@ function ScrollBridge() {
       const max =
         document.documentElement.scrollHeight - window.innerHeight || 1;
       setProgress(window.scrollY / max);
+      const raw = computeSectionRaw();
+      if (raw != null) setSectionRaw(raw);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -53,11 +91,13 @@ export default function SmoothScroll({
     <ReactLenis
       root
       options={{
-        lerp: 0.085,
-        duration: 1.25,
+        // Softer lerp + longer duration → calmer inertia so the camera glides
+        // between the plateaued station keyframes instead of darting.
+        lerp: 0.06,
+        duration: 1.5,
         smoothWheel: !reduced,
-        wheelMultiplier: 1,
-        touchMultiplier: 1.4,
+        wheelMultiplier: 0.9,
+        touchMultiplier: 1.3,
       }}
     >
       <ScrollBridge />

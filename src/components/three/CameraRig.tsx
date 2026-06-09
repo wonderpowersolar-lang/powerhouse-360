@@ -50,8 +50,10 @@ export default function CameraRig({ enabled = true }: { enabled?: boolean }) {
       curTarget.current.copy(_curTarget);
       inited.current = true;
     } else {
-      // critically-damped follow — calm, no hectic motion
-      const k = 1 - Math.pow(0.0009, delta);
+      // critically-damped follow — calm, no hectic motion. Slightly softer than
+      // before so the plateaued keyframes (scrollProgress hold zones) are reached
+      // with a gentle ease-in/settle rather than a snap.
+      const k = 1 - Math.pow(0.0007, delta);
       camera.position.lerp(_pos, k);
       curTarget.current.lerp(_curTarget, k);
     }
