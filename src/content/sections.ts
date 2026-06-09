@@ -100,13 +100,18 @@ export const SECTIONS: SectionDef[] = [
     emphasis: "hub",
     // INSIDE the tower envelope (outward faces back-face-cull away) so the
     // wall-mounted Hub (≈-0.2,3.05,-2.7) reads as the LARGE hero. Headline is
-    // RIGHT-aligned, so we TARGET THE HUB ITSELF (x≈-0.2) and pull the camera
-    // close + slightly right of the Hub. This lands the portrait device big and
-    // left-of-centre, clear of the right copy, and pushes the meter cabinet
-    // (x≈1.6) off the right edge so it no longer intrudes. Near-frontal, gentle
-    // three-quarter so the latches + chevron mark + "HUB v1" read.
-    camPos: [0.25, 3.12, 1.5],
-    camTarget: [-0.15, 3.0, -2.6],
+    // IMPORTANT — read before editing these numbers:
+    // The DOM #hub anchor settles at section-float s≈2.54, NOT the pure hub
+    // keyframe (s=3.0). So the camera the viewer SEES is a ~56% blend from the
+    // HEAT keyframe (heatPos x≈-9.2,+z) toward this one; the pure values below
+    // are never shown directly. They were SOLVED so that the blend at s=2.54
+    // lands the camera at ≈[0.4,3.1,1.6] looking at the Hub centre ≈[-0.3,3,-2.7]
+    // — i.e. ~4.3u frontal, Hub big in the LEFT-centre, right ~45% clear for the
+    // right-aligned copy. The brighter TechRoom fill keeps the white enclosure
+    // bright so the 4-tile screen + "HUB v1" read. (Solve: kf=(view-heat·(1-f))/f,
+    // f=smoothstep(0.54)≈0.563.) Verified against the qa-anchor #hub screenshot.
+    camPos: [7.85, 3.33, -0.88],
+    camTarget: [3.12, 4.55, -5.73],
   },
   {
     id: "meters",

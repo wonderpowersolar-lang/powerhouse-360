@@ -21,12 +21,17 @@ export default function TechRoom() {
   const lightRef = useRef<THREE.PointLight>(null);
   const wallMat = useRef<THREE.MeshStandardMaterial>(null);
 
+  const fillRef = useRef<THREE.PointLight>(null);
+
   useFrame(() => {
     const w = smooth01(emphasisWeight("hub", 1.1));
     // Keep a higher floor so the white Hub enclosure never crushes to black in
     // the recessed niche (AO + shadows darken the niche otherwise), and ramp up
-    // brighter when the hub chapter is active.
-    if (lightRef.current) lightRef.current.intensity = 1.1 + w * 7;
+    // much brighter when the hub chapter is active so the white device reads as
+    // a bright hero (was reading dark in headless review).
+    if (lightRef.current) lightRef.current.intensity = 1.8 + w * 9;
+    // A broad cool front fill that lifts the whole enclosure face evenly.
+    if (fillRef.current) fillRef.current.intensity = 1.0 + w * 4.5;
     if (wallMat.current) {
       (wallMat.current.color as THREE.Color).setStyle(SCENE.navy700);
       wallMat.current.emissiveIntensity = w * 0.08;
@@ -68,15 +73,25 @@ export default function TechRoom() {
       <pointLight
         ref={lightRef}
         position={[0.0, 0.9, 1.4]}
-        intensity={0.8}
-        color="#dfeef0"
-        distance={8}
+        intensity={1.8}
+        color="#eaf4f6"
+        distance={9}
+        decay={2}
+      />
+      {/* broad cool front fill, placed further out + centred on the face so the
+          whole white enclosure lifts evenly (not just a hot spot near the top). */}
+      <pointLight
+        ref={fillRef}
+        position={[0.1, 0.2, 2.4]}
+        intensity={1.0}
+        color="#dbe9ef"
+        distance={11}
         decay={2}
       />
       {/* steady warm fill so the niche never reads black between chapters */}
       <pointLight
         position={[-0.2, -0.2, 1.2]}
-        intensity={0.7}
+        intensity={0.9}
         color={SCENE.warm}
         distance={6}
         decay={2}

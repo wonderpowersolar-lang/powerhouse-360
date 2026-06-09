@@ -6,7 +6,7 @@ const { chromium } = require("playwright");
 const fs = require("fs");
 
 const OUT = "/tmp/ph360-anchor";
-const URL = "http://localhost:3000";
+const URL = process.env.PH_URL || "http://localhost:3000";
 const want = process.argv.slice(2);
 const SECTIONS = want.length ? want : ["dashboard", "residents", "meters"];
 

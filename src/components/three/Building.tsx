@@ -6,6 +6,7 @@ import { MeshReflectorMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { SCENE } from "./palette";
 import { emphasisWeight } from "./emphasis";
+import { usePBR, ensureUv2 } from "./textures";
 
 /**
  * POWERHOUSE360 — the residential TOWER (REF-A).
@@ -57,6 +58,14 @@ const WIN_H = 1.45;
 export default function Building() {
   const winRef = useRef<THREE.InstancedMesh>(null);
   const litFlags = useRef<number[]>([]);
+
+  // ── Real concrete PBR maps on the facade (the main realism lever) ─────────
+  // The light-grey CC0 concrete albedo is multiplied by the dark anthracite
+  // `color`, so we keep the calm dusk mood AND gain real grain + normal relief +
+  // roughness variation. Body is ~6 m wide × ~15 m tall → tile a 1 m² scan ~3×
+  // across, ~5× up so the concrete reads life-sized. Plinth gets a denser repeat.
+  const bodyTex = usePBR("concrete", [3, 5]);
+  const plinthTex = usePBR("concrete", [3, 1]);
 
   // ── Window + frame + sill instanced transforms (built once) ──────────────
   const { winMatrices, lit, frameMatrices, sillMatrices } = useMemo(() => {
@@ -196,25 +205,44 @@ export default function Building() {
   return (
     <group>
       {/* ───────────────── MAIN MASSING ───────────────── */}
-      {/* glazed ground floor / lobby plinth (slightly inset, darker) */}
-      <mesh position={[0, GROUND_H / 2, 0]} receiveShadow>
+      {/* glazed ground floor / lobby plinth (slightly inset, darker) — real
+          concrete maps tinted dark navy. */}
+      <mesh position={[0, GROUND_H / 2, 0]} receiveShadow ref={ensureUv2}>
         <boxGeometry args={[WIDTH + 0.02, GROUND_H, DEPTH + 0.02]} />
         <meshStandardMaterial
           color={SCENE.navy900}
-          roughness={0.78}
-          metalness={0.14}
+          map={plinthTex.map}
+          normalMap={plinthTex.normalMap}
+          roughnessMap={plinthTex.roughnessMap}
+          aoMap={plinthTex.aoMap}
+          aoMapIntensity={0.6}
+          normalScale={new THREE.Vector2(0.7, 0.7)}
+          roughness={0.85}
+          metalness={0.12}
           envMapIntensity={0.7}
         />
       </mesh>
-      {/* main tower body (anthracite concrete). Slightly lower roughness + a
-          modest envMapIntensity so the cool sky lightformer grazes the facade
-          and gives the concrete believable, non-flat falloff. */}
-      <mesh position={[0, GROUND_H + (BODY_TOP - GROUND_H) / 2, 0]} castShadow receiveShadow>
+      {/* main tower body (anthracite concrete). REAL concrete albedo + normal +
+          roughness + AO, multiplied by the dark anthracite `color` so the dusk
+          mood survives while the facade gains believable scanned grain + relief.
+          A modest envMapIntensity lets the cool sky lightformer graze it. */}
+      <mesh
+        position={[0, GROUND_H + (BODY_TOP - GROUND_H) / 2, 0]}
+        castShadow
+        receiveShadow
+        ref={ensureUv2}
+      >
         <boxGeometry args={[WIDTH, BODY_TOP - GROUND_H, DEPTH]} />
         <meshStandardMaterial
           color={SCENE.navy800}
-          roughness={0.72}
-          metalness={0.16}
+          map={bodyTex.map}
+          normalMap={bodyTex.normalMap}
+          roughnessMap={bodyTex.roughnessMap}
+          aoMap={bodyTex.aoMap}
+          aoMapIntensity={0.65}
+          normalScale={new THREE.Vector2(0.85, 0.85)}
+          roughness={0.78}
+          metalness={0.14}
           envMapIntensity={0.85}
         />
       </mesh>
@@ -609,6 +637,14 @@ function Plaza() {
   const PLAZA = 15; // plaza tile half-extent-ish
   const upRef = useRef<THREE.Group>(null);
 
+  // Real ground PBR maps. Asphalt on the street (tiled fine so the aggregate
+  // grain reads at road scale across the ~21 m strip), paving stones on the
+  // sidewalk band (tiled so individual stones read at ~0.5 m). The reflective
+  // street keeps its wet sheen via MeshReflectorMaterial while now carrying real
+  // asphalt color/normal/roughness; the sidewalk is a plain PBR surface.
+  const asphalt = usePBR("asphalt", [10, 1.6]);
+  const paving = usePBR("paving", [(WIDTH + 3) / 1.3, (DEPTH + 3) / 1.3]);
+
   useFrame(({ clock }) => {
     // gentle breathing of the warm uplights
     if (!upRef.current) return;
@@ -641,10 +677,27 @@ function Plaza() {
           envMapIntensity={0.4}
         />
       </mesh>
-      {/* lighter sidewalk band around tower */}
-      <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      {/* lighter sidewalk band around tower — real paving-stone maps tinted to
+          the cool slate of the plaza. */}
+      <mesh
+        position={[0, 0.015, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+        ref={ensureUv2}
+      >
         <planeGeometry args={[WIDTH + 3.0, DEPTH + 3.0]} />
-        <meshStandardMaterial color="#222d3d" roughness={0.85} metalness={0.12} envMapIntensity={0.5} />
+        <meshStandardMaterial
+          color="#3a4761"
+          map={paving.map}
+          normalMap={paving.normalMap}
+          roughnessMap={paving.roughnessMap}
+          aoMap={paving.aoMap}
+          aoMapIntensity={0.7}
+          normalScale={new THREE.Vector2(0.8, 0.8)}
+          roughness={0.9}
+          metalness={0.1}
+          envMapIntensity={0.5}
+        />
       </mesh>
 
       {/* dark asphalt street wrapping the front (+z) — wet-asphalt reflection,
@@ -653,15 +706,19 @@ function Plaza() {
       <mesh position={[0, 0.008, DEPTH / 2 + 4.6]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[PLAZA + 6, 3.4]} />
         <MeshReflectorMaterial
-          color="#0a0f19"
-          roughness={0.6}
-          metalness={0.35}
+          color="#11161f"
+          map={asphalt.map}
+          normalMap={asphalt.normalMap}
+          roughnessMap={asphalt.roughnessMap}
+          normalScale={new THREE.Vector2(0.6, 0.6)}
+          roughness={0.62}
+          metalness={0.3}
           blur={[400, 120]}
           mixBlur={1.4}
-          mixStrength={10}
+          mixStrength={8}
           mixContrast={1.2}
           resolution={512}
-          mirror={0.35}
+          mirror={0.3}
           depthScale={0.8}
           minDepthThreshold={0.3}
           maxDepthThreshold={1.4}
