@@ -72,20 +72,22 @@ export default function SceneLoader({ hidden }: { hidden: boolean }) {
 
       <LogoMark size={44} className="mb-5 animate-pulse opacity-90" />
 
-      <p className="text-sm font-medium tracking-wide text-ink-dim">
-        Gebäude wird geladen…
+      {/* brand + claim (station 00) */}
+      <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand-teal">
+        Powerhouse 360
+      </p>
+      <p className="mt-2 max-w-md px-6 text-center text-xl font-bold leading-snug text-ink sm:text-2xl">
+        Das Betriebssystem deiner Immobilie.
       </p>
 
-      <div className="mt-5 h-px w-40 overflow-hidden rounded-full bg-white/10">
-        <div className="h-full w-1/2 animate-[loader_1.4s_ease-in-out_infinite] bg-gradient-to-r from-brand-green to-brand-teal" />
+      {/* energy line — a travelling light pulse along a hairline */}
+      <div className="relative mt-6 h-px w-56 overflow-hidden rounded-full bg-white/10">
+        <div className="h-full w-1/3 animate-[energy-line_1.6s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-brand-teal to-brand-green" />
       </div>
 
-      <style>{`
-        @keyframes loader {
-          0% { transform: translateX(-120%); }
-          100% { transform: translateX(260%); }
-        }
-      `}</style>
+      <p className="mt-4 text-xs font-medium tracking-wide text-ink-faint">
+        Gebäude wird geladen…
+      </p>
     </div>
   );
 }

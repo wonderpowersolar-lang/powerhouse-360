@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- plain Node QA harness, not app code */
 /* Visual QA harness — drives REAL Chrome (GPU/SwiftShader) against the dev
  * server, scrolls through the 8 chapters like a user (wheel events so Lenis
  * tracks), and captures a screenshot + console diagnostics per section.

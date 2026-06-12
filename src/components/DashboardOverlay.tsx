@@ -1,16 +1,18 @@
 "use client";
 
 import EnergyFlowOverlay from "./EnergyFlowOverlay";
+import MetricCard from "./ui/MetricCard";
 import { PRODUCT_WORLDS, DASHBOARD_KPIS } from "@/content/sections";
 
 /**
- * Section 7 — "Ein System. Vier Produktwelten. Ein Gebäude."
+ * Station 07 — "Fünf Module. Ein System. Ein Gebäude."
  *
  * A polished, light "app window" floating over the dark digital-twin scene. It
- * reads as a real PropTech platform: window chrome + POWERHOUSE360 branding, a
- * row of FOUR product-world modules (Powermieter / Heatmieter / Chargemieter /
- * Smokemieter), the live energy-flow building hero, a column of platform KPI
- * tiles + an Abrechnungsfortschritt donut, and an Abrechnungsübersicht table.
+ * reads as a real PropTech platform: window chrome + POWERHOUSE360 branding,
+ * the numbered launch-blueprint row of FIVE modules (01 Powermieter ·
+ * 02 Heatmieter · 03 Hub · 04 Chargemieter · 05 Smokemieter — Razorpay
+ * pattern), the live energy-flow building hero, platform KPI MetricCards + an
+ * Abrechnungsfortschritt donut, and an Abrechnungsübersicht table.
  *
  * Token-driven, responsive, keyboard-accessible. The window is the only
  * interactive surface; the rest of the panel passes scroll through.
@@ -46,7 +48,7 @@ const DONUT = [
 
 export default function DashboardOverlay() {
   return (
-    <div className="pointer-events-auto mx-auto mt-9 w-full max-w-6xl text-left">
+    <div className="pointer-events-auto mx-auto w-full max-w-6xl text-left">
       {/* ── App window ── */}
       <div className="overflow-hidden rounded-3xl border border-white/10 bg-white shadow-[0_40px_120px_-30px_rgba(5,12,26,0.85)] ring-1 ring-black/5">
         {/* window chrome */}
@@ -74,8 +76,8 @@ export default function DashboardOverlay() {
           </div>
         </div>
 
-        {/* ── FOUR PRODUCT WORLDS module row ── */}
-        <div className="grid grid-cols-2 gap-3 border-b border-slate-200 bg-slate-50/60 p-5 sm:p-6 lg:grid-cols-4">
+        {/* ── FIVE NUMBERED MODULES — the launch blueprint row ── */}
+        <div className="grid grid-cols-2 gap-3 border-b border-slate-200 bg-slate-50/60 p-5 sm:p-6 lg:grid-cols-5">
           {PRODUCT_WORLDS.map((m) => (
             <div
               key={m.name}
@@ -85,6 +87,13 @@ export default function DashboardOverlay() {
                 className="absolute left-0 top-0 h-full w-1"
                 style={{ background: m.accent }}
               />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-2.5 top-1.5 select-none text-2xl font-bold tabular-nums"
+                style={{ color: m.accent, opacity: 0.22 }}
+              >
+                {m.num}
+              </span>
               <div className="flex items-center gap-2">
                 <span
                   className="grid h-7 w-7 place-items-center rounded-lg"
@@ -107,14 +116,16 @@ export default function DashboardOverlay() {
           ))}
         </div>
 
-        {/* ── platform KPI strip ── */}
+        {/* ── platform KPI strip (shared MetricCard) ── */}
         <div className="grid grid-cols-2 gap-2.5 border-b border-slate-200 px-5 py-4 sm:px-6 md:grid-cols-5">
           {DASHBOARD_KPIS.map((k) => (
-            <div key={k.label} className="rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
-              <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">{k.label}</p>
-              <p className="mt-0.5 text-base font-bold tabular-nums text-navy-900">{k.value}</p>
-              <p className="text-[10px] text-slate-400">{k.trend}</p>
-            </div>
+            <MetricCard
+              key={k.label}
+              label={k.label}
+              value={k.value}
+              sub={k.trend}
+              tone="light"
+            />
           ))}
         </div>
 
@@ -201,24 +212,17 @@ export default function DashboardOverlay() {
         </div>
       </div>
 
-      {/* caption */}
-      <p className="mt-4 text-center text-xs text-ink-faint">
-        Ein System. Vier Produktwelten. Ein Gebäude. POWERHOUSE360 verbindet Betrieb,
-        Abrechnung und Gebäudedaten auf einer Plattform.
-      </p>
     </div>
   );
 }
 
 /** Conic-gradient donut with a centred label. */
 function Donut({ segments, center }: { segments: { value: number; color: string }[]; center: string }) {
-  let acc = 0;
+  const cumulative = segments.map((_, i) =>
+    segments.slice(0, i + 1).reduce((sum, s) => sum + s.value, 0)
+  );
   const stops = segments
-    .map((s) => {
-      const from = acc;
-      acc += s.value;
-      return `${s.color} ${from}% ${acc}%`;
-    })
+    .map((s, i) => `${s.color} ${cumulative[i] - s.value}% ${cumulative[i]}%`)
     .join(", ");
   return (
     <div

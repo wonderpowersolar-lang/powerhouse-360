@@ -1,19 +1,23 @@
 /**
  * POWERHOUSE360 — single source of truth for the 9 scroll chapters.
  *
- * EDIT COPY HERE. Each entry pairs the German marketing copy with the camera
- * keyframe + which 3D element is emphasised + the data-driven ProductPanel
- * (the floating product card that eases in once the camera settles). The scene
- * (BuildingScene.tsx) interpolates the camera between consecutive keyframes
- * based on the plateaued section-float (scrollProgress.ts), so reordering /
- * retiming chapters is a data change, not a code change.
+ * EDIT COPY HERE. Copy is the FINAL client-approved wording from
+ * docs/DESIGN-DIRECTION.md (§4 panel texts verbatim, §10 hero/final copy).
+ * Each entry pairs the German marketing copy with the camera keyframe + which
+ * 3D element is emphasised + the numbered ProductPanel (the floating product
+ * card that reveals once the camera settles). The scene (BuildingScene.tsx)
+ * interpolates the camera between consecutive keyframes based on the
+ * plateaued section-float (scrollProgress.ts) using the per-section `hold`
+ * value, so reordering / retiming chapters is a data change, not a code
+ * change.
  *
  * Camera coordinates are in world units. The building sits at the origin,
  * footprint 6 × 6 (x,z), occupied massing ~y0..15.6, roof ~y15.6.
  *
- * THE STORY — modular Building-OS with FOUR product worlds:
- *   Powermieter (Strom) · Heatmieter (Wärme + Heizkosten) ·
- *   Chargemieter (Wallboxen/Laden) · Smokemieter (Rauchmelder/Sicherheit).
+ * THE STORY — the Building-OS with numbered product worlds 01–07:
+ *   01 Powermieter (Strom) · 02 Heatmieter (Wärme) · 03 POWERHOUSE Hub ·
+ *   04 Chargemieter (Laden) · 05 Smokemieter (Sicherheit) ·
+ *   06 Bewohnerportal · 07 POWERHOUSE 360 Plattform.
  */
 
 import type { Vector3Tuple } from "three";
@@ -29,7 +33,7 @@ export type Emphasis =
   | "dashboard"
   | "all";
 
-/** A small KPI chip shown inside a ProductPanel. */
+/** A small KPI chip shown inside a ProductPanel (rendered via MetricCard). */
 export interface PanelKpi {
   label: string;
   value: string;
@@ -39,9 +43,12 @@ export interface PanelKpi {
 
 /** Data-driven ProductPanel content for a section (the floating product card). */
 export interface ProductPanelDef {
+  /** chapter / product number, "01".."07" — the Razorpay numeral leitmotif */
+  number: string;
   /** small tag above the title */
   tag: string;
   title: string;
+  /** §4 panel subline */
   subtitle: string;
   bullets: string[];
   kpis?: PanelKpi[];
@@ -54,7 +61,7 @@ export interface ProductPanelDef {
 export interface SectionDef {
   id: string;
   index: number;
-  /** small label shown above the headline */
+  /** small label shown above the headline — `01 / Powermieter` style */
   kicker: string;
   headline: string;
   subline: string;
@@ -67,6 +74,11 @@ export interface SectionDef {
   camPos: Vector3Tuple;
   /** camera look-at target at the *centre* of this chapter */
   camTarget: Vector3Tuple;
+  /**
+   * Plateau share of this station's scroll band, 0..1 (motionTokens §5).
+   * Default 0.75. Heatmieter 0.8; hero/dashboard/cta long.
+   */
+  hold?: number;
   /** the floating product card for this station (optional on hero/cta) */
   panel?: ProductPanelDef;
 }
@@ -76,16 +88,17 @@ export const SECTIONS: SectionDef[] = [
   {
     id: "hero",
     index: 0,
-    kicker: "Das Building-OS",
-    headline: "POWERHOUSE360 macht Mehrfamilienhäuser intelligent.",
+    kicker: "Powerhouse 360",
+    headline: "Das Betriebssystem deiner Immobilie.",
     subline:
-      "Strom, Wärme, Laden, Sicherheit und Abrechnung – verbunden in einem System.",
+      "Strom, Wärme, Laden, Sicherheit und Abrechnung – verbunden in einem intelligenten System für Mehrfamilienhäuser.",
     align: "left",
     cta: [
-      { label: "System entdecken", href: "#dashboard", variant: "primary" },
+      { label: "System entdecken", href: "#powermieter", variant: "primary" },
       { label: "Pilotobjekt anfragen", href: "#cta", variant: "secondary" },
     ],
     emphasis: "building",
+    hold: 0.8,
     // Whole tower, frontal three-quarter, elevated dusk push-in. Pulled back
     // far enough that the roof + PV array stay IN frame (REF-1 full-building
     // night render).
@@ -97,12 +110,13 @@ export const SECTIONS: SectionDef[] = [
   {
     id: "powermieter",
     index: 1,
-    kicker: "01 — Powermieter",
-    headline: "Die Stromplattform für Mehrfamilienhäuser.",
+    kicker: "01 / Powermieter",
+    headline: "Strom im Mehrfamilienhaus wirtschaftlich betreiben.",
     subline:
-      "Powermieter verbindet PV-Erzeugung, Energiefluss und Messung zu einer wirtschaftlichen Stromlösung.",
+      "Mieterstrom, Gebäudestrom, Energiefluss und Abrechnung in einem klaren System.",
     align: "right",
     emphasis: "pv",
+    hold: 0.78,
     // The METERING MOMENT (REF-3): inside the bright plant room, frontal on
     // the white Zählerwand (cabinet door + five meter columns, world x≈-2.7..
     // 0.55, centred ≈3.0 high on the back wall at z≈-2.8). Camera rests just
@@ -111,21 +125,23 @@ export const SECTIONS: SectionDef[] = [
     camPos: [-0.85, 3.1, 0.9],
     camTarget: [-1.05, 3.0, -2.8],
     panel: {
+      number: "01",
       tag: "Produktwelt · Strom",
       title: "Powermieter",
-      subtitle: "Die Stromplattform für Mehrfamilienhäuser",
+      subtitle:
+        "Mieterstrom, Gebäudestrom, Energiefluss und Abrechnung in einem klaren System.",
       bullets: [
-        "Mieterstrom & Gebäudestrom",
-        "Energiefluss transparent machen",
-        "Stromkosten senken",
-        "Bewohner fair abrechnen",
-        "Lokale Energie wirtschaftlich nutzen",
+        "PV-Strom lokal nutzen",
+        "Mieter fair abrechnen",
+        "Energieflüsse transparent machen",
+        "Netzbezug und Eigenverbrauch sichtbar machen",
+        "Abrechnung und Betrieb digitalisieren",
       ],
       kpis: [
-        { label: "Eigenverbrauch", value: "68 %", bar: 0.68 },
         { label: "PV-Anteil", value: "54 %", bar: 0.54 },
+        { label: "Eigenverbrauch", value: "68 %", bar: 0.68 },
         { label: "Netzbezug", value: "−31 %", bar: 0.31 },
-        { label: "Einsparung", value: "1.840 €", bar: 0.6 },
+        { label: "Ersparnis", value: "1.840 €", bar: 0.6 },
       ],
       theme: "dark",
       accent: "green",
@@ -136,12 +152,13 @@ export const SECTIONS: SectionDef[] = [
   {
     id: "heatmieter",
     index: 2,
-    kicker: "02 — Heatmieter",
-    headline: "Wärme, Verbrauch und Heizkosten digital gedacht.",
+    kicker: "02 / Heatmieter",
+    headline: "Wärme und Heizkosten digital verstehen.",
     subline:
-      "Heatmieter integriert Wärmepumpen, macht den Wärmeverbrauch sichtbar und digitalisiert die Heizkostenabrechnung.",
+      "Heatmieter verbindet Wärmepumpe, Verbrauchsdaten, Heizkostenabrechnung und Optimierung.",
     align: "left",
     emphasis: "heatpump",
+    hold: 0.8,
     // Front-three-quarter of the WIDE anthracite louvre monobloc (REF-4). Unit
     // centre is at x≈4.7 on the right plaza edge, front (louvre) face = +x.
     // Camera sits low-front-right so the horizontal-louvre intake + service
@@ -150,22 +167,24 @@ export const SECTIONS: SectionDef[] = [
     camPos: [9.4, 1.85, 4.7],
     camTarget: [4.35, 0.9, 1.7],
     panel: {
+      number: "02",
       tag: "Produktwelt · Wärme",
       title: "Heatmieter",
-      subtitle: "Wärme, Verbrauch und Heizkosten digital gedacht",
+      subtitle:
+        "Heatmieter verbindet Wärmepumpe, Verbrauchsdaten, Heizkostenabrechnung und Optimierung.",
       bullets: [
-        "Wärmepumpen-Integration",
-        "Wärmeverbrauch transparent machen",
-        "Heizkostenabrechnung digitalisieren",
-        "Grundlage für Optimierung schaffen",
-        "Betrieb und Verbrauch intelligent verbinden",
+        "Wärmepumpenbetrieb sichtbar machen",
+        "Wärmeverbrauch je Gebäude/Einheit analysieren",
+        "Heizkostenabrechnung vorbereiten",
+        "CO₂- und Verbrauchsdaten verständlich darstellen",
+        "Optimierungspotenziale erkennen",
       ],
       kpis: [
         { label: "Vorlauf", value: "38 °C", bar: 0.52 },
         { label: "Rücklauf", value: "29 °C", bar: 0.4 },
-        { label: "Verbrauch", value: "12,4 MWh", bar: 0.62 },
-        { label: "Wärmekosten", value: "−24 %", bar: 0.5 },
-        { label: "CO₂", value: "−41 %", bar: 0.66 },
+        { label: "Wärmeverbrauch", value: "12,4 MWh", bar: 0.62 },
+        { label: "CO₂-Kosten", value: "−41 %", bar: 0.66 },
+        { label: "Heizkostenstatus", value: "vorbereitet", bar: 0.9 },
       ],
       theme: "dark",
       accent: "teal",
@@ -176,12 +195,13 @@ export const SECTIONS: SectionDef[] = [
   {
     id: "hub",
     index: 3,
-    kicker: "03 — POWERHOUSE Hub",
+    kicker: "03 / POWERHOUSE Hub",
     headline: "Die lokale Schaltzentrale im Gebäude.",
     subline:
-      "Der POWERHOUSE Hub verbindet Geräte und Datenpunkte und vernetzt Strom, Wärme, Laden und Sicherheit.",
+      "Der Hub verbindet Geräte, Sensoren, Zähler und Gebäudedaten zu einem steuerbaren System.",
     align: "right",
     emphasis: "hub",
+    hold: 0.78,
     // INSIDE the tower envelope (outward faces back-face-cull away). The Hub
     // now hangs on the bare light-grey concrete section at world x≈1.62
     // (REF-2), with the Zählerwand + server rack as left-background context.
@@ -189,20 +209,23 @@ export const SECTIONS: SectionDef[] = [
     camPos: [2.5, 3.12, 1.8],
     camTarget: [1.72, 2.98, -2.7],
     panel: {
-      tag: "Das Gebäudehirn",
+      number: "03",
+      tag: "Produktwelt · Vernetzung",
       title: "POWERHOUSE Hub",
-      subtitle: "Die lokale Schaltzentrale im Gebäude",
+      subtitle:
+        "Der Hub verbindet Geräte, Sensoren, Zähler und Gebäudedaten zu einem steuerbaren System.",
       bullets: [
-        "Verbindet Geräte und Datenpunkte",
-        "Vernetzt Strom, Wärme, Laden und Sicherheit",
-        "Schafft die Grundlage für Monitoring und Abrechnung",
-        "Lokales Gebäudehirn für das Building-OS",
+        "verbindet Strom, Wärme, Laden und Sicherheit",
+        "lokale Gebäudedatenplattform",
+        "Schnittstelle zu Zählern, Wärmepumpe, Sensorik und Cloud",
+        "Grundlage für Monitoring, Abrechnung und Betrieb",
+        "macht aus Technik ein digitales Gebäudesystem",
       ],
       kpis: [
-        { label: "Datenpunkte", value: "248", bar: 0.8 },
         { label: "Geräte online", value: "32 / 33", bar: 0.97 },
-        { label: "Latenz", value: "12 ms", bar: 0.3 },
-        { label: "Uptime", value: "99,9 %", bar: 0.99 },
+        { label: "Datenpunkte", value: "248", bar: 0.8 },
+        { label: "Gateway-Status", value: "Online", bar: 1 },
+        { label: "Verbindungsqualität", value: "99,9 %", bar: 0.99 },
       ],
       theme: "light",
       accent: "teal",
@@ -213,33 +236,37 @@ export const SECTIONS: SectionDef[] = [
   {
     id: "chargemieter",
     index: 4,
-    kicker: "04 — Chargemieter",
-    headline: "Wallboxen und Ladeabrechnung fürs MFH.",
+    kicker: "04 / Chargemieter",
+    headline: "Ladeinfrastruktur für Mehrfamilienhäuser abrechenbar machen.",
     subline:
-      "Chargemieter integriert Wallboxen, verwaltet Ladepunkte und rechnet Ladevorgänge fair ab – mit Lastmanagement.",
+      "Wallboxen, Ladepunkte, Lastmanagement und Abrechnung in einem System.",
     align: "left",
     emphasis: "wallbox",
+    hold: 0.76,
     // INSIDE the garage volume (pos y-2.0). Back wall (wallboxes) is at world
     // z≈-3.8, boxes at world y≈-1.65, x≈-2.2..0.8. Camera sits close + three-
     // quarter so the lit wallbox row + car read as the hero, left clear for copy.
     camPos: [2.4, -1.3, -1.4],
     camTarget: [-0.9, -1.55, -3.6],
     panel: {
+      number: "04",
       tag: "Produktwelt · Laden",
       title: "Chargemieter",
-      subtitle: "Wallboxen und Ladeabrechnung für Mehrfamilienhäuser",
+      subtitle:
+        "Wallboxen, Ladepunkte, Lastmanagement und Abrechnung in einem System.",
       bullets: [
-        "Wallboxen im MFH integrieren",
-        "Ladepunkte verwalten",
-        "Stromverbräuche erfassen",
-        "Lastmanagement ermöglichen",
+        "Ladepunkte im MFH verwalten",
+        "Verbrauch je Nutzer erfassen",
+        "Lastspitzen vermeiden",
         "Ladevorgänge abrechnen",
+        "Ladeinfrastruktur skalierbar betreiben",
       ],
       kpis: [
-        { label: "Ladepunkte aktiv", value: "6 / 8", bar: 0.75 },
-        { label: "Ladeleistung", value: "11 kW", bar: 0.5 },
-        { label: "Verbrauch", value: "284 kWh", bar: 0.58 },
-        { label: "Verfügbarkeit", value: "98 %", bar: 0.98 },
+        { label: "aktive Ladepunkte", value: "6 / 8", bar: 0.75 },
+        { label: "aktuelle Ladeleistung", value: "44 kW", bar: 0.5 },
+        { label: "Lastreserve", value: "38 %", bar: 0.38 },
+        { label: "Ladevorgänge", value: "312 / Monat", bar: 0.58 },
+        { label: "Abrechnungsstatus", value: "automatisch", bar: 1 },
       ],
       theme: "light",
       accent: "aqua",
@@ -250,12 +277,13 @@ export const SECTIONS: SectionDef[] = [
   {
     id: "smokemieter",
     index: 5,
-    kicker: "05 — Smokemieter",
-    headline: "Digitale Rauchmelderverwaltung für den Bestand.",
+    kicker: "05 / Smokemieter",
+    headline: "Rauchmelder digital verwalten.",
     subline:
-      "Smokemieter behält Status und Wartung der Rauchmelder im Blick und macht den Sicherheitsstatus transparent.",
+      "Sicherheitsstatus, Wartung und Geräteverwaltung für den Bestand.",
     align: "right",
     emphasis: "smoke",
+    hold: 0.75,
     // INSIDE the stairwell volume (pos y6.4, ceiling world y≈7.9). The ceiling
     // detector hangs at world ≈ (0, 7.56, -1.6). Camera sits directly below-
     // front looking UP so the round detector + its LED read clearly as the
@@ -264,91 +292,124 @@ export const SECTIONS: SectionDef[] = [
     camPos: [0.1, 6.7, 1.0],
     camTarget: [0.0, 7.48, -1.65],
     panel: {
+      number: "05",
       tag: "Produktwelt · Sicherheit",
       title: "Smokemieter",
-      subtitle: "Digitale Rauchmelderverwaltung für den Bestand",
+      subtitle:
+        "Sicherheitsstatus, Wartung und Geräteverwaltung für den Bestand.",
       bullets: [
         "Rauchmelderstatus im Blick",
-        "Wartung und Service organisieren",
-        "Sicherheitsstatus transparent machen",
-        "Gebäudeschutz digital verwalten",
+        "Wartung digital organisieren",
+        "Geräte und Räume zuordnen",
+        "Servicefälle dokumentieren",
+        "Sicherheit transparent machen",
       ],
       kpis: [
-        { label: "Status ok", value: "46 / 48", bar: 0.96 },
-        { label: "Wartung fällig", value: "2", bar: 0.12 },
         { label: "Geräte online", value: "48", bar: 1 },
-        { label: "Alarmhistorie", value: "0 / 30 T", bar: 0.02 },
+        { label: "Status OK", value: "46 / 48", bar: 0.96 },
+        { label: "Wartung fällig", value: "2", bar: 0.12 },
+        { label: "letzter Test", value: "vor 3 Tagen", bar: 0.9 },
+        { label: "Alarmhistorie", value: "0 / 30 Tage", bar: 0.02 },
       ],
       theme: "light",
       accent: "amber",
     },
   },
 
-  // ──────────────────────────────────────────────────── 6 · RESIDENTS
+  // ──────────────────────────────────────────────────── 6 · BEWOHNERPORTAL
   {
     id: "residents",
     index: 6,
-    kicker: "06 — Für Bewohner",
-    headline: "Für Bewohner verständlich und einfach.",
+    kicker: "06 / Bewohnerportal",
+    headline: "Energie wird für Bewohner verständlich.",
     subline:
-      "Alle Energie- und Gebäudethemen in einer klaren Nutzererfahrung – Verbrauch, Kosten und Services auf einen Blick.",
+      "Verbrauch, Kosten, Abrechnung und Services in einer einfachen Nutzererfahrung.",
     align: "right",
     emphasis: "apartment",
+    hold: 0.76,
     // INSIDE the apartment on an upper floor (≈1.2,8.6,-2.2), front-left angle:
     // warm lounge to the left, wall display + Paula card to the right.
     camPos: [-0.2, 8.95, 0.7],
     camTarget: [1.55, 8.6, -2.0],
     panel: {
-      tag: "Bewohnererlebnis",
-      title: "Für Bewohner verständlich und einfach",
+      number: "06",
+      tag: "Produktwelt · Bewohner",
+      title: "Bewohnerportal",
       subtitle:
-        "Alle Energie- und Gebäudethemen in einer klaren Nutzererfahrung",
+        "Verbrauch, Kosten, Abrechnung und Services in einer einfachen Nutzererfahrung.",
       bullets: [
-        "Verbrauch verstehen",
+        "Strom- und Wärmeverbrauch sehen",
         "Kosten nachvollziehen",
-        "Energieflüsse sehen",
+        "Verträge und Abrechnung verstehen",
         "Services digital nutzen",
+        "Paula als Energie-Assistentin",
       ],
       kpis: [
-        { label: "Verbrauch", value: "8,7 kWh", bar: 0.45 },
-        { label: "Vom Dach", value: "68 %", bar: 0.68 },
-        { label: "Gespart", value: "31 €", bar: 0.55 },
+        { label: "Solarstromanteil", value: "68 %", bar: 0.68 },
+        { label: "Verbrauch heute", value: "8,7 kWh", bar: 0.45 },
+        { label: "Kostenprognose", value: "86 € / Monat", bar: 0.55 },
+        { label: "Status Wohnung", value: "alles ok", bar: 1 },
       ],
       theme: "dark",
       accent: "green",
     },
   },
 
-  // ──────────────────────────────────────────────────── 7 · DASHBOARD
+  // ──────────────────────────────────────────────────── 7 · PLATTFORM
   {
     id: "dashboard",
     index: 7,
-    kicker: "07 — Ein System",
-    headline: "Ein System. Vier Produktwelten. Ein Gebäude.",
+    kicker: "07 / Plattform",
+    headline: "Fünf Module. Ein System. Ein Gebäude.",
     subline:
-      "POWERHOUSE360 verbindet Betrieb, Abrechnung und Gebäudedaten – über alle Energie- und Gebäudethemen hinweg.",
+      "Alle Produktwelten laufen in einer zentralen Verwaltungsansicht zusammen.",
     align: "center",
     emphasis: "dashboard",
+    hold: 0.8,
     // Pulled back, frontal — the full tower reads as a digital twin behind the
     // platform window.
     camPos: [0, 9.0, 25],
     camTarget: [0, 8, 0],
+    panel: {
+      number: "07",
+      tag: "Plattform",
+      title: "POWERHOUSE 360 Plattform",
+      subtitle:
+        "Ein System für Betrieb, Abrechnung und Gebäudedaten.",
+      bullets: [
+        "Objektübersicht für Hausverwaltung und Eigentümer",
+        "Strom, Wärme, Laden und Sicherheit in einem System",
+        "Monitoring und Abrechnung verbunden",
+        "transparente Daten für Entscheidungen",
+        "Grundlage für den digitalen Gebäudebetrieb",
+      ],
+      kpis: [
+        { label: "Systemstatus", value: "Online", bar: 1 },
+        { label: "CO₂-Ersparnis", value: "24,6 t / a", bar: 0.7 },
+        { label: "Geräte online", value: "126", bar: 0.95 },
+        { label: "Abrechnung bereit", value: "98 %", bar: 0.98 },
+        { label: "Objektperformance", value: "A+", bar: 0.92 },
+      ],
+      theme: "dark",
+      accent: "teal",
+    },
   },
 
-  // ──────────────────────────────────────────────────────── 8 · CTA
+  // ──────────────────────────────────────────────────────── 8 · FINAL
   {
     id: "cta",
     index: 8,
-    kicker: "Vom Gebäude zur Plattform",
-    headline: "Vom Gebäude zur Plattform.",
+    kicker: "Powerhouse 360",
+    headline: "Das Betriebssystem deiner Immobilie.",
     subline:
-      "POWERHOUSE360 macht Mehrfamilienhäuser wirtschaftlicher, transparenter und zukunftsfähig.",
+      "Vom Mehrfamilienhaus zum intelligenten Energie-Asset – wirtschaftlich, transparent und zukunftsfähig.",
     align: "left",
     cta: [
       { label: "Demo buchen", href: "#cta", variant: "primary" },
-      { label: "Pilot starten", href: "#cta", variant: "secondary" },
+      { label: "Pilotobjekt starten", href: "#cta", variant: "secondary" },
     ],
     emphasis: "all",
+    hold: 0.85,
     // Pull back out to the whole connected tower (mirrors the hero, other
     // side) — roof + PV kept in frame like REF-1.
     camPos: [14.5, 12.8, 20.5],
@@ -366,27 +427,51 @@ export const NAV_LINKS = [
   { label: "Plattform", href: "#dashboard" },
 ];
 
-/** The four product worlds — used by the dashboard module grid. */
+/** ModuleNavigation chapter indicator (00–08): number + short label per station. */
+export const STATION_LABELS: Record<string, string> = {
+  hero: "Start",
+  powermieter: "Powermieter",
+  heatmieter: "Heatmieter",
+  hub: "Hub",
+  chargemieter: "Chargemieter",
+  smokemieter: "Smokemieter",
+  residents: "Bewohner",
+  dashboard: "Plattform",
+  cta: "Kontakt",
+};
+
+/** The five numbered modules — used by the dashboard module grid (§10 bracket). */
 export const PRODUCT_WORLDS = [
   {
+    num: "01",
     name: "Powermieter",
     domain: "Strom",
     desc: "Mieterstrom, Gebäudestrom & Energiefluss",
     accent: "#43b649",
   },
   {
+    num: "02",
     name: "Heatmieter",
     domain: "Wärme & Heizkosten",
     desc: "Wärmepumpe, Verbrauch & Heizkostenabrechnung",
     accent: "#2bb6b0",
   },
   {
+    num: "03",
+    name: "POWERHOUSE Hub",
+    domain: "Vernetzung",
+    desc: "Geräte, Zähler & Sensorik verbunden",
+    accent: "#5b9bd5",
+  },
+  {
+    num: "04",
     name: "Chargemieter",
     domain: "Wallboxen",
     desc: "Ladepunkte, Lastmanagement & Ladeabrechnung",
     accent: "#80cec1",
   },
   {
+    num: "05",
     name: "Smokemieter",
     domain: "Rauchmelder",
     desc: "Status, Wartung & Sicherheitsnachweis",
@@ -394,7 +479,7 @@ export const PRODUCT_WORLDS = [
   },
 ] as const;
 
-/** Dashboard KPI tiles (Section 7). */
+/** Dashboard KPI tiles (platform window strip). */
 export const DASHBOARD_KPIS = [
   { label: "Systemstatus", value: "Online", trend: "alle Module" },
   { label: "CO₂ vermieden", value: "24,6 t", trend: "/ Jahr" },

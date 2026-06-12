@@ -38,20 +38,22 @@ const { WIDTH } = BUILDING_DIMS;
 const POS: [number, number, number] = [WIDTH / 2 + 1.7, 0, 1.5];
 
 // ── body dimensions (wide monobloc; front face = +x) ───────────────────────
-const BODY_D = 0.78; // along x (depth of unit; front face at +x)
-const BODY_H = 1.05; // height — clearly wider than tall
-const BODY_W = 1.9; // along z (width of unit)
+// Moodframe 03-heatpump-station.png: the unit is wider than tall at ~1.3–1.4,
+// NOT a long slab — body resized to match.
+const BODY_D = 0.74; // along x (depth of unit; front face at +x)
+const BODY_H = 1.18; // height
+const BODY_W = 1.62; // along z (width of unit) — W:H ≈ 1.37 per moodframe
 const PAD_H = 0.1;
 const FOOT_H = 0.22;
-const BODY_CY = PAD_H + FOOT_H + BODY_H / 2; // ≈ 0.845
-const FRONT_X = BODY_D / 2; // +0.39 local
+const BODY_CY = PAD_H + FOOT_H + BODY_H / 2; // ≈ 0.91
+const FRONT_X = BODY_D / 2; // +0.37 local
 
 // Louvre region (left ~2/3 of the front in the camera's view = larger z) and
 // service panel (right ~1/3 = smaller z).
-const LOUVRE_CZ = 0.32; // centre z of the louvre region
-const LOUVRE_W = 1.16; // louvre span along z
-const PANEL_CZ = -0.62; // centre z of the smooth service panel
-const PANEL_W = 0.56;
+const LOUVRE_CZ = 0.26; // centre z of the louvre region
+const LOUVRE_W = 1.0; // louvre span along z
+const PANEL_CZ = -0.5; // centre z of the smooth service panel
+const PANEL_W = 0.48;
 
 const ANTHRACITE = "#2b3036";
 const ANTHRACITE_DARK = "#23272c";
@@ -82,9 +84,10 @@ export default function HeatPump() {
       return seed / 233280;
     };
     const out: { x: number; z: number; r: number; c: string }[] = [];
-    const cols = ["#454d57", "#566069", "#3c444e"];
+    // light river pebbles per moodframe (warm grey-beige, not dark slate)
+    const cols = ["#7d7e80", "#8e8a84", "#6a6c70", "#98948d"];
     // along the two long edges (±x of pad) and the two short edges (±z)
-    for (let i = 0; i < 26; i++) {
+    for (let i = 0; i < 44; i++) {
       const t = rng();
       const edge = i % 4;
       const padX = 0.85;
@@ -104,12 +107,13 @@ export default function HeatPump() {
         z = -padZ - 0.08 - rng() * 0.1;
         x = -padX + t * padX * 2;
       }
-      out.push({ x, z, r: 0.035 + rng() * 0.045, c: cols[i % 3] });
+      out.push({ x, z, r: 0.035 + rng() * 0.045, c: cols[i % 4] });
     }
     return out;
   }, []);
 
-  const louvres = useMemo(() => Array.from({ length: 15 }, (_, i) => i), []);
+  // FINE horizontal louvres (moodframe: dense, thin fins over ~2/3 of front)
+  const louvres = useMemo(() => Array.from({ length: 22 }, (_, i) => i), []);
 
   return (
     <group position={POS}>
@@ -133,7 +137,7 @@ export default function HeatPump() {
       ))}
 
       {/* ── TWO concrete block feet ── */}
-      {[-0.55, 0.55].map((z, i) => (
+      {[-0.5, 0.5].map((z, i) => (
         <mesh key={`foot${i}`} position={[0, PAD_H + FOOT_H / 2, z]} castShadow>
           <boxGeometry args={[0.55, FOOT_H, 0.3]} />
           <meshStandardMaterial color="#5d646c" roughness={0.9} metalness={0.05} />
@@ -195,10 +199,10 @@ export default function HeatPump() {
       </group>
       {/* fine HORIZONTAL louvres across the intake */}
       {louvres.map((i) => {
-        const y = BODY_CY - (BODY_H - 0.2) / 2 + (i * (BODY_H - 0.2)) / 14;
+        const y = BODY_CY - (BODY_H - 0.2) / 2 + (i * (BODY_H - 0.2)) / 21;
         return (
-          <mesh key={`lv${i}`} position={[FRONT_X + 0.012, y, LOUVRE_CZ]} rotation={[0, 0, -0.5]}>
-            <boxGeometry args={[0.05, 0.022, LOUVRE_W]} />
+          <mesh key={`lv${i}`} position={[FRONT_X + 0.012, y, LOUVRE_CZ]} rotation={[0, 0, -0.38]}>
+            <boxGeometry args={[0.045, 0.015, LOUVRE_W]} />
             <meshStandardMaterial color={ANTHRACITE_DARK} roughness={0.55} metalness={0.25} />
           </mesh>
         );
@@ -224,12 +228,13 @@ export default function HeatPump() {
           envMapIntensity={0.9}
         />
       </mesh>
-      {/* thin vertical status strip on the panel's inner edge */}
-      <mesh position={[FRONT_X + 0.014, BODY_CY + 0.05, PANEL_CZ + PANEL_W / 2 - 0.08]}>
-        <boxGeometry args={[0.012, 0.42, 0.024]} />
+      {/* thin HORIZONTAL status light strip near the panel top (moodframe:
+          a discreet cool-white LED line, breathing — never neon) */}
+      <mesh position={[FRONT_X + 0.014, BODY_CY + 0.3, PANEL_CZ]}>
+        <boxGeometry args={[0.012, 0.016, PANEL_W * 0.72]} />
         <meshBasicMaterial
           ref={stripRef}
-          color={SCENE.teal}
+          color="#d9e9e6"
           transparent
           opacity={0.3}
           toneMapped={false}
@@ -237,9 +242,9 @@ export default function HeatPump() {
       </mesh>
       {/* small brand mark on the service panel */}
       <Text
-        position={[FRONT_X + 0.014, BODY_CY - 0.34, PANEL_CZ - 0.06]}
+        position={[FRONT_X + 0.014, BODY_CY - 0.4, PANEL_CZ]}
         rotation={[0, Math.PI / 2, 0]}
-        fontSize={0.045}
+        fontSize={0.042}
         color="#8d97a1"
         anchorX="center"
         anchorY="middle"
@@ -334,27 +339,33 @@ export default function HeatPump() {
         </mesh>
       ))}
 
-      {/* ── vertical-slat dark fence behind-right of the unit ── */}
+      {/* ── vertical-slat WOOD fence behind-right (moodframe: warm brown
+          timber slats catching the downlight, not anthracite) ── */}
       <group position={[-0.3, 0, -1.55]}>
         {Array.from({ length: 13 }).map((_, i) => (
           <mesh key={`sl${i}`} position={[-1.0 + i * 0.17, 0.62, 0]} castShadow>
             <boxGeometry args={[0.08, 1.24, 0.022]} />
-            <meshStandardMaterial color="#22262b" roughness={0.8} metalness={0.1} />
+            <meshStandardMaterial
+              color={i % 2 ? "#4a3a28" : "#3e3022"}
+              roughness={0.85}
+              metalness={0.02}
+            />
           </mesh>
         ))}
         {[0.28, 0.98].map((y, i) => (
           <mesh key={`rl${i}`} position={[0.02, y, -0.025]}>
             <boxGeometry args={[2.2, 0.05, 0.02]} />
-            <meshStandardMaterial color="#1b1f24" roughness={0.8} />
+            <meshStandardMaterial color="#332718" roughness={0.85} />
           </mesh>
         ))}
       </group>
 
-      {/* ── ornamental grass tufts ── */}
+      {/* ── ornamental grass tufts (moodframe: prominent tall grasses) ── */}
       {[
-        { p: [-0.45, 0, 1.65] as [number, number, number], s: 1.0 },
-        { p: [0.75, 0, -1.35], s: 0.85 },
-        { p: [-1.05, 0, -0.9], s: 0.75 },
+        { p: [-0.45, 0, 1.65] as [number, number, number], s: 1.2 },
+        { p: [0.75, 0, -1.35], s: 1.0 },
+        { p: [-1.05, 0, -0.9], s: 0.9 },
+        { p: [0.15, 0, -1.7], s: 1.1 },
       ].map((g, gi) => (
         <group key={`gr${gi}`} position={g.p as [number, number, number]} scale={g.s}>
           {Array.from({ length: 7 }).map((_, i) => {

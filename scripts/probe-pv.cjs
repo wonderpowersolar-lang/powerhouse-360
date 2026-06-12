@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- plain Node QA harness, not app code */
 const { chromium } = require("playwright");
 (async () => {
   const browser = await chromium.launch({ channel: "chrome", headless: true,

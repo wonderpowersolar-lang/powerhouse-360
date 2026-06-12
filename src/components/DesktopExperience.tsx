@@ -7,6 +7,8 @@ import SectionPanel from "./SectionPanel";
 import DashboardOverlay from "./DashboardOverlay";
 import SceneLoader from "./SceneLoader";
 import BuildingArt from "./BuildingArt";
+import ModuleNavigation from "./ModuleNavigation";
+import TransitionVeil from "./TransitionVeil";
 
 /** R3F canvas — client only, no SSR. */
 const BuildingScene = dynamic(() => import("./three/BuildingScene"), {
@@ -37,21 +39,19 @@ function hasWebGL(): boolean {
  */
 export default function DesktopExperience() {
   const [ready, setReady] = useState(false);
-  const [webgl, setWebgl] = useState<boolean | null>(null);
+  // DesktopExperience only mounts client-side (Experience decides after
+  // mount), so WebGL support can be detected in the state initializer.
+  const [webgl] = useState<boolean | null>(() =>
+    typeof window === "undefined" ? null : hasWebGL()
+  );
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Decide WebGL support before mounting the canvas.
-  useEffect(() => {
-    const ok = hasWebGL();
-    setWebgl(ok);
-    if (!ok) setReady(true); // no canvas → reveal content immediately
-  }, []);
-
-  // Safety net: never trap the user on the loader. If the scene hasn't
-  // signalled ready within 6s (lost WebGL context, slow device), reveal anyway.
+  // Perceived-loader cap (§9: max ~2.5s): if the scene hasn't signalled ready
+  // by then (slow device, lost WebGL context), reveal anyway — the canvas
+  // keeps warming up behind the content.
   useEffect(() => {
     if (ready) return;
-    const t = setTimeout(() => setReady(true), 6000);
+    const t = setTimeout(() => setReady(true), 2500);
     return () => clearTimeout(t);
   }, [ready]);
 
@@ -93,10 +93,15 @@ export default function DesktopExperience() {
               "radial-gradient(130% 100% at 50% 45%, transparent 55%, rgba(9,15,26,0.55) 100%)",
           }}
         />
+        {/* Darken pulse during big interior↔exterior camera jumps (§5). */}
+        <TransitionVeil />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-navy-900/80 to-transparent" />
       </div>
 
       <SceneLoader hidden={ready} />
+
+      {/* Chapter indicator 00–08 + phase rail (desktop only) */}
+      <ModuleNavigation />
 
       {/* Scrolling copy panels over the pinned scene */}
       <div className="relative z-10">

@@ -91,8 +91,10 @@ export default function RoofPV() {
     return out;
   }, []);
 
+  // eslint-disable-next-line react-hooks/immutability -- R3F idiom: per-frame imperative mutation of THREE materials inside useFrame (never React state per frame)
   useFrame(() => {
     const w = smooth01(emphasisWeight("pv", 1.1));
+    // eslint-disable-next-line react-hooks/immutability -- see above
     glassMat.emissiveIntensity = 0.22 + w * 0.55;
     if (accentMat.current) {
       accentMat.current.emissiveIntensity = 0.1 + w * 1.6;

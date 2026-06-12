@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- plain Node QA harness, not app code */
 // Screenshot ONLY the WebGL canvas at the hub anchor (bypasses the dark DOM
 // overlay) so we can judge the raw Hub framing + brightness. Port via PH_URL.
 const { chromium } = require("playwright");

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- plain Node QA harness, not app code */
 // Probe: scroll to hub anchor, sample canvas luminance in left/center/right
 // thirds so we can SEE (numerically) where the bright Hub enclosure lands.
 const { chromium } = require("playwright");

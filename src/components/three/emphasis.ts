@@ -24,6 +24,19 @@ export function emphasisWeight(target: Emphasis, falloff = 0.85): number {
       w = Math.max(w, base * (1 - d / falloff));
     }
   }
+
+  // ── ADDITIVE BUILD-UP (NRG principle, §2): once a station has been visited
+  // and passed, its system layer stays subtly ON at a low base weight, so the
+  // building is visibly "more system" with every chapter — until the finale
+  // connects everything (emphasis: "all").
+  if (target !== "all") {
+    const owner = SECTIONS.find((sec) => sec.emphasis === target);
+    if (owner) {
+      const passed = smooth01((s - owner.index - 0.4) / 0.5);
+      w = Math.max(w, 0.25 * passed);
+    }
+  }
+
   return w;
 }
 

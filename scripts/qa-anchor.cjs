@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- plain Node QA harness, not app code */
 /* Resting-state QA: scrolls to each section's anchor (#id) via Lenis-friendly
  * wheel nudges so the camera keyframe + the panel text + DOM overlays settle
  * together, then screenshots. Targets the DOM-overlay sections by default.
@@ -43,12 +44,13 @@ const SECTIONS = want.length
   await page.waitForTimeout(3500);
 
   for (const id of SECTIONS) {
-    // get the target y of the section element, then wheel-nudge Lenis toward it
+    // target MID-HOLD of the section band (camera settled, panel revealed),
+    // then wheel-nudge Lenis toward it
     const targetY = await page.evaluate((sid) => {
       const el = document.getElementById(sid);
       if (!el) return null;
       const r = el.getBoundingClientRect();
-      return Math.round(window.scrollY + r.top);
+      return Math.round(window.scrollY + r.top + el.offsetHeight * 0.5);
     }, id);
     if (targetY == null) { console.log(`MISSING #${id}`); continue; }
     for (let it = 0; it < 120; it++) {

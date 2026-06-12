@@ -197,6 +197,18 @@ function World() {
         bow={0.45}
         speed={0.2}
       />
+      {/* FINALE — when everything is connected (emphasis "all"), one calm
+          riser line climbs the front facade from the ground systems to the
+          roof: the building reads as a single connected system before the CTA. */}
+      <EnergyFlow
+        from={[WIDTH / 2 - 0.6, 0.6, DEPTH_HALF + 0.28]}
+        to={[-1.2, ROOF_Y - 0.3, DEPTH_HALF + 0.28]}
+        color={SCENE.green}
+        activeOn="all"
+        bow={0.4}
+        speed={0.12}
+        dots={3}
+      />
 
       <CameraRig />
 

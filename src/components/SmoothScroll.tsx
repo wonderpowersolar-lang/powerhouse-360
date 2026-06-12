@@ -2,7 +2,7 @@
 
 import { ReactLenis, useLenis } from "lenis/react";
 import { useEffect } from "react";
-import { setProgress, setSectionRaw } from "@/lib/scrollProgress";
+import { getReduced, setProgress, setSectionRaw } from "@/lib/scrollProgress";
 
 /**
  * Compute the DOM-anchored raw section float from the actual `[data-section]`
@@ -48,6 +48,31 @@ function computeSectionRaw(): number | null {
  * internal loop and only *reads* the shared progress value.
  */
 function ScrollBridge() {
+  const lenisInstance = useLenis();
+
+  // Desktop anchor clicks land MID-HOLD of the target station (camera settled,
+  // panel revealed) instead of the band start (which is mid-approach).
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement | null)?.closest?.('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute("href")?.slice(1);
+      const el = id ? document.getElementById(id) : null;
+      if (!el || getReduced()) return; // mobile/static keeps native behaviour
+      e.preventDefault();
+      const max =
+        document.documentElement.scrollHeight - window.innerHeight || 0;
+      const y = Math.min(
+        max,
+        window.scrollY + el.getBoundingClientRect().top + el.offsetHeight * 0.45
+      );
+      if (lenisInstance) lenisInstance.scrollTo(y, { duration: 1.8 });
+      else window.scrollTo({ top: y, behavior: "smooth" });
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [lenisInstance]);
+
   useLenis((lenis) => {
     // lenis.progress is 0..1 across the full scrollable height (kept for the
     // mobile/static path + as a fallback), but the camera follows the
@@ -91,10 +116,9 @@ export default function SmoothScroll({
     <ReactLenis
       root
       options={{
-        // Softer lerp + longer duration → calmer inertia so the camera glides
+        // §5: lerp 0.05–0.06, NO snapping — calm inertia so the camera glides
         // between the plateaued station keyframes instead of darting.
-        lerp: 0.06,
-        duration: 1.5,
+        lerp: 0.055,
         smoothWheel: !reduced,
         wheelMultiplier: 0.9,
         touchMultiplier: 1.3,
