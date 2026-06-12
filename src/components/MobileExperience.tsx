@@ -1,8 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { SECTIONS } from "@/content/sections";
 import { ButtonLink } from "./ui/Button";
-import BuildingArt from "./BuildingArt";
 import DashboardOverlay from "./DashboardOverlay";
 import ProductPanel from "./ProductPanel";
 import ResidentsOverlay from "./ResidentsOverlay";
@@ -32,7 +32,18 @@ export default function MobileExperience() {
               "radial-gradient(120% 70% at 50% 0%, #16243f 0%, #0d1626 65%, #090f1a 100%)",
           }}
         />
-        <BuildingArt className="mx-auto mb-8 h-72 w-auto" />
+        {/* photoreal dusk render (Higgsfield, REF-1 look) instead of the SVG */}
+        <div className="relative mx-auto mb-8 aspect-[9/16] max-h-96 w-full max-w-xs overflow-hidden rounded-3xl border border-white/10">
+          <Image
+            src="/brand/hero-tower-mobile.jpg"
+            alt="POWERHOUSE360 Mehrfamilienhaus in der Abenddämmerung"
+            fill
+            priority
+            sizes="(max-width: 768px) 90vw, 320px"
+            className="object-cover"
+          />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#090f1a] to-transparent" />
+        </div>
 
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
           {hero.kicker}

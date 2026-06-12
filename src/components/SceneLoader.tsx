@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { LogoMark } from "./ui/Logo";
 
 /**
@@ -19,6 +20,25 @@ export default function SceneLoader({ hidden }: { hidden: boolean }) {
           "radial-gradient(120% 80% at 50% 20%, #16243f 0%, #0d1626 60%, #090f1a 100%)",
       }}
     >
+      {/* photoreal dusk render as dimmed backdrop (Higgsfield, REF-1 look) */}
+      <Image
+        src="/brand/hero-tower-wide.jpg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="absolute inset-0 object-cover opacity-40"
+        aria-hidden
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 80% at 50% 30%, rgba(13,22,38,0.35) 0%, rgba(9,15,26,0.85) 100%)",
+        }}
+        aria-hidden
+      />
+
       {/* stacked-building silhouette */}
       <svg
         width="120"
