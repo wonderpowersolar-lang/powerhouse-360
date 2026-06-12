@@ -26,9 +26,12 @@ export function SmokeDetector({
     const t = clock.elapsedTime;
     const w = smooth01(emphasisWeight("smoke", 1.0));
     if (ledRef.current) {
-      // Heartbeat blink: a quick double-pulse every ~3s, lifted while active.
+      // Heartbeat blink: a quick double-pulse every ~3s. While the smoke
+      // chapter is ACTIVE the LED stays clearly lit between pulses so the
+      // status read is unmissable in the hero framing.
       const phase = (t % 3) / 3;
-      const beat = phase < 0.06 || (phase > 0.12 && phase < 0.18) ? 1 : 0.18;
+      const beat =
+        phase < 0.06 || (phase > 0.12 && phase < 0.18) ? 1 : 0.18 + w * 0.55;
       ledRef.current.opacity = (0.3 + w * 0.6) * beat + 0.08;
     }
   });
@@ -98,10 +101,10 @@ export function Stairwell({ pos = [0, 6.4, -2.4] as [number, number, number] }) 
 
   return (
     <group position={pos}>
-      {/* back wall */}
+      {/* back wall — lighter, concrete stairwell read */}
       <mesh position={[0, 0, -RD / 2]}>
         <boxGeometry args={[RW, RH, 0.2]} />
-        <meshStandardMaterial color="#2a3a52" roughness={0.9} side={THREE.FrontSide} />
+        <meshStandardMaterial color="#46505e" roughness={0.92} side={THREE.FrontSide} />
       </mesh>
       {/* ceiling (detector mounts just below) — kept a calm mid-slate so the
           white detector + aqua mount ring read clearly against it (white-on-
@@ -160,15 +163,33 @@ export function Stairwell({ pos = [0, 6.4, -2.4] as [number, number, number] }) 
         <meshStandardMaterial color={SCENE.slateLight} metalness={0.6} roughness={0.4} />
       </mesh>
 
-      {/* apartment door on the right wall */}
-      <mesh position={[1.5, -RH / 2 + 1.05, 0.2]}>
-        <boxGeometry args={[0.06, 2.1, 0.95]} />
+      {/* apartment door on the right wall, with a visible door FRAME */}
+      <mesh position={[1.48, -RH / 2 + 1.12, 0.2]}>
+        <boxGeometry args={[0.08, 2.24, 1.09]} />
+        <meshStandardMaterial color="#5a6472" roughness={0.7} metalness={0.1} />
+      </mesh>
+      <mesh position={[1.46, -RH / 2 + 1.05, 0.2]}>
+        <boxGeometry args={[0.08, 2.1, 0.95]} />
         <meshStandardMaterial color={SCENE.navy700} roughness={0.6} metalness={0.15} />
       </mesh>
-      <mesh position={[1.46, -RH / 2 + 1.05, 0.55]}>
+      <mesh position={[1.4, -RH / 2 + 1.05, 0.55]}>
         <sphereGeometry args={[0.04, 12, 12]} />
         <meshStandardMaterial color={SCENE.slateLight} metalness={0.7} roughness={0.3} />
       </mesh>
+
+      {/* warm wall sconce on the back wall — the cosy stairwell glow */}
+      <group position={[-1.35, 0.32, -RD / 2 + 0.13]}>
+        <mesh>
+          <boxGeometry args={[0.26, 0.1, 0.08]} />
+          <meshStandardMaterial color="#2c333d" roughness={0.5} metalness={0.3} />
+        </mesh>
+        {/* up + down light wash */}
+        <mesh position={[0, 0.07, 0.01]} rotation={[0.4, 0, 0]}>
+          <planeGeometry args={[0.2, 0.05]} />
+          <meshBasicMaterial color={SCENE.warm} toneMapped={false} />
+        </mesh>
+        <pointLight position={[0, 0.12, 0.25]} intensity={1.4} color={SCENE.warm} distance={3.6} decay={2} />
+      </group>
 
       {/* small wall-mounted exit/safety sign (green) */}
       <mesh position={[1.3, 0.6, -RD / 2 + 0.12]}>

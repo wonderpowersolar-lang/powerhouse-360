@@ -86,9 +86,11 @@ export const SECTIONS: SectionDef[] = [
       { label: "Pilotobjekt anfragen", href: "#cta", variant: "secondary" },
     ],
     emphasis: "building",
-    // Whole tower, frontal three-quarter, elevated dusk push-in.
-    camPos: [15, 11, 19],
-    camTarget: [0, 8.0, 0],
+    // Whole tower, frontal three-quarter, elevated dusk push-in. Pulled back
+    // far enough that the roof + PV array stay IN frame (REF-1 full-building
+    // night render).
+    camPos: [16, 13, 21],
+    camTarget: [0, 7.4, 0],
   },
 
   // ──────────────────────────────────────────────────── 1 · POWERMIETER
@@ -101,10 +103,13 @@ export const SECTIONS: SectionDef[] = [
       "Powermieter verbindet PV-Erzeugung, Energiefluss und Messung zu einer wirtschaftlichen Stromlösung.",
     align: "right",
     emphasis: "pv",
-    // Steep, close look down onto the rooftop array (centred ~y16.1, z≈1.6),
-    // energy flow visible running down into the building.
-    camPos: [-2.2, 20.5, 7.0],
-    camTarget: [-1.0, 15.9, 1.4],
+    // The METERING MOMENT (REF-3): inside the bright plant room, frontal on
+    // the white Zählerwand (cabinet door + five meter columns, world x≈-2.7..
+    // 0.55, centred ≈3.0 high on the back wall at z≈-2.8). Camera rests just
+    // outside the open room front; meter wall reads centre-left, the Hub /
+    // concrete continuity at frame right sits under the right-aligned panel.
+    camPos: [-0.85, 3.1, 0.9],
+    camTarget: [-1.05, 3.0, -2.8],
     panel: {
       tag: "Produktwelt · Strom",
       title: "Powermieter",
@@ -137,11 +142,13 @@ export const SECTIONS: SectionDef[] = [
       "Heatmieter integriert Wärmepumpen, macht den Wärmeverbrauch sichtbar und digitalisiert die Heizkostenabrechnung.",
     align: "left",
     emphasis: "heatpump",
-    // Front-three-quarter of the upright air-water monobloc. Cabinet centre is
-    // at x≈-4.9, fan centre at y≈1.66 on the -x face. Camera sits low-front-left
-    // so the round fan grille + tall cabinet read as the hero; tower mass behind.
-    camPos: [-9.6, 2.9, 5.0],
-    camTarget: [-5.0, 1.5, 1.1],
+    // Front-three-quarter of the WIDE anthracite louvre monobloc (REF-4). Unit
+    // centre is at x≈4.7 on the right plaza edge, front (louvre) face = +x.
+    // Camera sits low-front-right so the horizontal-louvre intake + service
+    // panel read as the hero (frame centre-right, copy left); facade + warm
+    // downlight cone behind.
+    camPos: [9.4, 1.85, 4.7],
+    camTarget: [4.35, 0.9, 1.7],
     panel: {
       tag: "Produktwelt · Wärme",
       title: "Heatmieter",
@@ -175,13 +182,12 @@ export const SECTIONS: SectionDef[] = [
       "Der POWERHOUSE Hub verbindet Geräte und Datenpunkte und vernetzt Strom, Wärme, Laden und Sicherheit.",
     align: "right",
     emphasis: "hub",
-    // INSIDE the tower envelope (outward faces back-face-cull away) so the
-    // wall-mounted Hub (≈-0.2,3.05,-2.7) reads as the LARGE hero in the left/
-    // centre, with the right kept clear for the right-aligned copy + panel.
-    // With the plateaued scroll-float the camera now RESTS exactly on this
-    // keyframe (no blend offset), so these are the true framing values.
-    camPos: [0.4, 3.15, 1.7],
-    camTarget: [-0.3, 3.0, -2.7],
+    // INSIDE the tower envelope (outward faces back-face-cull away). The Hub
+    // now hangs on the bare light-grey concrete section at world x≈1.62
+    // (REF-2), with the Zählerwand + server rack as left-background context.
+    // Camera frames the Hub centre-left; right stays clear for copy + panel.
+    camPos: [2.5, 3.12, 1.8],
+    camTarget: [1.72, 2.98, -2.7],
     panel: {
       tag: "Das Gebäudehirn",
       title: "POWERHOUSE Hub",
@@ -250,14 +256,13 @@ export const SECTIONS: SectionDef[] = [
       "Smokemieter behält Status und Wartung der Rauchmelder im Blick und macht den Sicherheitsstatus transparent.",
     align: "right",
     emphasis: "smoke",
-    // INSIDE the stairwell volume (pos y6.4, ceiling world y≈7.9). The ceiling-
-    // mounted detector sits at world ≈ (0, 7.7, -2.4). Camera sits close + below,
-    // angled UP so the round detector + its mounting ring fill the left/centre as
-    // the hero against the white ceiling; right kept clear for the copy + panel.
-    // Detector now hangs at world ≈ (0, 7.56, -1.6). Camera sits close + just
-    // below, looking up so the round detector + aqua mount ring read as hero.
-    camPos: [1.05, 6.85, 0.35],
-    camTarget: [-0.2, 7.45, -1.6],
+    // INSIDE the stairwell volume (pos y6.4, ceiling world y≈7.9). The ceiling
+    // detector hangs at world ≈ (0, 7.56, -1.6). Camera sits directly below-
+    // front looking UP so the round detector + its LED read clearly as the
+    // CENTRED subject (upper-centre of frame); stairs/handrail left, door +
+    // sconce give the landing its concrete stairwell read.
+    camPos: [0.1, 6.7, 1.0],
+    camTarget: [0.0, 7.48, -1.65],
     panel: {
       tag: "Produktwelt · Sicherheit",
       title: "Smokemieter",
@@ -292,7 +297,7 @@ export const SECTIONS: SectionDef[] = [
     // INSIDE the apartment on an upper floor (≈1.2,8.6,-2.2), front-left angle:
     // warm lounge to the left, wall display + Paula card to the right.
     camPos: [-0.2, 8.95, 0.7],
-    camTarget: [1.3, 8.6, -2.0],
+    camTarget: [1.55, 8.6, -2.0],
     panel: {
       tag: "Bewohnererlebnis",
       title: "Für Bewohner verständlich und einfach",
@@ -344,9 +349,10 @@ export const SECTIONS: SectionDef[] = [
       { label: "Pilot starten", href: "#cta", variant: "secondary" },
     ],
     emphasis: "all",
-    // Pull back out to the whole connected tower (mirrors the hero, other side).
-    camPos: [13.5, 11, 19.5],
-    camTarget: [0, 8.0, 0],
+    // Pull back out to the whole connected tower (mirrors the hero, other
+    // side) — roof + PV kept in frame like REF-1.
+    camPos: [14.5, 12.8, 20.5],
+    camTarget: [0, 7.4, 0],
   },
 ];
 

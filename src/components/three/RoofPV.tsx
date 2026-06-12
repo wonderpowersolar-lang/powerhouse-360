@@ -45,8 +45,10 @@ export default function RoofPV() {
   const glassMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: new THREE.Color(SCENE.navy700),
-        emissive: new THREE.Color(SCENE.teal),
+        // deep PV-module blue (REF-1: "neat blue PV array") with a cool blue
+        // emissive lift instead of the old teal-green cast.
+        color: new THREE.Color("#16306b"),
+        emissive: new THREE.Color("#2f63c4"),
         emissiveIntensity: 0.22,
         metalness: 0.9,
         roughness: 0.12,

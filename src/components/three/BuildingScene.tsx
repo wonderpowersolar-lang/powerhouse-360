@@ -190,11 +190,11 @@ function World() {
         speed={0.16}
       />
       <EnergyFlow
-        from={[-WIDTH / 2 - 1.9, 2.0, 1.4]}
-        to={[-WIDTH / 2 + 0.4, 3.2, 0.8]}
+        from={[WIDTH / 2 + 1.55, 1.42, 1.5]}
+        to={[WIDTH / 2 - 0.05, 1.0, 1.45]}
         color={SCENE.teal}
         activeOn="heatpump"
-        bow={0.9}
+        bow={0.45}
         speed={0.2}
       />
 

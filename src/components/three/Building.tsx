@@ -58,6 +58,8 @@ const WIN_H = 1.45;
 export default function Building() {
   const winRef = useRef<THREE.InstancedMesh>(null);
   const litFlags = useRef<number[]>([]);
+  const litTones = useRef<number[]>([]);
+  const litHues = useRef<number[]>([]);
 
   // ── Real concrete PBR maps on the facade (the main realism lever) ─────────
   // The light-grey CC0 concrete albedo is multiplied by the dark anthracite
@@ -68,11 +70,13 @@ export default function Building() {
   const plinthTex = usePBR("concrete", [3, 1]);
 
   // ── Window + frame + sill instanced transforms (built once) ──────────────
-  const { winMatrices, lit, frameMatrices, sillMatrices } = useMemo(() => {
+  const { winMatrices, lit, tones, hues, frameMatrices, sillMatrices } = useMemo(() => {
     const wm: THREE.Matrix4[] = [];
     const fm: THREE.Matrix4[] = [];
     const sm: THREE.Matrix4[] = [];
     const litArr: number[] = [];
+    const toneArr: number[] = [];
+    const hueArr: number[] = [];
     const dummy = new THREE.Object3D();
 
     const place = (x: number, y: number, z: number, ry: number, isLit: boolean) => {
@@ -83,6 +87,13 @@ export default function Building() {
       dummy.updateMatrix();
       wm.push(dummy.matrix.clone());
       litArr.push(isLit ? 1 : 0);
+      // per-window interior character (REF-1 "cozy variety"): most windows are
+      // full warm living-room glow, some are dimmer (curtains / a single lamp),
+      // and each leans a slightly different amber so the facade reads inhabited.
+      // (rng is initialised before place() is first called.)
+      const dim = rng() < 0.28 ? 0.45 + rng() * 0.2 : 0.9 + rng() * 0.3;
+      toneArr.push(dim);
+      hueArr.push(rng() * 0.4);
 
       // recessed dark frame just behind the glass
       dummy.scale.set(WIN_W + 0.16, WIN_H + 0.16, 1);
@@ -123,7 +134,14 @@ export default function Building() {
         place(-WIDTH / 2 - 0.02, y, bayZ(c), -Math.PI / 2, rng() > 0.5);
       }
     }
-    return { winMatrices: wm, lit: litArr, frameMatrices: fm, sillMatrices: sm };
+    return {
+      winMatrices: wm,
+      lit: litArr,
+      tones: toneArr,
+      hues: hueArr,
+      frameMatrices: fm,
+      sillMatrices: sm,
+    };
   }, []);
 
   // Set window matrices + per-instance colours once the mesh exists.
@@ -131,12 +149,21 @@ export default function Building() {
     if (!mesh) return;
     winRef.current = mesh;
     const warm = new THREE.Color(SCENE.warm);
+    const amber = new THREE.Color(SCENE.amber);
     const cold = new THREE.Color(SCENE.navy600);
+    const tmp = new THREE.Color();
     winMatrices.forEach((mat, i) => {
       mesh.setMatrixAt(i, mat);
-      mesh.setColorAt(i, (lit[i] ? warm : cold).clone());
+      if (lit[i]) {
+        tmp.copy(warm).lerp(amber, hues[i]).multiplyScalar(tones[i]);
+        mesh.setColorAt(i, tmp.clone());
+      } else {
+        mesh.setColorAt(i, cold.clone());
+      }
     });
     litFlags.current = lit;
+    litTones.current = tones;
+    litHues.current = hues;
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   };
@@ -163,11 +190,13 @@ export default function Building() {
     let dirty = false;
     for (let i = 0; i < litFlags.current.length; i++) {
       if (!litFlags.current[i]) continue;
-      const flick = 0.82 + 0.18 * Math.sin(t * 0.7 + i * 1.3);
+      const flick = 0.88 + 0.12 * Math.sin(t * 0.7 + i * 1.3);
+      const tone = litTones.current[i] ?? 1;
+      const hue = litHues.current[i] ?? 0.15;
       tmp
         .copy(warm)
-        .lerp(amber, 0.12 + 0.1 * Math.sin(i))
-        .multiplyScalar(flick * (0.9 + 0.25 * w));
+        .lerp(amber, hue)
+        .multiplyScalar(tone * flick * (0.9 + 0.25 * w));
       mesh.setColorAt(i, tmp);
       dirty = true;
     }
@@ -605,8 +634,14 @@ function Shrub({
   );
 }
 
-/** An L-shaped raised planting bed with a hedge fill + a tree. Module-scope. */
-function Bed({ sx }: { sx: number }) {
+/**
+ * An L-shaped raised planting bed (REF-1). Two variants:
+ *  - "tree": a small feature tree + dense shrubs + warm ground uplights
+ *    (the LEFT bed in the hero frame),
+ *  - "low": low shrubs only (the RIGHT front corner bed) so the right plaza
+ *    edge stays clear for the heat-pump pad + lawn.
+ */
+function Bed({ sx, variant = "tree" }: { sx: number; variant?: "tree" | "low" }) {
   return (
     <group position={[sx * (WIDTH / 2 + 2.0), 0.06, DEPTH / 2 + 1.4]}>
       {/* L-shaped raised bed: two boxes */}
@@ -623,12 +658,44 @@ function Bed({ sx }: { sx: number }) {
         <boxGeometry args={[2.3, 0.34, 0.95]} />
         <meshStandardMaterial color="#2f7d4a" roughness={0.92} flatShading />
       </mesh>
-      {/* a feature tree + a smaller companion + shrubs along the bed */}
-      <Tree x={sx * -0.8} z={-1.2} kind="deciduous" scale={1.05} rot={sx * 0.6} />
-      <Tree x={sx * 0.7} z={-1.1} kind="conifer" scale={0.78} rot={sx * 1.2} />
-      <Shrub x={sx * 0.3} z={0.05} scale={1.1} />
-      <Shrub x={sx * -0.5} z={0.1} scale={0.9} />
-      <Shrub x={sx * 0.9} z={0.0} scale={0.8} />
+      {variant === "tree" ? (
+        <>
+          {/* a feature tree + dense shrub fill */}
+          <Tree x={sx * -0.8} z={-1.2} kind="deciduous" scale={1.05} rot={sx * 0.6} />
+          <Shrub x={sx * 0.7} z={-1.1} scale={1.15} />
+          <Shrub x={sx * 0.3} z={0.05} scale={1.1} />
+          <Shrub x={sx * -0.5} z={0.1} scale={0.9} />
+          <Shrub x={sx * 0.9} z={0.0} scale={0.8} />
+          {/* warm ground uplights washing the tree + shrubs */}
+          {[
+            [sx * -0.8, -0.7],
+            [sx * 0.4, 0.45],
+          ].map((p, i) => (
+            <group key={`bu${i}`}>
+              <mesh position={[p[0], 0.13, p[1]]} rotation={[-Math.PI / 2, 0, 0]}>
+                <circleGeometry args={[0.14, 14]} />
+                <meshBasicMaterial color={SCENE.warm} transparent opacity={0.65} toneMapped={false} />
+              </mesh>
+              <pointLight
+                position={[p[0], 0.4, p[1]]}
+                intensity={1.1}
+                color={SCENE.warm}
+                distance={3.4}
+                decay={2}
+              />
+            </group>
+          ))}
+        </>
+      ) : (
+        <>
+          {/* low shrubs only — keeps the right corner calm */}
+          <Shrub x={sx * 0.3} z={0.05} scale={1.05} />
+          <Shrub x={sx * -0.6} z={0.1} scale={0.85} />
+          <Shrub x={sx * 0.9} z={-0.05} scale={0.75} />
+          <Shrub x={sx * -1.0} z={-1.3} scale={0.9} />
+          <Shrub x={sx * -0.9} z={-0.6} scale={0.7} />
+        </>
+      )}
     </group>
   );
 }
@@ -703,10 +770,10 @@ function Plaza() {
       {/* dark asphalt street wrapping the front (+z) — wet-asphalt reflection,
           the big realism lever from the reference. Stronger mirror, heavy blur
           so it reads as a damp road, not a literal mirror. */}
-      <mesh position={[0, 0.008, DEPTH / 2 + 4.6]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <mesh position={[0, 0.014, DEPTH / 2 + 4.6]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[PLAZA + 6, 3.4]} />
         <MeshReflectorMaterial
-          color="#11161f"
+          color="#1c2430"
           map={asphalt.map}
           normalMap={asphalt.normalMap}
           roughnessMap={asphalt.roughnessMap}
@@ -729,17 +796,17 @@ function Plaza() {
       {Array.from({ length: 9 }).map((_, i) => (
         <mesh
           key={`lane${i}`}
-          position={[-8 + i * 2, 0.012, DEPTH / 2 + 4.6]}
+          position={[-8 + i * 2, 0.019, DEPTH / 2 + 4.6]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
           <planeGeometry args={[0.9, 0.12]} />
-          <meshBasicMaterial color="#46566a" toneMapped={false} />
+          <meshBasicMaterial color="#76879d" toneMapped={false} />
         </mesh>
       ))}
 
-      {/* two L-shaped corner planting beds */}
-      <Bed sx={-1} />
-      <Bed sx={1} />
+      {/* two L-shaped corner planting beds (REF-1: tree bed left, low right) */}
+      <Bed sx={-1} variant="tree" />
+      <Bed sx={1} variant="low" />
 
       {/* warm ground uplights along the plaza front */}
       <group ref={upRef}>

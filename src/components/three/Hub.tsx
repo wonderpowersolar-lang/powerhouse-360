@@ -41,17 +41,19 @@ const H = 2.18;
 const FACE_Z = 0.11;
 
 // UI palette to match the photo's screen.
+// Dimmed toward REF-2's dark-glass look: the display reads as a black glass
+// rectangle with subtle content, not a lit dashboard. Tiles/text are muted.
 const UI = {
-  screenBg: "#0a0e15",
-  bar: "#10151f",
-  tile: "#141a26",
-  text: "#e8eef6",
-  textDim: "#9fb0c4",
-  sun: "#f5c542",
-  house: "#ef8b3a",
-  battery: "#3ec46b",
-  grid: "#5b9bd5",
-  ok: "#3ec46b",
+  screenBg: "#070a10",
+  bar: "#0b0f16",
+  tile: "#0e131c",
+  text: "#b9c4d2",
+  textDim: "#76869a",
+  sun: "#c79f3a",
+  house: "#c1742f",
+  battery: "#379a55",
+  grid: "#4d7ba8",
+  ok: "#379a55",
 };
 
 /** Stacked-chevron "building" logo mark: 5 angled bars forming an upward arrow. */
@@ -221,9 +223,10 @@ function Display({
           ref={matRef}
           color={UI.screenBg}
           emissive={UI.grid}
-          emissiveIntensity={0.25}
-          roughness={0.25}
-          metalness={0.1}
+          emissiveIntensity={0.1}
+          roughness={0.16}
+          metalness={0.18}
+          envMapIntensity={1.2}
         />
       </mesh>
 
@@ -365,9 +368,10 @@ export default function Hub() {
     const w = smooth01(emphasisWeight("hub", 1.0));
     const t = clock.elapsedTime;
     if (displayMat.current) {
-      // gentle screen breathing, brighter when the chapter is active
+      // gentle screen breathing — kept LOW so the display reads as dark glass
+      // (REF-2), only a touch livelier while the hub chapter is active
       displayMat.current.emissiveIntensity =
-        0.22 + w * 0.5 + Math.sin(t * 1.2) * 0.04;
+        0.08 + w * 0.22 + Math.sin(t * 1.2) * 0.02;
     }
   });
 

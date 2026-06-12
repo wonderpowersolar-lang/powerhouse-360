@@ -9,218 +9,386 @@ import { emphasisWeight, smooth01 } from "./emphasis";
 import { BUILDING_DIMS } from "./Building";
 
 /**
- * Heatmieter — a REALISTIC monobloc air-to-water heat pump (Luft-Wasser-
- * Wärmepumpe) in the courtyard on the -x side, the way a Vaillant aroTHERM /
- * Viessmann Vitocal outdoor unit actually looks:
+ * Heatmieter — a MODERN anthracite monobloc air-to-water heat pump, rebuilt to
+ * the client reference (REF-4):
  *
- *  - UPRIGHT rectangular cabinet (taller than deep) on an anti-vibration stand,
- *  - a LARGE circular fan recessed behind a round protective grille on the FRONT
- *    face (faces -x, toward the heat-chapter camera) — concentric guard rings +
- *    radial spokes + spinning swept blades + centre hub cap,
- *  - a TOP air-outlet louvre cassette (angled slats) where the cooled air exits,
- *  - side SERVICE panels with recessed seams + fixing screws + a small data badge,
- *  - INSULATED flow / return pipes (lagged, grey) routed from the base into the
- *    building wall on a bracket, with a condensate drain,
- *  - a clean concrete pad.
+ *  - WIDE rectangular anthracite body with softly rounded edges (NOT white, NOT
+ *    a round-fan front),
+ *  - the LEFT ~2/3 of the front face is a full-height intake grille of fine
+ *    HORIZONTAL black louvres — the fan sits hidden BEHIND the louvres and is
+ *    only barely visible as a dark disc + slow blade hint,
+ *  - the RIGHT ~1/3 is a smooth anthracite service panel with a thin vertical
+ *    status strip and a small brand mark,
+ *  - the body sits on TWO concrete block feet on a concrete pad with a pebble
+ *    border and a small green lawn patch (REF-1: pad + lawn on the right plaza
+ *    edge),
+ *  - context: a dark wall-mounted downlight on the facade above casts a warm
+ *    cone over the unit, a vertical-slat dark fence runs behind-right, a few
+ *    ornamental grass tufts + a glowing bollard light sit nearby,
+ *  - INSULATED flow/return pipes (lagged, grey) run from the unit into the
+ *    building wall on a bracket, with a condensate drain.
  *
- * The fan spins faster + a faint warm core glows when the heat chapter is active;
- * the body stays readable (no wash-out).
+ * Sits on the +x (right) edge of the plaza per REF-1, so it reads in the hero
+ * frame on a small pad with its own lawn patch, and the heatmieter chapter
+ * camera (sections.ts) frames it three-quarter from the front-right.
  */
 const { WIDTH } = BUILDING_DIMS;
 
-// Cabinet dimensions — upright monobloc. Fan + grille live on the -x face.
-const BODY_W = 1.35; // along x (depth of the unit, front face at -x)
-const BODY_H = 2.0; // height (upright)
-const BODY_D = 1.55; // along z (width of the unit)
-const STAND_H = 0.5; // feet/stand height above pad
+// ── placement: right plaza edge, beside the +x facade ──────────────────────
+const POS: [number, number, number] = [WIDTH / 2 + 1.7, 0, 1.5];
 
-// Centre of the cabinet body. Sits just off the -x facade on the plaza.
-const PAD_Y = 0.04;
-const BODY_CY = PAD_Y + STAND_H + BODY_H / 2;
-const POS: [number, number, number] = [-WIDTH / 2 - 1.9, 0, 1.2];
+// ── body dimensions (wide monobloc; front face = +x) ───────────────────────
+const BODY_D = 0.78; // along x (depth of unit; front face at +x)
+const BODY_H = 1.05; // height — clearly wider than tall
+const BODY_W = 1.9; // along z (width of unit)
+const PAD_H = 0.1;
+const FOOT_H = 0.22;
+const BODY_CY = PAD_H + FOOT_H + BODY_H / 2; // ≈ 0.845
+const FRONT_X = BODY_D / 2; // +0.39 local
 
-// Front (fan) face plane in local space.
-const FRONT_X = -BODY_W / 2;
-const FAN_R = 0.62;
+// Louvre region (left ~2/3 of the front in the camera's view = larger z) and
+// service panel (right ~1/3 = smaller z).
+const LOUVRE_CZ = 0.32; // centre z of the louvre region
+const LOUVRE_W = 1.16; // louvre span along z
+const PANEL_CZ = -0.62; // centre z of the smooth service panel
+const PANEL_W = 0.56;
+
+const ANTHRACITE = "#2b3036";
+const ANTHRACITE_DARK = "#23272c";
+const ANTHRACITE_PANEL = "#363c43";
+const CONCRETE = "#737a82";
 
 export default function HeatPump() {
   const fanRef = useRef<THREE.Group>(null);
-  const bodyMat = useRef<THREE.MeshStandardMaterial>(null);
-  const coreRef = useRef<THREE.Mesh>(null);
+  const stripRef = useRef<THREE.MeshBasicMaterial>(null);
+  const glowRef = useRef<THREE.MeshBasicMaterial>(null);
+  const spotRef = useRef<THREE.SpotLight>(null);
+  const spotTarget = useMemo(() => new THREE.Object3D(), []);
 
   useFrame((_, delta) => {
     const w = smooth01(emphasisWeight("heatpump", 1.0));
-    if (fanRef.current) fanRef.current.rotation.x += delta * (0.7 + w * 8);
-    if (bodyMat.current) bodyMat.current.emissiveIntensity = 0.02 + w * 0.18;
-    if (coreRef.current) {
-      const m = coreRef.current.material as THREE.MeshBasicMaterial;
-      m.opacity = 0.04 + w * 0.22;
-    }
+    // fan barely visible behind the louvres — slow idle, gentle ramp-up
+    if (fanRef.current) fanRef.current.rotation.x += delta * (0.5 + w * 3.5);
+    if (stripRef.current) stripRef.current.opacity = 0.3 + w * 0.65;
+    if (glowRef.current) glowRef.current.opacity = 0.02 + w * 0.12;
+    if (spotRef.current) spotRef.current.intensity = 2.2 + w * 7.5;
   });
 
-  // Swept fan blades (5), built once.
-  const blades = useMemo(() => [0, 1, 2, 3, 4], []);
+  // pebble border — deterministic scatter around the pad perimeter
+  const pebbles = useMemo(() => {
+    let seed = 7;
+    const rng = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
+    const out: { x: number; z: number; r: number; c: string }[] = [];
+    const cols = ["#454d57", "#566069", "#3c444e"];
+    // along the two long edges (±x of pad) and the two short edges (±z)
+    for (let i = 0; i < 26; i++) {
+      const t = rng();
+      const edge = i % 4;
+      const padX = 0.85;
+      const padZ = 1.38;
+      let x = 0;
+      let z = 0;
+      if (edge === 0) {
+        x = padX + 0.08 + rng() * 0.1;
+        z = -padZ + t * padZ * 2;
+      } else if (edge === 1) {
+        x = -padX - 0.08 - rng() * 0.1;
+        z = -padZ + t * padZ * 2;
+      } else if (edge === 2) {
+        z = padZ + 0.08 + rng() * 0.1;
+        x = -padX + t * padX * 2;
+      } else {
+        z = -padZ - 0.08 - rng() * 0.1;
+        x = -padX + t * padX * 2;
+      }
+      out.push({ x, z, r: 0.035 + rng() * 0.045, c: cols[i % 3] });
+    }
+    return out;
+  }, []);
+
+  const louvres = useMemo(() => Array.from({ length: 15 }, (_, i) => i), []);
 
   return (
     <group position={POS}>
-      {/* ── concrete pad ── */}
-      <mesh position={[0, PAD_Y - 0.06, 0]} receiveShadow>
-        <boxGeometry args={[BODY_W + 0.7, 0.12, BODY_D + 0.6]} />
-        <meshStandardMaterial color={SCENE.navy800} roughness={0.96} />
+      {/* ── small green lawn patch under/around the pad (REF-1) ── */}
+      <mesh position={[0.15, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[2.7, 3.4]} />
+        <meshStandardMaterial color="#23502f" roughness={1} />
       </mesh>
 
-      {/* ── anti-vibration stand (two rails + feet) ── */}
-      {[-BODY_D / 2 + 0.2, BODY_D / 2 - 0.2].map((z, i) => (
-        <mesh key={`rail${i}`} position={[0, PAD_Y + STAND_H / 2, z]} castShadow>
-          <boxGeometry args={[BODY_W - 0.1, STAND_H, 0.12]} />
-          <meshStandardMaterial color={SCENE.navy900} metalness={0.5} roughness={0.6} />
+      {/* ── concrete pad ── */}
+      <mesh position={[0, PAD_H / 2 + 0.01, 0]} receiveShadow castShadow>
+        <boxGeometry args={[1.5, PAD_H, 2.5]} />
+        <meshStandardMaterial color={CONCRETE} roughness={0.92} metalness={0.05} />
+      </mesh>
+      {/* pebble border */}
+      {pebbles.map((p, i) => (
+        <mesh key={`peb${i}`} position={[p.x, 0.035, p.z]}>
+          <icosahedronGeometry args={[p.r, 0]} />
+          <meshStandardMaterial color={p.c} roughness={0.95} flatShading />
         </mesh>
       ))}
 
-      {/* ── main UPRIGHT cabinet ── */}
+      {/* ── TWO concrete block feet ── */}
+      {[-0.55, 0.55].map((z, i) => (
+        <mesh key={`foot${i}`} position={[0, PAD_H + FOOT_H / 2, z]} castShadow>
+          <boxGeometry args={[0.55, FOOT_H, 0.3]} />
+          <meshStandardMaterial color="#5d646c" roughness={0.9} metalness={0.05} />
+        </mesh>
+      ))}
+
+      {/* ── WIDE anthracite body (rounded edges via slight bevel stack) ── */}
       <mesh position={[0, BODY_CY, 0]} castShadow receiveShadow>
-        <boxGeometry args={[BODY_W, BODY_H, BODY_D]} />
+        <boxGeometry args={[BODY_D, BODY_H, BODY_W]} />
         <meshStandardMaterial
-          ref={bodyMat}
-          color="#cfd6dc"
-          emissive={SCENE.amber}
-          emissiveIntensity={0.02}
-          roughness={0.42}
-          metalness={0.32}
+          color={ANTHRACITE}
+          roughness={0.5}
+          metalness={0.25}
+          envMapIntensity={0.8}
         />
       </mesh>
-      {/* darker plinth band at the cabinet base */}
-      <mesh position={[0, PAD_Y + STAND_H + 0.12, 0]}>
-        <boxGeometry args={[BODY_W + 0.02, 0.24, BODY_D + 0.02]} />
-        <meshStandardMaterial color={SCENE.slate} roughness={0.6} metalness={0.35} />
+      {/* softly rounded top cap */}
+      <mesh position={[0, BODY_CY + BODY_H / 2 + 0.018, 0]} castShadow>
+        <boxGeometry args={[BODY_D - 0.06, 0.04, BODY_W - 0.06]} />
+        <meshStandardMaterial color={ANTHRACITE_DARK} roughness={0.45} metalness={0.3} />
+      </mesh>
+      {/* subtle base trim */}
+      <mesh position={[0, PAD_H + FOOT_H + 0.03, 0]}>
+        <boxGeometry args={[BODY_D + 0.015, 0.06, BODY_W + 0.015]} />
+        <meshStandardMaterial color="#1d2126" roughness={0.6} metalness={0.3} />
       </mesh>
 
-      {/* ── TOP air-outlet louvre cassette (angled slats) ── */}
-      <group position={[0, BODY_CY + BODY_H / 2 + 0.01, 0]}>
-        <mesh>
-          <boxGeometry args={[BODY_W + 0.06, 0.1, BODY_D + 0.06]} />
-          <meshStandardMaterial color={SCENE.slate} roughness={0.5} metalness={0.4} />
+      {/* ── FRONT (+x): louvre intake, left ~2/3 ── */}
+      {/* dark recessed cavity behind the louvres */}
+      <mesh position={[FRONT_X - 0.025, BODY_CY, LOUVRE_CZ]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[LOUVRE_W + 0.06, BODY_H - 0.12]} />
+        <meshStandardMaterial color="#14171b" roughness={0.85} />
+      </mesh>
+      {/* fan hidden behind the louvres — barely visible dark disc + blade hint */}
+      <group position={[FRONT_X - 0.02, BODY_CY, LOUVRE_CZ]}>
+        <mesh rotation={[0, Math.PI / 2, 0]}>
+          <circleGeometry args={[0.36, 28]} />
+          <meshStandardMaterial color="#1a1e23" roughness={0.7} metalness={0.2} />
         </mesh>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <mesh key={i} position={[0, 0.08, -BODY_D / 2 + 0.22 + i * 0.22]} rotation={[0.5, 0, 0]}>
-            <boxGeometry args={[BODY_W - 0.16, 0.02, 0.16]} />
-            <meshStandardMaterial color={SCENE.navy700} roughness={0.55} metalness={0.3} />
-          </mesh>
-        ))}
-      </group>
-
-      {/* ── FRONT FAN ASSEMBLY (faces -x, toward the heat camera) ── */}
-      <group position={[FRONT_X - 0.01, BODY_CY + 0.12, 0]} rotation={[0, 0, 0]}>
-        {/* recessed fan well (dark) */}
-        <mesh position={[-0.02, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[FAN_R + 0.06, FAN_R + 0.06, 0.1, 40]} />
-          <meshStandardMaterial color={SCENE.navy900} roughness={0.7} metalness={0.3} />
-        </mesh>
-
-        {/* swept blades + hub (spin) */}
-        <group ref={fanRef} position={[-0.06, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-          {blades.map((i) => (
-            <mesh
-              key={i}
-              rotation={[0, (i * Math.PI * 2) / blades.length, 0.42]}
-              position={[0, 0, 0]}
-            >
-              {/* a curved-ish blade: thin tapered box offset from centre */}
-              <group rotation={[0, 0, 0]}>
-                <mesh position={[0, 0.02, 0.3]} rotation={[0.35, 0, 0]}>
-                  <boxGeometry args={[0.2, 0.02, 0.5]} />
-                  <meshStandardMaterial color="#aeb8c0" roughness={0.4} metalness={0.35} />
-                </mesh>
-              </group>
-            </mesh>
-          ))}
-          {/* hub cap */}
-          <mesh rotation={[0, 0, 0]}>
-            <cylinderGeometry args={[0.16, 0.18, 0.14, 20]} />
-            <meshStandardMaterial color={SCENE.navy700} metalness={0.6} roughness={0.4} />
-          </mesh>
-        </group>
-
-        {/* faint warm core glow (active state) just inside the well */}
-        <mesh ref={coreRef} position={[0.02, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <circleGeometry args={[FAN_R * 0.8, 32]} />
-          <meshBasicMaterial color={SCENE.amber} transparent opacity={0.04} side={THREE.DoubleSide} toneMapped={false} />
-        </mesh>
-
-        {/* round protective GRILLE: outer ring + 2 concentric rings + spokes */}
-        <group position={[-0.12, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-          {[FAN_R + 0.04, FAN_R * 0.66, FAN_R * 0.34].map((r, i) => (
-            <mesh key={`ring${i}`}>
-              <torusGeometry args={[r, 0.022, 8, 44]} />
-              <meshStandardMaterial color={i === 0 ? SCENE.slateLight : SCENE.slate} metalness={0.65} roughness={0.4} />
-            </mesh>
-          ))}
-          {Array.from({ length: 8 }).map((_, i) => (
-            <mesh key={`spk${i}`} rotation={[0, (i * Math.PI) / 4, 0]}>
-              <boxGeometry args={[0.014, 0.014, (FAN_R + 0.04) * 2]} />
-              <meshStandardMaterial color={SCENE.slate} metalness={0.55} roughness={0.45} />
+        <group ref={fanRef} rotation={[0, 0, Math.PI / 2]}>
+          {[0, 1, 2, 3].map((i) => (
+            <mesh key={i} rotation={[(i * Math.PI) / 2, 0, 0]} position={[0, 0, 0]}>
+              <boxGeometry args={[0.01, 0.09, 0.6]} />
+              <meshStandardMaterial color="#262b31" roughness={0.55} metalness={0.3} />
             </mesh>
           ))}
         </group>
+        {/* faint warm glow when the chapter is active */}
+        <mesh position={[0.012, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <circleGeometry args={[0.34, 24]} />
+          <meshBasicMaterial
+            ref={glowRef}
+            color={SCENE.warm}
+            transparent
+            opacity={0.02}
+            toneMapped={false}
+          />
+        </mesh>
       </group>
-
-      {/* ── side SERVICE panel seams + fixing screws (on +z face) ── */}
-      <group position={[0, BODY_CY, BODY_D / 2 + 0.001]}>
-        {[BODY_H * 0.28, -BODY_H * 0.18].map((y, i) => (
-          <mesh key={`seam${i}`} position={[0, y, 0]}>
-            <boxGeometry args={[BODY_W - 0.1, 0.014, 0.006]} />
-            <meshStandardMaterial color={SCENE.navy600} roughness={0.6} />
+      {/* fine HORIZONTAL louvres across the intake */}
+      {louvres.map((i) => {
+        const y = BODY_CY - (BODY_H - 0.2) / 2 + (i * (BODY_H - 0.2)) / 14;
+        return (
+          <mesh key={`lv${i}`} position={[FRONT_X + 0.012, y, LOUVRE_CZ]} rotation={[0, 0, -0.5]}>
+            <boxGeometry args={[0.05, 0.022, LOUVRE_W]} />
+            <meshStandardMaterial color={ANTHRACITE_DARK} roughness={0.55} metalness={0.25} />
           </mesh>
-        ))}
-        {[[-0.5, 0.8], [0.5, 0.8], [-0.5, -0.8], [0.5, -0.8]].map((p, i) => (
-          <mesh key={`scr${i}`} position={[p[0], p[1], 0.004]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.022, 0.022, 0.01, 8]} />
-            <meshStandardMaterial color={SCENE.slate} metalness={0.6} roughness={0.4} />
-          </mesh>
-        ))}
-      </group>
+        );
+      })}
+      {/* slim frame around the louvre field */}
+      {[
+        [BODY_CY + (BODY_H - 0.12) / 2, 0.03, LOUVRE_W + 0.08],
+        [BODY_CY - (BODY_H - 0.12) / 2, 0.03, LOUVRE_W + 0.08],
+      ].map((p, i) => (
+        <mesh key={`lf${i}`} position={[FRONT_X + 0.01, p[0], LOUVRE_CZ]}>
+          <boxGeometry args={[0.03, p[1], p[2]]} />
+          <meshStandardMaterial color={ANTHRACITE} roughness={0.5} metalness={0.25} />
+        </mesh>
+      ))}
 
-      {/* data/brand badge on the +z upper panel */}
+      {/* ── FRONT (+x): smooth service panel, right ~1/3 ── */}
+      <mesh position={[FRONT_X + 0.008, BODY_CY, PANEL_CZ]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[PANEL_W, BODY_H - 0.1]} />
+        <meshStandardMaterial
+          color={ANTHRACITE_PANEL}
+          roughness={0.38}
+          metalness={0.3}
+          envMapIntensity={0.9}
+        />
+      </mesh>
+      {/* thin vertical status strip on the panel's inner edge */}
+      <mesh position={[FRONT_X + 0.014, BODY_CY + 0.05, PANEL_CZ + PANEL_W / 2 - 0.08]}>
+        <boxGeometry args={[0.012, 0.42, 0.024]} />
+        <meshBasicMaterial
+          ref={stripRef}
+          color={SCENE.teal}
+          transparent
+          opacity={0.3}
+          toneMapped={false}
+        />
+      </mesh>
+      {/* small brand mark on the service panel */}
       <Text
-        position={[0, BODY_CY + BODY_H * 0.34, BODY_D / 2 + 0.012]}
-        fontSize={0.11}
-        color={SCENE.navy700}
+        position={[FRONT_X + 0.014, BODY_CY - 0.34, PANEL_CZ - 0.06]}
+        rotation={[0, Math.PI / 2, 0]}
+        fontSize={0.045}
+        color="#8d97a1"
         anchorX="center"
         anchorY="middle"
-        letterSpacing={0.05}
-        rotation={[0, 0, 0]}
+        letterSpacing={0.12}
       >
         HEATMIETER
       </Text>
 
-      {/* ── insulated flow/return pipes into the building wall (+x side) ── */}
-      <group position={[BODY_W / 2 + 0.05, PAD_Y + STAND_H + 0.3, 0.2]}>
-        {[-0.16, 0.16].map((dz, i) => (
+      {/* side seam on the +z face (service panel split) */}
+      <mesh position={[0, BODY_CY, BODY_W / 2 + 0.002]}>
+        <boxGeometry args={[BODY_D - 0.08, 0.012, 0.006]} />
+        <meshStandardMaterial color="#1d2126" roughness={0.6} />
+      </mesh>
+
+      {/* ── insulated flow/return pipes into the building wall (-x → facade) ── */}
+      <group position={[-BODY_D / 2 - 0.02, PAD_H + FOOT_H + 0.18, -0.05]}>
+        {[-0.14, 0.14].map((dz, i) => (
           <group key={i}>
             {/* horizontal lagged run toward the wall */}
-            <mesh position={[0.6, 0, dz]} rotation={[0, 0, Math.PI / 2]}>
-              <cylinderGeometry args={[0.075, 0.075, 1.25, 14]} />
-              <meshStandardMaterial color="#dfe3e7" roughness={0.75} />
+            <mesh position={[-0.62, 0, dz]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.07, 0.07, 1.3, 14]} />
+              <meshStandardMaterial color="#aeb4ba" roughness={0.8} />
             </mesh>
-            {/* elbow + short vertical into wall */}
-            <mesh position={[1.2, 0.18, dz]}>
-              <cylinderGeometry args={[0.078, 0.078, 0.5, 14]} />
-              <meshStandardMaterial color="#dfe3e7" roughness={0.75} />
+            {/* elbow + short vertical rise at the wall */}
+            <mesh position={[-1.25, 0.21, dz]}>
+              <cylinderGeometry args={[0.072, 0.072, 0.55, 14]} />
+              <meshStandardMaterial color="#aeb4ba" roughness={0.8} />
             </mesh>
           </group>
         ))}
         {/* wall bracket */}
-        <mesh position={[1.2, 0, 0]}>
-          <boxGeometry args={[0.1, 0.46, 0.5]} />
+        <mesh position={[-1.25, 0.05, 0]}>
+          <boxGeometry args={[0.1, 0.4, 0.46]} />
           <meshStandardMaterial color={SCENE.navy700} metalness={0.4} roughness={0.5} />
         </mesh>
       </group>
-
-      {/* condensate drain pipe to the pad */}
-      <mesh position={[0.2, PAD_Y + 0.18, BODY_D / 2 - 0.2]}>
-        <cylinderGeometry args={[0.03, 0.03, STAND_H + 0.3, 8]} />
+      {/* condensate drain to the pad */}
+      <mesh position={[-0.15, PAD_H + 0.12, BODY_W / 2 - 0.25]}>
+        <cylinderGeometry args={[0.025, 0.025, FOOT_H + 0.2, 8]} />
         <meshStandardMaterial color={SCENE.slate} metalness={0.4} roughness={0.5} />
       </mesh>
+
+      {/* ── wall-mounted downlight on the facade, warm cone over the unit ── */}
+      <group position={[-POS[0] + WIDTH / 2 + 0.12, 2.85, 0]}>
+        {/* dark fixture body */}
+        <mesh castShadow>
+          <boxGeometry args={[0.16, 0.22, 0.12]} />
+          <meshStandardMaterial color="#1d2126" roughness={0.5} metalness={0.4} />
+        </mesh>
+        {/* warm emitting underside */}
+        <mesh position={[0.0, -0.115, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.13, 0.09]} />
+          <meshBasicMaterial color={SCENE.warm} toneMapped={false} />
+        </mesh>
+      </group>
+      <spotLight
+        ref={spotRef}
+        position={[-POS[0] + WIDTH / 2 + 0.35, 2.8, 0]}
+        angle={0.62}
+        penumbra={0.75}
+        intensity={2.2}
+        color="#f3bd78"
+        distance={9}
+        decay={1.6}
+        target={spotTarget}
+      />
+      <primitive object={spotTarget} position={[0.3, 0, 0.6]} />
+      {/* faked warm light cone ON the wall below the fixture (REF-4) — a flat
+          additive circle-sector hugging the facade, apex at the downlight,
+          fanning downward. Inner wedge adds a brighter core. */}
+      {[
+        { r: 2.1, spread: 0.5, o: 0.09 },
+        { r: 1.3, spread: 0.34, o: 0.1 },
+      ].map((c, i) => (
+        <mesh
+          key={`cone${i}`}
+          position={[-POS[0] + WIDTH / 2 + 0.035 + i * 0.004, 2.72, 0]}
+          rotation={[0, Math.PI / 2, 0]}
+        >
+          <circleGeometry
+            args={[c.r, 14, -Math.PI / 2 - c.spread / 2, c.spread]}
+          />
+          <meshBasicMaterial
+            color={SCENE.warm}
+            transparent
+            opacity={c.o}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+
+      {/* ── vertical-slat dark fence behind-right of the unit ── */}
+      <group position={[-0.3, 0, -1.55]}>
+        {Array.from({ length: 13 }).map((_, i) => (
+          <mesh key={`sl${i}`} position={[-1.0 + i * 0.17, 0.62, 0]} castShadow>
+            <boxGeometry args={[0.08, 1.24, 0.022]} />
+            <meshStandardMaterial color="#22262b" roughness={0.8} metalness={0.1} />
+          </mesh>
+        ))}
+        {[0.28, 0.98].map((y, i) => (
+          <mesh key={`rl${i}`} position={[0.02, y, -0.025]}>
+            <boxGeometry args={[2.2, 0.05, 0.02]} />
+            <meshStandardMaterial color="#1b1f24" roughness={0.8} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* ── ornamental grass tufts ── */}
+      {[
+        { p: [-0.45, 0, 1.65] as [number, number, number], s: 1.0 },
+        { p: [0.75, 0, -1.35], s: 0.85 },
+        { p: [-1.05, 0, -0.9], s: 0.75 },
+      ].map((g, gi) => (
+        <group key={`gr${gi}`} position={g.p as [number, number, number]} scale={g.s}>
+          {Array.from({ length: 7 }).map((_, i) => {
+            const a = (i / 7) * Math.PI * 2;
+            return (
+              <mesh
+                key={i}
+                position={[Math.cos(a) * 0.06, 0.16, Math.sin(a) * 0.06]}
+                rotation={[Math.cos(a) * 0.35, 0, Math.sin(a) * 0.35]}
+              >
+                <coneGeometry args={[0.022, 0.34 + (i % 3) * 0.09, 4]} />
+                <meshStandardMaterial
+                  color={i % 2 ? "#4c7040" : "#3d5c34"}
+                  roughness={0.95}
+                  flatShading
+                />
+              </mesh>
+            );
+          })}
+        </group>
+      ))}
+
+      {/* ── glowing bollard light ── */}
+      <group position={[0.85, 0, 2.1]}>
+        <mesh position={[0, 0.26, 0]} castShadow>
+          <cylinderGeometry args={[0.045, 0.05, 0.52, 10]} />
+          <meshStandardMaterial color="#22262b" roughness={0.6} metalness={0.35} />
+        </mesh>
+        <mesh position={[0, 0.46, 0]}>
+          <cylinderGeometry args={[0.047, 0.047, 0.06, 10]} />
+          <meshBasicMaterial color={SCENE.warm} toneMapped={false} />
+        </mesh>
+        <pointLight position={[0, 0.5, 0]} intensity={0.9} color={SCENE.warm} distance={2.8} decay={2} />
+      </group>
     </group>
   );
 }
