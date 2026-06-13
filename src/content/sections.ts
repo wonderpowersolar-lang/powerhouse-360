@@ -79,6 +79,12 @@ export interface SectionDef {
    * Default 0.75. Heatmieter 0.8; hero/dashboard/cta long.
    */
   hold?: number;
+  /**
+   * Photoreal station image (public/stations/*) used by the image stage and the
+   * mobile cards. Optional — resolved via STATION_IMAGE in config/stage.ts when
+   * omitted, so this is just a per-section override hook.
+   */
+  image?: string;
   /** the floating product card for this station (optional on hero/cta) */
   panel?: ProductPanelDef;
 }

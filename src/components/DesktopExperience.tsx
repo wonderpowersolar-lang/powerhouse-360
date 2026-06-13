@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { SECTIONS } from "@/content/sections";
+import { STAGE } from "@/config/stage";
 import SectionPanel from "./SectionPanel";
 import DashboardOverlay from "./DashboardOverlay";
 import SceneLoader from "./SceneLoader";
@@ -10,13 +11,18 @@ import BuildingArt from "./BuildingArt";
 import ModuleNavigation from "./ModuleNavigation";
 import TransitionVeil from "./TransitionVeil";
 import HotspotPins from "./HotspotPins";
+import ImageHotspotPins from "./ImageHotspotPins";
+import DashboardBackdropDim from "./DashboardBackdropDim";
 import FocusOverlay from "./FocusOverlay";
 import FocusScrollLock from "./FocusScrollLock";
 
-/** R3F canvas — client only, no SSR. */
+/** R3F canvas — client only, no SSR. Preserved; mounted only when STAGE==="r3f". */
 const BuildingScene = dynamic(() => import("./three/BuildingScene"), {
   ssr: false,
 });
+
+/** Photoreal cinematic image stage — client only. Default stage (STAGE==="image"). */
+const ImageStage = dynamic(() => import("./ImageStage"), { ssr: false });
 
 /** Feature-detect a usable WebGL context. */
 function hasWebGL(): boolean {
@@ -74,10 +80,14 @@ export default function DesktopExperience() {
 
   return (
     <div ref={rootRef} className="relative">
-      {/* Pinned 3D stage (or static fallback if WebGL is unavailable) */}
+      {/* Pinned stage — photoreal image stage (default) or the preserved R3F
+          canvas (STAGE==="r3f"), with a static fallback if WebGL is missing. */}
       <div className="fixed inset-0 z-0 h-dvh w-full overflow-hidden">
-        {webgl === true && <BuildingScene onReady={() => setReady(true)} />}
-        {webgl === false && (
+        {STAGE === "image" && <ImageStage onReady={() => setReady(true)} />}
+        {STAGE === "r3f" && webgl === true && (
+          <BuildingScene onReady={() => setReady(true)} />
+        )}
+        {STAGE === "r3f" && webgl === false && (
           <div
             className="absolute inset-0 flex items-center justify-center"
             style={{
@@ -88,25 +98,34 @@ export default function DesktopExperience() {
             <BuildingArt className="h-[80vh] w-auto opacity-90" />
           </div>
         )}
-        {/* Vignette and top fade keep headlines legible. */}
+        {/* Vignette and top fade keep headlines legible. The ImageStage carries
+            its own graded vignette, so the DOM vignette is lighter in image
+            mode (avoid double-darkening the photoreal renders). */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(130% 100% at 50% 45%, transparent 55%, rgba(9,15,26,0.55) 100%)",
+              STAGE === "image"
+                ? "radial-gradient(135% 105% at 50% 45%, transparent 62%, rgba(9,15,26,0.32) 100%)"
+                : "radial-gradient(130% 100% at 50% 45%, transparent 55%, rgba(9,15,26,0.55) 100%)",
           }}
         />
-        {/* Darken pulse during big interior↔exterior camera jumps (§5). */}
+        {/* Darken pulse during big interior↔exterior transitions (§5). */}
         <TransitionVeil />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-navy-900/80 to-transparent" />
       </div>
 
+      {/* Dim the photoreal tower behind the platform dashboard so the DOM window
+          is unmistakably the hero of that station (image stage only). */}
+      {STAGE === "image" && <DashboardBackdropDim />}
+
       <SceneLoader hidden={ready} />
 
-      {/* Interactive building explorer — labelled hotspot pins projected onto
-          the real module positions (overview only), the focused-module stage
-          overlay, and the scroll lock that holds the stage during a fly-in. */}
-      <HotspotPins />
+      {/* Interactive building explorer — labelled hotspot pins (the image stage
+          anchors them to fixed hero-image coordinates; the R3F stage projects
+          the 3D anchors), the focused-module stage overlay, and the scroll lock
+          that holds the stage during a fly-in. */}
+      {STAGE === "image" ? <ImageHotspotPins /> : <HotspotPins />}
       <FocusOverlay />
       <FocusScrollLock />
 
