@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { ButtonLink } from "./ui/Button";
 import ProductPanel from "./ProductPanel";
 import { copyWeight } from "@/lib/scrollProgress";
+import { getFocusBlend } from "@/lib/focusStore";
 import { sectionHeightVh } from "@/styles/motionTokens";
 import type { SectionDef } from "@/content/sections";
 
@@ -44,7 +45,10 @@ export default function SectionPanel({
     const tick = () => {
       const el = layerRef.current;
       if (el) {
-        const w = copyWeight(section.index);
+        // Fade the scroll-story copy out as the explorer flies a module in, so
+        // the focused-module overlay reads cleanly (no hero copy bleeding
+        // through), then fade it back as the camera returns to the overview.
+        const w = copyWeight(section.index) * (1 - getFocusBlend());
         el.style.opacity = w.toFixed(3);
         el.style.visibility = w < 0.015 ? "hidden" : "visible";
       }

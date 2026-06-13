@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { useLenis } from "lenis/react";
 import { SECTIONS, STATION_LABELS } from "@/content/sections";
 import { getSectionFloat } from "@/lib/scrollProgress";
+import {
+  clearFocus,
+  hotspotIdForSection,
+  setFocus,
+  useFocusId,
+} from "@/lib/focusStore";
 import ScrollProgress from "./ScrollProgress";
 
 /**
@@ -20,6 +26,7 @@ import ScrollProgress from "./ScrollProgress";
 export default function ModuleNavigation() {
   const [active, setActive] = useState(0);
   const lenis = useLenis();
+  const focusId = useFocusId();
 
   // Track the active station from the scroll core (state update only on change).
   useEffect(() => {
@@ -37,7 +44,21 @@ export default function ModuleNavigation() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  /**
+   * Rail click shares ONE mechanism with the hotspot pins:
+   *  • product zones (Powermieter…Bewohnerportal) → fly the camera in via the
+   *    focus store (the same fly-in the pins trigger). Module→module flies
+   *    directly; from the overview it eases in.
+   *  • non-product rows (Start / Plattform / Kontakt) → clear any focus and
+   *    smooth-scroll to the band's HOLD (camera at rest, panel revealed).
+   */
   const goTo = (id: string) => {
+    const hotspot = hotspotIdForSection(id);
+    if (hotspot) {
+      setFocus(hotspot);
+      return;
+    }
+    if (focusId) clearFocus();
     const el = document.getElementById(id);
     if (!el) return;
     // land mid-HOLD: camera at rest, panel revealed
@@ -50,6 +71,13 @@ export default function ModuleNavigation() {
     else window.scrollTo({ top: target, behavior: "smooth" });
   };
 
+  // When a module is focused, light its row in the rail; otherwise follow scroll.
+  const focusedIndex =
+    focusId != null
+      ? SECTIONS.find((s) => hotspotIdForSection(s.id) === focusId)?.index ?? -1
+      : -1;
+  const activeIndex = focusedIndex >= 0 ? focusedIndex : active;
+
   return (
     <nav
       aria-label="Kapitel"
@@ -58,7 +86,7 @@ export default function ModuleNavigation() {
       <div className="relative flex flex-col items-end gap-2">
         <ScrollProgress className="absolute -right-2.5 inset-y-1" />
         {SECTIONS.map((s) => {
-          const isActive = s.index === active;
+          const isActive = s.index === activeIndex;
           const num = String(s.index).padStart(2, "0");
           return (
             <button

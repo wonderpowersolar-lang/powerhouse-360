@@ -9,6 +9,9 @@ import SceneLoader from "./SceneLoader";
 import BuildingArt from "./BuildingArt";
 import ModuleNavigation from "./ModuleNavigation";
 import TransitionVeil from "./TransitionVeil";
+import HotspotPins from "./HotspotPins";
+import FocusOverlay from "./FocusOverlay";
+import FocusScrollLock from "./FocusScrollLock";
 
 /** R3F canvas — client only, no SSR. */
 const BuildingScene = dynamic(() => import("./three/BuildingScene"), {
@@ -99,6 +102,13 @@ export default function DesktopExperience() {
       </div>
 
       <SceneLoader hidden={ready} />
+
+      {/* Interactive building explorer — labelled hotspot pins projected onto
+          the real module positions (overview only), the focused-module stage
+          overlay, and the scroll lock that holds the stage during a fly-in. */}
+      <HotspotPins />
+      <FocusOverlay />
+      <FocusScrollLock />
 
       {/* Chapter indicator 00–08 + phase rail (desktop only) */}
       <ModuleNavigation />

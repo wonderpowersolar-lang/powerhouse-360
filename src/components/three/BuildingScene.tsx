@@ -20,6 +20,7 @@ import EnergyFlow from "./EnergyFlow";
 import { Garage } from "./Wallbox";
 import { Stairwell } from "./SmokeDetector";
 import CameraRig from "./CameraRig";
+import HotspotProjector from "./HotspotProjector";
 import Effects from "./Effects";
 import { SECTIONS } from "@/content/sections";
 
@@ -211,6 +212,10 @@ function World() {
       />
 
       <CameraRig />
+
+      {/* Projects the explorer hotspot anchors to screen space each frame for
+          the DOM pin layer (HotspotPins). Renders nothing. */}
+      <HotspotProjector />
 
       {/* Distance fog blends the building into the navy void */}
       <fog attach="fog" args={[SCENE.navy900, 18, 52]} />
