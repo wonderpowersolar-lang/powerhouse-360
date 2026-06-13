@@ -93,6 +93,10 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
   const grainRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<{ t: number; done: boolean }>({ t: 0, done: false });
   const readyFired = useRef(false);
+  /** prefers-reduced-motion: damps AUTONOMOUS motion only (breathing, grain,
+   *  hero auto push-in). The scroll-coupled crossfade + zoom stay on — that is
+   *  user-driven motion and the whole point of the journey. */
+  const reducedRef = useRef(false);
 
   const layers: Layer[] = SECTIONS.map((s) => ({
     id: s.id,
@@ -138,6 +142,13 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
     let raf = 0;
     let last = performance.now();
 
+    const mq = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    reducedRef.current = mq?.matches ?? false;
+    const onRM = () => {
+      reducedRef.current = mq?.matches ?? false;
+    };
+    mq?.addEventListener?.("change", onRM);
+
     const tick = (now: number) => {
       const delta = Math.min(0.05, (now - last) / 1000);
       last = now;
@@ -155,9 +166,15 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
         setFocusBlend(blend);
       }
 
+      const rm = reducedRef.current;
+
       // ── hero push-in at load (a slow scale-in on the hero layer) ───────────
       const intro = introRef.current;
-      if (!intro.done) {
+      if (rm) {
+        // reduced-motion: skip the autonomous load push-in, start settled.
+        intro.t = 1;
+        intro.done = true;
+      } else if (!intro.done) {
         intro.t = Math.min(1, intro.t + delta / 2.4); // ~2.4s push-in
         if (intro.t >= 1) intro.done = true;
       }
@@ -188,7 +205,7 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
         // frozen — gated by holdWeight so it ONLY happens once the station is
         // settled (never competes with the travel push).
         const hw = holdWeight(i); // 1 = settled/reading, 0 = travelling
-        const breathe = hw * 0.012 * (0.5 + 0.5 * Math.sin(now / 4200 + i));
+        const breathe = rm ? 0 : hw * 0.012 * (0.5 + 0.5 * Math.sin(now / 4200 + i));
         let scale = HOLD_SCALE + ad * TRAVEL_SCALE + breathe;
         // Hero gets the load push-in: starts further back, settles to HOLD_SCALE.
         if (i === 0) {
@@ -246,7 +263,7 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
       }
 
       // ── film grain drift (very subtle, keeps the still from looking flat) ──
-      if (grainRef.current) {
+      if (grainRef.current && !rm) {
         const gx = (Math.sin(now / 1700) * 2).toFixed(1);
         const gy = (Math.cos(now / 2300) * 2).toFixed(1);
         grainRef.current.style.transform = `translate3d(${gx}px, ${gy}px, 0)`;
@@ -255,7 +272,10 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      mq?.removeEventListener?.("change", onRM);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

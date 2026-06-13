@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import DesktopExperience from "./DesktopExperience";
 import MobileExperience from "./MobileExperience";
 import { setReduced } from "@/lib/scrollProgress";
+import { STAGE } from "@/config/stage";
 
 /**
  * Decides which experience to render.
@@ -24,8 +25,14 @@ export default function Experience() {
       const reduced = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       ).matches;
-      const ok = wide && fine && !reduced;
-      setReduced(!ok);
+      // The lightweight photoreal image stage runs even under
+      // prefers-reduced-motion (its AUTONOMOUS motion — breathing drift, grain,
+      // hero auto push-in — is damped inside ImageStage, while the scroll-coupled
+      // crossfade journey stays on). Only the heavy real-time R3F stage is
+      // skipped for reduced-motion users.
+      const ok = wide && fine && (STAGE === "image" || !reduced);
+      // Keep the store's reduced flag truthful for a11y-sensitive behaviours.
+      setReduced(reduced);
       setMode(ok ? "desktop" : "mobile");
     };
     decide();
