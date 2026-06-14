@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { SECTIONS } from "@/content/sections";
 import {
   getSectionFloat,
+  getStationScrub,
   holdWeight,
   NUM_SECTIONS,
 } from "@/lib/scrollProgress";
@@ -14,10 +15,10 @@ import {
   getFocusSectionIndex,
   setFocusBlend,
 } from "@/lib/focusStore";
-import {
-  STATION_IMAGE,
-  STATION_FOCAL,
-} from "@/config/stage";
+import { STATION_FOCAL } from "@/config/stage";
+import { sceneImage, sceneVideo, type SceneVideoSrc } from "@/config/scenes";
+import { useTheme } from "./theme/useTheme";
+import SceneVideo, { type SceneVideoHandle } from "./SceneVideo";
 
 /**
  * ImageStage — the photoreal cinematic stage that REPLACES the R3F canvas.
@@ -76,10 +77,27 @@ function smoother(t: number): number {
   return x * x * x * (x * (x * 6 - 15) + 10);
 }
 
+/**
+ * Video scrub ease. Input = raw band-relative position (getStationScrub):
+ * 0 at band entry, 1 at band exit. Output = clip progress [0,1]:
+ *   • scrub 0 → 0.5 across the first 35% of the band (Approach),
+ *   • HOLD at 0.5 through the middle 30% (Hold / Card / Explain beats),
+ *   • scrub 0.5 → 1 across the last 35% (Transition).
+ * At band entry (x=0) the clip sits on its FIRST frame, which matches the still
+ * poster — so the lazy video swap is seamless (no push-in pop).
+ */
+function scrubEase(x: number): number {
+  const t = Math.min(1, Math.max(0, x));
+  if (t < 0.35) return (t / 0.35) * 0.5;
+  if (t > 0.65) return 0.5 + ((t - 0.65) / 0.35) * 0.5;
+  return 0.5;
+}
+
 interface Layer {
   id: string;
   index: number;
   src: string;
+  video?: SceneVideoSrc;
   alt: string;
   focal: { x: number; y: number };
   /** priority-load the hero + first product station; lazy the rest. */
@@ -87,8 +105,10 @@ interface Layer {
 }
 
 export default function ImageStage({ onReady }: { onReady?: () => void }) {
+  const theme = useTheme();
   const rootRef = useRef<HTMLDivElement>(null);
   const layerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRefs = useRef<(SceneVideoHandle | null)[]>([]);
   const focusLayerRef = useRef<HTMLDivElement>(null);
   const grainRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<{ t: number; done: boolean }>({ t: 0, done: false });
@@ -98,14 +118,30 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
    *  user-driven motion and the whole point of the journey. */
   const reducedRef = useRef(false);
 
+  // Theme-aware: each layer resolves its still + optional scrubbed video for the
+  // ACTIVE theme. A theme toggle re-renders (rare) and swaps every src; the rAF
+  // loop keeps writing opacity/transform imperatively — those live OUTSIDE JSX
+  // style, so a re-render never resets them (see the layer wrapper + the
+  // initial-style layout effect below).
   const layers: Layer[] = SECTIONS.map((s) => ({
     id: s.id,
     index: s.index,
-    src: s.image ?? STATION_IMAGE[s.id] ?? STATION_IMAGE.hero,
+    src: s.image ?? sceneImage(s.id, theme),
+    video: sceneVideo(s.id, theme),
     alt: `${s.kicker} — ${s.headline}`,
     focal: STATION_FOCAL[s.id] ?? { x: 0.5, y: 0.5 },
     priority: s.index <= 1, // hero + powermieter eager; rest lazy
   }));
+
+  // Seed initial layer opacity/visibility BEFORE first paint (kept out of JSX
+  // style so theme re-renders never reset them; the rAF owns them thereafter).
+  useLayoutEffect(() => {
+    layerRefs.current.forEach((el, i) => {
+      if (!el) return;
+      el.style.opacity = i === 0 ? "1" : "0";
+      el.style.visibility = i === 0 ? "visible" : "hidden";
+    });
+  }, []);
 
   // Signal ready once the hero image has decoded (so the loader lifts on the
   // real asset, not a blank frame). Falls back to the DesktopExperience 2.5s cap.
@@ -230,6 +266,18 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
         el.style.transform = `translate3d(${tx.toFixed(3)}%, ${ty.toFixed(
           3
         )}%, 0) scale(${scale.toFixed(4)})`;
+
+        // scroll-scrubbed video (when this station has one for the active
+        // theme): map the band-relative position to clip progress and seek.
+        // sectionFloat plateaus on the hold, so currentTime holds on a frame
+        // while the panel is read, and scrubs during approach/transition.
+        const vh = videoRefs.current[i];
+        if (vh && op > 0.02) {
+          // scrub from the RAW band position (not the plateaued sf): wide first
+          // frame at entry (matches the poster — no pop), gentle mid-band hold,
+          // fully advanced by exit.
+          vh.seek(scrubEase(getStationScrub(i)));
+        }
       }
 
       // ── focus overlay (explorer crossfade-zoom) ────────────────────────────
@@ -293,8 +341,6 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
             transformOrigin: `${(l.focal.x * 100).toFixed(1)}% ${(
               l.focal.y * 100
             ).toFixed(1)}%`,
-            opacity: i === 0 ? 1 : 0,
-            visibility: i === 0 ? "visible" : "hidden",
           }}
           aria-hidden={i !== 0}
         >
@@ -314,6 +360,17 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
             }}
             draggable={false}
           />
+          {l.video && (
+            <SceneVideo
+              key={l.video.mp4}
+              ref={(h) => {
+                videoRefs.current[i] = h;
+              }}
+              src={l.video}
+              poster={l.src}
+              focal={l.focal}
+            />
+          )}
         </div>
       ))}
 
@@ -331,19 +388,24 @@ export default function ImageStage({ onReady }: { onReady?: () => void }) {
         />
       </div>
 
-      {/* ── grade: cool depth wash + soft vignette (premium, no neon) ── */}
+      {/* ── grade: cool depth wash + soft vignette. Dark mode = premium night
+           depth; light mode = only a whisper so the daylight render stays bright. ── */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(9,15,26,0.28) 0%, rgba(9,15,26,0) 28%, rgba(9,15,26,0) 70%, rgba(9,15,26,0.42) 100%)",
+            theme === "dark"
+              ? "linear-gradient(180deg, rgba(9,15,26,0.28) 0%, rgba(9,15,26,0) 28%, rgba(9,15,26,0) 70%, rgba(9,15,26,0.42) 100%)"
+              : "linear-gradient(180deg, rgba(18,28,44,0.10) 0%, rgba(18,28,44,0) 30%, rgba(18,28,44,0) 72%, rgba(16,28,46,0.14) 100%)",
         }}
       />
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(125% 100% at 50% 44%, transparent 52%, rgba(9,15,26,0.5) 100%)",
+            theme === "dark"
+              ? "radial-gradient(125% 100% at 50% 44%, transparent 52%, rgba(9,15,26,0.5) 100%)"
+              : "radial-gradient(130% 105% at 50% 46%, transparent 62%, rgba(36,52,72,0.14) 100%)",
         }}
       />
 

@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { SECTIONS } from "@/content/sections";
-import { STATION_IMAGE } from "@/config/stage";
+import { sceneImage } from "@/config/scenes";
+import { useTheme } from "./theme/useTheme";
 import { ButtonLink } from "./ui/Button";
 import DashboardOverlay from "./DashboardOverlay";
 import ProductPanel from "./ProductPanel";
@@ -18,8 +19,9 @@ import ResidentsOverlay from "./ResidentsOverlay";
  * top-to-bottom.
  */
 export default function MobileExperience() {
+  const theme = useTheme();
   const [hero, ...rest] = SECTIONS;
-  const heroImg = hero.image ?? STATION_IMAGE[hero.id] ?? STATION_IMAGE.hero;
+  const heroImg = hero.image ?? sceneImage(hero.id, theme);
 
   return (
     <div className="relative">
@@ -78,7 +80,7 @@ export default function MobileExperience() {
       {/* Stacked chapter cards */}
       <div className="space-y-4 px-5 pb-16">
         {rest.map((s) => {
-          const cardImg = s.image ?? STATION_IMAGE[s.id];
+          const cardImg = s.image ?? sceneImage(s.id, theme);
           // The dashboard card shows the full DOM dashboard (its own hero) over a
           // dimmed tower; every other station leads with its photoreal render.
           const showImg = cardImg && s.id !== "dashboard";

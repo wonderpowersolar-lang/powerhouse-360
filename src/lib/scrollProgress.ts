@@ -84,7 +84,11 @@ export function getProgress() {
 
 /** ScrollBridge feeds the DOM-anchored raw section float here every tick. */
 export function setSectionRaw(v: number) {
-  store.sectionRaw = Math.min(NUM_SECTIONS - 1, Math.max(0, v));
+  // Keep the LAST band's own fraction (…-1 .. -0.0001) instead of clamping it
+  // away, so the finale video can scrub across its band. getSectionFloat /
+  // holdWeight / copyWeight clamp to LAST internally, so camera + copy are
+  // unaffected; only getStationScrub reads the fractional overshoot.
+  store.sectionRaw = Math.min(NUM_SECTIONS - 0.0001, Math.max(0, v));
 }
 
 function smoothstep(t: number) {
@@ -126,6 +130,20 @@ export function getSectionFloat() {
   }
 
   return i;
+}
+
+/**
+ * Raw, UN-plateaued band-relative position for station `index`: roughly
+ * `rawScroll − index`, so it is 0 at station index's own start crossing and 1
+ * at its end (negative before, >1 after). Unlike getSectionFloat (which PINS to
+ * the hold plateau), this travels continuously with scroll — used to SCRUB a
+ * station's video smoothly across its whole band. Clamp + ease at the call site.
+ */
+export function getStationScrub(index: number): number {
+  // Un-plateaued AND not clamped to LAST (unlike rawFloat), so the finale band
+  // scrubs across its full height too.
+  const raw = store.sectionRaw >= 0 ? store.sectionRaw : store.progress * LAST;
+  return Math.min(NUM_SECTIONS - 0.0001, Math.max(0, raw)) - index;
 }
 
 /**

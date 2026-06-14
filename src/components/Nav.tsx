@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { LogoLockup } from "./ui/Logo";
 import { ButtonLink } from "./ui/Button";
+import ThemeToggle from "./theme/ThemeToggle";
 import { NAV_LINKS } from "@/content/sections";
 
 /**
@@ -51,10 +52,13 @@ export default function Nav() {
           ))}
         </div>
 
-        <div className="hidden lg:block">
-          <ButtonLink href="#cta" variant="primary">
-            Projekt prüfen lassen
-          </ButtonLink>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <ThemeToggle />
+          <div className="hidden lg:block">
+            <ButtonLink href="#cta" variant="primary">
+              Projekt prüfen lassen
+            </ButtonLink>
+          </div>
         </div>
 
         {/* Mobile menu button */}

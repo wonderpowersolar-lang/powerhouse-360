@@ -1,113 +1,161 @@
-# POWERHOUSE360 — Landing Page
+# POWERHOUSE 360 — Scroll-Website
 
-Production landing page for **POWERHOUSE360**, the Building-OS for German
-multi-family buildings (Mehrfamilienhäuser). A scroll-driven, code-controlled
-React Three Fiber (R3F) scene sits pinned behind eight German-language story
-chapters: Building → PV → Heat → Hub → Metering → Residents → Management →
-Platform.
+**Powerhouse 360 – Das Betriebssystem deiner Immobilie.**
 
-Core message: **„Aus einem Mehrfamilienhaus wird ein intelligentes Energie-Asset."**
+Eine premium, scroll-getriggerte Website für das Building-OS für Mehrfamilienhäuser.
+Hinter langgehaltenen Scroll-Stationen liegt eine **photoreale Szenen-Bühne** (Stills +
+scroll-gescrubbte Videos), darüber erscheinen **echte DOM-Produktkarten**. Komplett in
+**Dark- und Light-Mode**, mit Mobile-Fallback.
+
+Produktwelten: **Powermieter** (Strom) · **Heatmieter** (Wärme) · **POWERHOUSE Hub** ·
+**Chargemieter** (Laden) · **Smokemieter** (Sicherheit) · **Bewohnerportal** · **Plattform**.
+
+---
 
 ## Stack
 
-- **Next.js 16** (App Router, TypeScript) + **Tailwind v4** (design tokens)
-- **React Three Fiber 9** + **three** + **@react-three/drei** (native R3F, not Spline)
-- **GSAP** (available) + **Lenis** smooth scroll driving a shared scroll-progress store
-- Font: **Sora** via `next/font`
-
-## Run it
+- **Next.js 16** (App Router, TypeScript) · **React 19** · **Tailwind v4** (Design-Tokens)
+- **GSAP** + **Lenis** (Smooth-Scroll, speist einen geteilten Scroll-Store)
+- **three / @react-three/fiber** — die ursprüngliche Echtzeit-3D-Bühne ist **erhalten** und
+  per Flag wieder aktivierbar (siehe `STAGE`)
+- Font: **Sora** (`next/font`)
 
 ```bash
-npm install        # if node_modules is missing
-npm run dev        # http://localhost:3000
-npm run build      # production build
-npm run start      # serve the production build
+npm install
+npm run dev      # http://localhost:3000  (launch.json nutzt :3005 für die Preview)
+npm run build
+npm run start
 npm run lint
 ```
 
-## How it works
+---
 
-- A single **persistent `<Canvas>`** is pinned full-viewport behind the text.
-- Lenis feeds `lib/scrollProgress.ts` (a module-level store) on every scroll tick.
-- `three/CameraRig.tsx` reads that progress each frame and smoothstep-interpolates
-  the camera between the 8 chapter keyframes. No React re-renders per frame.
-- Each scene element (PV, heat pump, Hub, meters, apartment, energy flows) brightens
-  via `three/emphasis.ts`, which computes a per-frame glow weight from the active
-  chapter — so the building "unfolds" its story as you scroll.
+## Wie es funktioniert
 
-### Where to edit things
+Eine **fixe, vollflächige Bühne** liegt hinter den scrollenden Copy-Panels. Lenis speist
+`lib/scrollProgress.ts` (ein Modul-Store, keine React-Re-Renders pro Frame). Eine einzige
+`requestAnimationFrame`-Schleife in `components/ImageStage.tsx` liest den Scroll-Stand und
+schreibt pro Station-Layer nur GPU-Eigenschaften (Opacity/Transform) → Crossfade + Ken-Burns;
+hat eine Station ein Video, wird zusätzlich `video.currentTime` aus dem Scroll gesetzt
+(scroll-Scrubbing).
 
-| You want to change…              | Edit                                              |
-|----------------------------------|---------------------------------------------------|
-| **Copy / headlines / CTAs**      | `src/content/sections.ts` (single source of truth)|
-| **Camera storyline / keyframes** | `camPos` / `camTarget` in `src/content/sections.ts` |
-| **Brand colors / tokens**        | `src/app/globals.css` (`@theme`) + `src/components/three/palette.ts` |
-| **The 3D scene assembly**        | `src/components/three/BuildingScene.tsx`          |
-| **The POWERHOUSE Hub v1 model**  | `src/components/three/Hub.tsx`                     |
-| **Building geometry / windows**  | `src/components/three/Building.tsx`               |
-| **Dashboard KPIs / modules**     | `src/content/sections.ts` (`DASHBOARD_*`)         |
-| **Nav links**                    | `src/content/sections.ts` (`NAV_LINKS`)           |
-| **Mobile fallback**              | `src/components/MobileExperience.tsx` + `BuildingArt.tsx` |
+**5-Beat-System pro Station** (`Approach · Hold · Reveal · Explain · Transition`): die
+Section-Höhe ist Scroll-Runway, der `hold`-Wert reserviert ein Plateau, auf dem die Szene
+ruht und die Produktkarte erscheint.
 
-## File structure
+### Dark / Light
+
+- `lib/themeStore.ts` — Modul-Store (`getTheme`/`setTheme`/`toggleTheme`/`subscribeTheme`)
+- `components/theme/useTheme.ts` — React-Hook · `components/theme/ThemeToggle.tsx` — der Schalter im Nav
+- **No-Flash:** `public/theme-init.js` (via `next/script` `beforeInteractive`) setzt
+  `data-theme` vor dem ersten Paint (Default **dark**, gespeichert in `localStorage`/Cookie).
+- **Re-Theming:** `app/globals.css` überschreibt unter `html[data-theme="light"]` die
+  Token-Variablen (navy-Skala → helle Neutral-Skala, ink → dunkel, Accents kontraststärker).
+  Jede `bg-navy-*` / `text-ink*` Utility kippt dadurch automatisch mit.
+- **Szenen-Assets** wechseln pro Theme über `sceneImage(id, theme)` / `sceneVideo(id, theme)`.
+
+---
+
+## ✏️ Wo ändere ich was?
+
+| Du willst ändern…                         | Datei |
+|-------------------------------------------|-------|
+| **Copy / Headlines / Sublines / CTAs**    | `src/content/sections.ts` |
+| **Produktkarten** (Titel, Bullets, KPIs)  | `src/content/sections.ts` → `panel` je Section |
+| **Karten-Design / Glass / Farben**        | `src/components/ProductPanel.tsx`, `src/components/ui/MetricCard.tsx` |
+| **Szenen-Bilder (dark/light)**            | Datei ablegen unter `public/assets/powerhouse/scenes/{dark,light}/<id>.jpg`; Pfad in `src/config/scenes.ts` |
+| **Szenen-Videos (dark/light)**            | mp4/webm ablegen unter `public/assets/powerhouse/video/{dark,light}/`; in `src/config/scenes.ts` das `video`-Feld der Station setzen |
+| **Bild-/Video-Fokuspunkt (Ken-Burns)**    | `focal` je Eintrag in `src/config/scenes.ts` |
+| **Scroll-Timings (Hold-Dauer)**           | `hold` je Section in `src/content/sections.ts` + `src/styles/motionTokens.ts` (`hold`, `sectionHeightVh`) |
+| **Band-Mapping / Scrub-Kurve**            | `src/lib/scrollProgress.ts` (`getSectionFloat`, `getStationScrub`), `scrubEase()` in `ImageStage.tsx` |
+| **Brand-Farben / Tokens**                 | `src/app/globals.css` (`@theme` = dark, `html[data-theme="light"]` = light) |
+| **Nav-Links / Theme-Toggle**              | `src/components/Nav.tsx`, `NAV_LINKS` in `sections.ts` |
+| **Mobile-Fallback**                       | `src/components/MobileExperience.tsx` |
+| **Bühne: Bild vs. Echtzeit-3D**           | `STAGE` in `src/config/stage.ts` (`"image"` ⟷ `"r3f"`) |
+
+---
+
+## ➕ Neue Szene/Station ergänzen
+
+1. **Asset** ablegen: `public/assets/powerhouse/scenes/{dark,light}/<neueId>.jpg`
+   (optional Video unter `video/{dark,light}/<neueId>.mp4`).
+2. **`src/config/scenes.ts`**: Eintrag in `SCENES` mit `image`, optional `video`, `focal`.
+3. **`src/content/sections.ts`**: `SectionDef` mit `id: "<neueId>"`, fortlaufendem `index`,
+   Copy, `hold`, optional `panel`. (Falls die R3F-Bühne genutzt wird: `camPos`/`camTarget`.)
+4. **`src/lib/scrollProgress.ts`**: `NUM_SECTIONS` erhöhen.
+5. Optional Nav-Link in `NAV_LINKS` + Label in `STATION_LABELS`.
+
+Reihenfolge der Stationen = Reihenfolge in `SECTIONS` (alles datengetrieben).
+
+---
+
+## 🎬 Asset-Pipeline (Higgsfield)
+
+Die Szenen sind mit **Higgsfield** erzeugt, identitätskonsistent vom Referenz-Render:
+
+- **Light-Renders** — Modell `flux_kontext` (Tag↔Nacht-Relight aus dem dunklen Still als
+  Referenz, ~1,5 Credits). Hält Gebäude/Geometrie konstant, ändert nur Licht/Himmel.
+- **Scroll-Videos** — Modell `seedance_2_0`, `start_image` = der Still, langsamer Push-in,
+  6 s, 720p (~27 Credits).
+
+**Video für Web optimieren** (für sauberes Scrubbing — dichte Keyframes, kein Audio):
+
+```bash
+ffmpeg -i raw.mp4 -an -c:v libx264 -profile:v high -pix_fmt yuv420p \
+  -crf 22 -g 4 -keyint_min 4 -sc_threshold 0 -movflags +faststart out.mp4
+```
+
+### Aktueller Asset-Stand
+
+- **Stills:** dark **und** light für alle Stationen ✓
+- **Videos (dark):** `hero`, `heatmieter`, `hub`, `cta` (Final). Übrige Stationen nutzen den
+  premium Bild-Crossfade (Ken-Burns) als Fallback — die Architektur mountet ein `SceneVideo`
+  automatisch, sobald für eine Station/Theme ein `video` im Manifest steht.
+- **Light-Videos:** noch keine → Light-Mode nutzt die Light-Stills (sauberer Fallback).
+
+---
+
+## Performance & A11y
+
+- Videos: `muted` · `playsInline` · `preload="none"` → lazy-load erst beim ersten Seek; kein
+  Autoplay (reines Scrubbing); bei Fehler Fallback auf das Still.
+- `next/image` für Stills; cinematic Grade ist theme-abhängig (Light bleibt hell).
+- `prefers-reduced-motion`: autonome Bewegung (Breathing/Grain/Auto-Push-in) gedämpft, die
+  scroll-gekoppelte Journey bleibt (user-getrieben).
+- Mobile / coarse-pointer → leichter gestapelter Fallback statt Scroll-Pinning.
+
+### Bekannte Dev-Hinweise (nur Entwicklung, nicht Produktion)
+
+- **Asset gleichen Namens überschrieben?** Next' Image-Optimizer cached pro URL — im Dev kann
+  ein altes Bild bleiben. Hard-Reload oder Dev-Server neu starten. In Produktion (gehashte
+  Builds) tritt das nicht auf.
+- Eine React-**Dev-Warnung** „Encountered a script tag…" stammt vom Theme-Init-Script und wird
+  im Production-Build entfernt (No-Flash funktioniert korrekt).
+
+---
+
+## Dateistruktur (Auszug)
 
 ```
 src/
-  app/
-    layout.tsx              Root layout, Sora font, metadata, Lenis wrapper
-    page.tsx                Nav + Experience + Footer
-    globals.css             Design tokens (@theme), brand colors, utilities
+  app/            layout.tsx (Theme-Init, Lenis) · page.tsx · globals.css (Tokens dark/light)
+  config/
+    scenes.ts     SZENEN-MANIFEST: image/video/focal je Station, dark+light  ← Assets hier
+    stage.ts      STAGE-Flag (image|r3f) · Explorer-Hotspots · back-compat Maps
   content/
-    sections.ts             8 chapters: copy + camera keyframes + emphasis (EDIT COPY HERE)
+    sections.ts   Stationen: Copy + Produktkarten + KPIs + Kamera-Keyframes   ← Copy hier
   lib/
-    scrollProgress.ts       Shared scroll store (DOM <-> R3F bridge, no re-renders)
+    scrollProgress.ts  Scroll-Store + 5-Beat-Mapping + getStationScrub
+    themeStore.ts      Theme-Store (dark/light)
+  styles/motionTokens.ts  hold-Werte, Section-Höhen, Easing
   components/
-    SmoothScroll.tsx        Lenis root, feeds the scroll store
-    Experience.tsx          Picks desktop (3D) vs mobile (static) at runtime
-    DesktopExperience.tsx   Pinned canvas + scrolling panels + loader + WebGL fallback
-    MobileExperience.tsx    Static SVG hero + stacked content cards
-    SectionPanel.tsx        One full-height scroll panel with directional scrim
-    DashboardOverlay.tsx    Section 7 KPI cards + module chips
-    SceneLoader.tsx         Branded loading state (navy + logo + building silhouette)
-    BuildingArt.tsx         Lightweight SVG building (mobile hero + WebGL fallback)
-    Nav.tsx / Footer.tsx    Sticky nav + footer
-    ui/
-      Button.tsx            Token-driven primary/secondary CTA
-      Logo.tsx              Official logo lockup + mark
-    three/
-      BuildingScene.tsx     <Canvas>, lighting, fog, scene assembly
-      CameraRig.tsx         Scroll-driven camera interpolation (keyframes -> camera)
-      Building.tsx          MFH massing + instanced warm windows
-      RoofPV.tsx            Rooftop PV array (Powermaker)
-      HeatPump.tsx          Air-source heat pump (Heatmaker)
-      TechRoom.tsx          Technical room shell hosting the Hub
-      Hub.tsx               POWERHOUSE Hub v1 (white enclosure, display, HUB v1, latches…)
-      MeterCabinet.tsx      Meter cabinet (Powermieter)
-      Apartment.tsx         Apartment interior + energy dashboard + Paula card
-      EnergyFlow.tsx        Subtle animated roof->hub, heatpump->building, meters->building flows
-      emphasis.ts           Per-frame glow weight per chapter
-      palette.ts            Scene color constants (mirror brand tokens)
-public/
-  brand/                    logo-lockup.png, logo-mark.png, logo.svg
+    ImageStage.tsx      die Scroll-Video-Bühne (Crossfade + Ken-Burns + Video-Scrub)
+    SceneVideo.tsx      scroll-gescrubbtes Video-Element (seek, poster, lazy)
+    theme/              themeStore-Hook + ThemeToggle
+    ProductPanel.tsx    Produktkarte (beat-gekoppeltes Reveal) · ui/MetricCard.tsx KPI-Chip
+    MobileExperience.tsx  gestapelter Mobile-Fallback
+    Nav.tsx · Footer.tsx · SectionPanel.tsx · ModuleNavigation.tsx · …
+public/assets/powerhouse/
+  scenes/{dark,light}/<id>.jpg
+  video/{dark,light}/<id>.mp4
 ```
-
-## Performance & accessibility
-
-- 3D is lazy-loaded (`dynamic`, `ssr:false`) behind a branded loading state.
-- `dpr` capped at `[1, 1.8]`, `AdaptiveDpr`, fog culling, instanced windows.
-- **Mobile / coarse-pointer / reduced-motion → no heavy 3D.** A lightweight static
-  SVG hero plus the 8 chapters as stacked cards (full German copy) is served instead.
-- **WebGL fallback:** if a WebGL context can't be created, the static building art is
-  shown behind the text and the loader never traps the user (6s safety timeout).
-- Semantic headings, keyboard-focusable nav/CTAs, `prefers-reduced-motion` honored.
-
-## Known limitations / follow-ups
-
-- **Hub v1 is a *stylized* model.** It is recognizable (white enclosure, "POWERHOUSE 360"
-  wordmark, black recessed display, large "HUB v1", two round latches, router + cables,
-  status LEDs) but built from primitives. Refine against a real product photo if desired.
-- The 3D requires a GPU-backed browser; headless/software-render environments fall back
-  to the static art (by design).
-- No real photographic imagery: `MUAPI_API_KEY` was not configured, so per the
-  website-building skill we fell back to crafted SVG/3D rather than failing. Add the key
-  and run the `muapi-*` skills to generate hero/OG imagery if photoreal assets are wanted.

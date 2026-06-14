@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { SECTIONS } from "@/content/sections";
 import { STAGE } from "@/config/stage";
+import { useTheme } from "./theme/useTheme";
 import SectionPanel from "./SectionPanel";
 import DashboardOverlay from "./DashboardOverlay";
 import SceneLoader from "./SceneLoader";
@@ -47,6 +48,7 @@ function hasWebGL(): boolean {
  * reveal class on each panel for calm fade-in of the copy.
  */
 export default function DesktopExperience() {
+  const theme = useTheme();
   const [ready, setReady] = useState(false);
   // DesktopExperience only mounts client-side (Experience decides after
   // mount), so WebGL support can be detected in the state initializer.
@@ -106,7 +108,9 @@ export default function DesktopExperience() {
           style={{
             background:
               STAGE === "image"
-                ? "radial-gradient(135% 105% at 50% 45%, transparent 62%, rgba(9,15,26,0.32) 100%)"
+                ? theme === "dark"
+                  ? "radial-gradient(135% 105% at 50% 45%, transparent 62%, rgba(9,15,26,0.32) 100%)"
+                  : "radial-gradient(140% 112% at 50% 46%, transparent 68%, rgba(36,52,72,0.10) 100%)"
                 : "radial-gradient(130% 100% at 50% 45%, transparent 55%, rgba(9,15,26,0.55) 100%)",
           }}
         />

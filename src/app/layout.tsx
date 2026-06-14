@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Sora } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 import SmoothScroll from "@/components/SmoothScroll";
 
 const sora = Sora({
@@ -39,8 +40,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de" className={`${sora.variable} antialiased`}>
+    <html
+      lang="de"
+      data-theme="dark"
+      suppressHydrationWarning
+      className={`${sora.variable} antialiased`}
+    >
       <body className="min-h-dvh bg-navy-900 text-ink">
+        {/* No-flash theme init (public/theme-init.js): sets data-theme before
+            paint from the stored choice (default dark). External src +
+            beforeInteractive runs pre-hydration and avoids React 19's inline-
+            script-in-component warning. */}
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

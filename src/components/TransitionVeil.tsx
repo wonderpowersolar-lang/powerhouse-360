@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { SECTIONS } from "@/content/sections";
 import { getSectionFloat } from "@/lib/scrollProgress";
+import { useTheme } from "./theme/useTheme";
 
 /**
  * TransitionVeil — a soft darken pulse over the 3D stage during BIG camera
@@ -26,6 +27,7 @@ const INTERIOR = new Set([
 
 export default function TransitionVeil() {
   const ref = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
 
   // Per-boundary jump magnitude 0..1 (i → i+1).
   const magnitudes = useMemo(() => {
@@ -70,7 +72,9 @@ export default function TransitionVeil() {
       style={{
         opacity: 0,
         background:
-          "radial-gradient(120% 100% at 50% 50%, rgba(7,12,22,0.72) 0%, rgba(7,12,22,0.92) 100%)",
+          theme === "dark"
+            ? "radial-gradient(120% 100% at 50% 50%, rgba(7,12,22,0.72) 0%, rgba(7,12,22,0.92) 100%)"
+            : "radial-gradient(120% 100% at 50% 50%, rgba(228,234,242,0.5) 0%, rgba(228,234,242,0.82) 100%)",
       }}
     />
   );

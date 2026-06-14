@@ -48,6 +48,73 @@
 :root {
   --background: #0d1626;
   --foreground: #eef3f8;
+
+  /* Theme-toggle chrome (overridden per theme below) */
+  --toggle-bg: rgba(255, 255, 255, 0.06);
+  --toggle-bg-hover: rgba(255, 255, 255, 0.12);
+  --toggle-border: rgba(255, 255, 255, 0.12);
+
+  /* Semantic surfaces used where the navy scale alone isn't enough.
+     Dark = the brand's primary register. */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --hairline-color: rgba(255, 255, 255, 0.08);
+  /* Scrim used to keep headlines legible over a scene (top + bottom fades). */
+  --scrim: rgba(9, 15, 26, 0.82);
+  --scrim-soft: rgba(9, 15, 26, 0.32);
+}
+
+/* ── LIGHT MODE ───────────────────────────────────────────────────────────
+   A bright studio / daylight register. We remap the navy surface scale to a
+   cool light-neutral scale and flip the ink scale to dark, so every existing
+   `bg-navy-*` / `text-ink*` utility re-themes live (Tailwind v4 utilities read
+   these custom properties). Accents are deepened a touch for AA contrast on
+   off-white. The photoreal scene assets carry their own light-mode mood. */
+html[data-theme="light"] {
+  --background: #eef1f6;
+  --foreground: #101c2e;
+
+  /* surfaces (navy scale → cool light-neutral scale) */
+  --color-navy-900: #eef1f6;
+  --color-navy-800: #e6eaf1;
+  --color-navy-700: #dce3ec;
+  --color-navy-600: #d1dae7;
+
+  /* text inks → dark on light */
+  --color-ink: #101c2e;
+  --color-ink-dim: #41526a;
+  --color-ink-faint: #74859a;
+
+  /* structural secondary text */
+  --color-slate-blue-500: #3a4c61;
+  --color-slate-blue-400: #46586d;
+  --color-slate-blue-300: #56697e;
+
+  /* accents — deepened for contrast on off-white */
+  --color-brand-green: #2f9b4a;
+  --color-brand-teal: #11857f;
+  --color-brand-aqua: #4fa99d;
+
+  /* chrome + semantic surfaces */
+  --toggle-bg: rgba(16, 28, 46, 0.05);
+  --toggle-bg-hover: rgba(16, 28, 46, 0.1);
+  --toggle-border: rgba(16, 28, 46, 0.16);
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-border: rgba(16, 28, 46, 0.1);
+  --hairline-color: rgba(16, 28, 46, 0.1);
+  --scrim: rgba(238, 241, 246, 0.84);
+  --scrim-soft: rgba(238, 241, 246, 0.34);
+}
+
+/* Smooth the surface/text transition when the toggle flips (but never the
+   per-frame stage transforms — those are driven imperatively). */
+html {
+  transition: background-color 0.5s var(--ease-calm);
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    transition: none;
+  }
 }
 
 * {

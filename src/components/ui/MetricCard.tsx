@@ -41,7 +41,7 @@ export default function MetricCard({
       </p>
       <p
         className={`mt-0.5 text-base font-bold tabular-nums ${
-          light ? "text-navy-900" : "text-ink"
+          light ? "text-[#101c2e]" : "text-ink"
         }`}
       >
         {value}

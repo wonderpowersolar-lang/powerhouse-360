@@ -5,6 +5,7 @@ import type { ProductPanelDef } from "@/content/sections";
 import { holdWeight } from "@/lib/scrollProgress";
 import { dur, ease } from "@/styles/motionTokens";
 import MetricCard from "./ui/MetricCard";
+import { useTheme } from "./theme/useTheme";
 
 /**
  * ProductPanel — the numbered floating product card that carries the detail
@@ -53,7 +54,11 @@ export default function ProductPanel({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const accent = ACCENT[panel.accent];
-  const light = panel.theme === "light";
+  const theme = useTheme();
+  // In global LIGHT mode every card uses the light glass treatment (off-white,
+  // dark text). In DARK mode the per-panel `theme` decides (light cards over the
+  // bright interior scenes, dark glass over the night exteriors) — unchanged.
+  const light = theme === "light" ? true : panel.theme === "light";
 
   // Per-frame beat state machine (see header).
   useEffect(() => {
@@ -111,7 +116,7 @@ export default function ProductPanel({
         className={[
           "relative overflow-hidden rounded-3xl border p-5 backdrop-blur-xl",
           light
-            ? "border-white/70 bg-white/85 text-navy-900 shadow-[0_30px_90px_-30px_rgba(5,12,26,0.7)]"
+            ? "border-white/70 bg-white/85 text-[#101c2e] shadow-[0_30px_90px_-30px_rgba(20,32,54,0.4)]"
             : "border-white/12 bg-navy-900/55 text-ink shadow-[0_30px_90px_-30px_rgba(0,0,0,0.8)]",
         ].join(" ")}
       >
@@ -145,7 +150,7 @@ export default function ProductPanel({
         {/* title + subtitle */}
         <h3
           className={`pr-14 text-xl font-bold leading-tight ${
-            light ? "text-navy-900" : "text-ink"
+            light ? "text-[#101c2e]" : "text-ink"
           }`}
         >
           {panel.title}
