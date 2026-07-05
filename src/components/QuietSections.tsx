@@ -60,54 +60,28 @@ export default function QuietSections() {
       <div className="hairline mx-auto max-w-4xl" />
 
       {/* ───────────────────────────── POWERHOUSE Hub v1 ──
-          Wie die Stationen: das Video ist der SEKTIONS-HINTERGRUND, die Copy
-          liegt mit Scrim darüber; weiche Fades oben/unten nahtlos ins
-          Seiten-Schwarz. */}
+          Zwei Spalten: links der Textkörper, rechts der Hub-Produktfilm als
+          gerahmte Karte. Opaker Navy-Grund für einen sauberen Übergang aus
+          der Plattform-Station (kein Vollbild-Video mehr). */}
       <section
         id="hub"
         aria-labelledby="hub-h"
-        className="relative flex min-h-[85vh] items-center overflow-hidden lg:min-h-[92vh]"
+        className="relative overflow-hidden pb-28 pt-24 sm:pb-32 sm:pt-28 lg:pb-40 lg:pt-32"
       >
-        <video
-          ref={hubVideoRef}
-          src="/media/hub-v1.mp4"
-          poster="/media/hub-v1-poster.jpg"
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-label="Produktfilm: POWERHOUSE Hub v1 – die lokale Zentrale im Gebäude"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "50% 46%" }}
-        />
-        {/* Leichter Scrim (Video behält Wirkung) + nahtlose Fades oben/unten.
-            Die Lesbarkeit übernimmt jetzt vor allem die Glasbox um den Text. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy-900/75 via-navy-900/25 to-transparent"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-navy-900 to-transparent"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-navy-900 to-transparent"
-        />
-
-        <div className="relative mx-auto w-full max-w-6xl px-5 py-24 sm:px-8">
-          <div className="q-reveal max-w-xl rounded-3xl border border-white/12 bg-navy-900/50 p-8 shadow-[0_24px_70px_-24px_rgba(0,0,0,0.7)] backdrop-blur-xl sm:p-10">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:gap-16">
+          {/* Textkörper — links */}
+          <div className="q-reveal order-2 lg:order-1">
             <p className="mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-gold">
               <span className="h-px w-8 bg-gold/60" />
               POWERHOUSE Hub v1
             </p>
             <h2
               id="hub-h"
-              className="text-legible text-3xl font-bold leading-[1.1] text-ink sm:text-4xl md:text-[2.75rem]"
+              className="text-3xl font-bold leading-[1.1] text-ink sm:text-4xl md:text-[2.75rem]"
             >
               Die lokale Schaltzentrale im Gebäude.
             </h2>
-            <p className="text-legible mt-5 max-w-lg text-base leading-relaxed text-ink-dim sm:text-lg">
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-ink-dim sm:text-lg">
               Der Hub verbindet Geräte, Zähler und Sensorik im Objekt und
               übergibt die Daten strukturiert an die Plattform – dieselbe
               lokale Datenbasis für alle Module.
@@ -121,7 +95,7 @@ export default function QuietSections() {
               ].map((line) => (
                 <li
                   key={line}
-                  className="text-legible flex items-start gap-3 text-[15px] leading-relaxed text-ink-dim"
+                  className="flex items-start gap-3 text-[15px] leading-relaxed text-ink-dim"
                 >
                   <span
                     aria-hidden
@@ -131,6 +105,33 @@ export default function QuietSections() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Produktfilm — rechts */}
+          <div className="q-reveal order-1 lg:order-2">
+            <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-navy-900 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)]">
+              <video
+                ref={hubVideoRef}
+                src="/media/hub-v1.mp4"
+                poster="/media/hub-v1-poster.jpg"
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                aria-label="Produktfilm: POWERHOUSE Hub v1 – die lokale Zentrale im Gebäude"
+                className="aspect-[4/3] w-full object-cover"
+                style={{ objectPosition: "50% 46%" }}
+              />
+              {/* feiner Innenrahmen + weicher unterer Verlauf für Tiefe */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/10"
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-navy-900/70 to-transparent"
+              />
+            </div>
           </div>
         </div>
       </section>

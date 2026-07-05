@@ -41,7 +41,27 @@ export default function SectionPanel({
     const tick = () => {
       const el = layerRef.current;
       if (el) {
-        const w = copyWeight(section.index);
+        let w = copyWeight(section.index);
+        // The dashboard is the LAST pinned station before the opaque quiet
+        // sections. By design its scroll band stretches across those sections
+        // (see computeSectionRaw), so copyWeight never fades it — leaving the
+        // platform headline pinned at full opacity, colliding with the Hub
+        // section as it scrolls up. Fade the copy out by the Hub's own
+        // viewport position instead, so the handoff is clean.
+        if (section.id === "dashboard") {
+          const next = document.getElementById("hub");
+          if (next) {
+            const vh = window.innerHeight || 1;
+            const top = next.getBoundingClientRect().top;
+            // 1 while the Hub is still well below the fold; ramps to 0 as it
+            // rises past ~40% of the viewport (fully cleared before it covers).
+            const exit = Math.min(
+              1,
+              Math.max(0, (top - vh * 0.4) / (vh * 0.5))
+            );
+            w = Math.min(w, exit);
+          }
+        }
         el.style.opacity = w.toFixed(3);
         el.style.visibility = w < 0.015 ? "hidden" : "visible";
         const nowOn = w > 0.42;
