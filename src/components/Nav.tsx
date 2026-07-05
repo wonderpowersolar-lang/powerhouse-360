@@ -7,7 +7,8 @@ import { NAV_LINKS } from "@/content/sections";
 
 /**
  * Sticky top navigation: logo lockup, chapter anchor links, primary CTA,
- * and a scroll-progress hairline. Collapses to a menu button on mobile.
+ * and a scroll-progress hairline in gold. Collapses to a menu button on
+ * mobile.
  */
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -30,13 +31,13 @@ export default function Nav() {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
         scrolled
-          ? "bg-navy-900/80 backdrop-blur-md border-b border-white/5"
+          ? "bg-navy-900/85 backdrop-blur-md border-b border-white/5"
           : "bg-transparent"
       }`}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-3.5 sm:px-8">
-        <a href="#hero" aria-label="POWERHOUSE 360 Startseite" className="shrink-0">
-          <LogoLockup priority className="h-7 w-auto sm:h-8" />
+        <a href="#hero" aria-label="Powerhouse 360 Startseite" className="shrink-0">
+          <LogoLockup priority className="h-9 w-auto sm:h-11" />
         </a>
 
         <div className="hidden items-center gap-7 lg:flex">
@@ -52,8 +53,8 @@ export default function Nav() {
         </div>
 
         <div className="hidden lg:block">
-          <ButtonLink href="#cta" variant="primary">
-            Projekt prüfen lassen
+          <ButtonLink href="/demo" variant="primary">
+            Demo anfragen
           </ButtonLink>
         </div>
 
@@ -84,10 +85,10 @@ export default function Nav() {
         </button>
       </nav>
 
-      {/* scroll progress hairline */}
+      {/* scroll progress hairline — gold */}
       <div className="h-px w-full bg-white/5">
         <div
-          className="h-full bg-gradient-to-r from-brand-green via-brand-teal to-brand-aqua transition-[width] duration-150"
+          className="h-full bg-gradient-to-r from-gold-deep via-gold to-gold-soft transition-[width] duration-150"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
@@ -107,12 +108,12 @@ export default function Nav() {
               </a>
             ))}
             <ButtonLink
-              href="#cta"
+              href="/demo"
               variant="primary"
               className="mt-2 w-full"
               onClick={() => setOpen(false)}
             >
-              Projekt prüfen lassen
+              Demo anfragen
             </ButtonLink>
           </div>
         </div>

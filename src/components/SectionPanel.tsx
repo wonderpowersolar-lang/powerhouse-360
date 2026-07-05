@@ -2,29 +2,20 @@
 
 import { useEffect, useRef } from "react";
 import { ButtonLink } from "./ui/Button";
-import ProductPanel from "./ProductPanel";
 import { copyWeight } from "@/lib/scrollProgress";
-import { getFocusBlend } from "@/lib/focusStore";
 import { sectionHeightVh } from "@/styles/motionTokens";
-import type { SectionDef } from "@/content/sections";
+import { ACCENT_VAR, type SectionDef } from "@/content/sections";
 
 /**
- * One station of the scroll story.
+ * One station of the scroll journey.
  *
  * The <section> element itself is pure SCROLL RUNWAY (its height defines the
- * station's band; heights from motionTokens: 190vh default, 220vh for hero /
- * heatmieter / dashboard). The visible stage copy lives in a FIXED overlay
- * whose opacity is driven per-frame from `copyWeight(index)` — NOT sticky:
- * sticky positioning can only pin for (H−100vh)/H of a band, which would
- * break the Explain beat (§5). With the fixed layer the copy is perfectly
- * static through Hold/Reveal/Explain and dissolves exactly when the camera
- * releases. Only the final CTA section keeps `sticky` so the footer can push
- * it out naturally at the end of the page.
- *
- * A per-station gradient scrim keeps headlines legible over the bright parts
- * of the scene. Each product station carries its big semi-transparent chapter
- * numeral ("03 /") behind the copy (Razorpay leitmotif); the hero shows the
- * NRG-style scroll prompt.
+ * station's band). The visible copy lives in a FIXED overlay whose opacity is
+ * driven per-frame from `copyWeight(index)` — perfectly static through the
+ * hold, dissolving exactly when the stage travels. Staccato module lines
+ * reveal in sequence once the station has settled (data-on threshold).
+ * Only the final CTA section keeps `sticky` so the footer can push it out
+ * naturally at the end of the page.
  */
 export default function SectionPanel({
   section,
@@ -34,23 +25,30 @@ export default function SectionPanel({
   children?: React.ReactNode;
 }) {
   const layerRef = useRef<HTMLDivElement>(null);
-  const isDashboard = section.id === "dashboard";
+  const isHero = section.index === 0;
   const isCta = section.id === "cta";
-  const numeral = section.panel?.number;
+  const accent = ACCENT_VAR[section.accent ?? "gold"];
+  /** ghost numeral for numbered module stations ("01 / Powermieter") */
+  const numeral = /^\d\d\s\//.test(section.kicker)
+    ? section.kicker.slice(0, 2)
+    : undefined;
 
-  // Per-frame copy visibility (fixed layers only — the CTA rides with flow).
+  // Per-frame copy visibility + the staggered line-reveal switch.
   useEffect(() => {
     if (isCta) return;
     let raf = 0;
+    let on = false;
     const tick = () => {
       const el = layerRef.current;
       if (el) {
-        // Fade the scroll-story copy out as the explorer flies a module in, so
-        // the focused-module overlay reads cleanly (no hero copy bleeding
-        // through), then fade it back as the camera returns to the overview.
-        const w = copyWeight(section.index) * (1 - getFocusBlend());
+        const w = copyWeight(section.index);
         el.style.opacity = w.toFixed(3);
         el.style.visibility = w < 0.015 ? "hidden" : "visible";
+        const nowOn = w > 0.42;
+        if (nowOn !== on) {
+          on = nowOn;
+          el.dataset.on = nowOn ? "1" : "0";
+        }
       }
       raf = requestAnimationFrame(tick);
     };
@@ -65,24 +63,31 @@ export default function SectionPanel({
       ? "items-center justify-center text-center"
       : "items-center justify-start text-left";
 
-  // Directional scrim so text side is darker than scene side.
+  // Directional scrim so the text side is darker than the scene side.
   const scrim =
     section.align === "right"
-      ? "bg-gradient-to-l from-navy-900/85 via-navy-900/30 to-transparent"
+      ? "bg-gradient-to-l from-navy-900/85 via-navy-900/25 to-transparent"
       : section.align === "center"
-      ? "bg-gradient-to-t from-navy-900/85 via-navy-900/25 to-navy-900/40"
-      : "bg-gradient-to-r from-navy-900/85 via-navy-900/30 to-transparent";
+      ? "bg-gradient-to-t from-navy-900/85 via-navy-900/20 to-navy-900/35"
+      : "bg-gradient-to-r from-navy-900/85 via-navy-900/25 to-transparent";
+
+  /** staccato display lines (modules) or the classic headline */
+  const lines = section.lines;
 
   return (
     <section
       id={section.id}
       data-section={section.index}
-      className="reveal relative w-full"
+      className="relative w-full"
       style={{ minHeight: `${sectionHeightVh(section.id)}vh` }}
       aria-labelledby={`${section.id}-h`}
     >
+      {isCta && (
+        <div id="kontakt" aria-hidden className="absolute -top-24 left-0" />
+      )}
       <div
         ref={layerRef}
+        data-on={section.index === 0 || isCta ? "1" : "0"}
         className={`${
           isCta ? "sticky" : "pointer-events-none fixed inset-x-0"
         } top-0 flex h-dvh w-full ${alignClasses}`}
@@ -102,117 +107,208 @@ export default function SectionPanel({
           className={`relative mx-auto flex w-full max-w-7xl px-5 sm:px-8 ${alignClasses}`}
         >
           <div
-            className={`reveal-inner pointer-events-auto relative ${
-              isDashboard
-                ? "w-full max-w-7xl"
+            className={`pointer-events-auto relative ${
+              section.id === "dashboard"
+                ? "w-full max-w-5xl"
                 : section.align === "center"
                 ? "max-w-3xl"
                 : "max-w-xl"
             }`}
           >
-            {/* Big chapter numeral leitmotif — quiet background figure,
-                absolutely positioned so it never pushes the copy (Razorpay). */}
+            {/* ghost chapter numeral (module leitmotif) */}
             {numeral && (
               <span
                 aria-hidden
-                className={`pointer-events-none absolute select-none font-bold leading-none tracking-tight text-ink ${
-                  isDashboard ? "left-1/2 -translate-x-1/2" : "-left-2"
-                }`}
+                className="pointer-events-none absolute -left-2 select-none font-bold leading-none tracking-tight"
                 style={{
-                  fontSize: "clamp(96px, 9vw, 140px)",
-                  opacity: 0.08,
-                  top: "-0.92em",
+                  fontSize: "clamp(110px, 10vw, 160px)",
+                  opacity: 0.09,
+                  top: "-0.95em",
+                  color: accent,
                 }}
               >
-                {numeral}&thinsp;/
+                {numeral}
               </span>
             )}
 
-            <p className="relative mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
-              <span className="h-px w-8 bg-brand-teal/60" />
-              {section.kicker}
-            </p>
+            {/* kicker */}
+            {section.kicker && !isHero && (
+              <p
+                className="stagger relative mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em]"
+                style={{ color: accent, transitionDelay: "40ms" }}
+              >
+                <span
+                  className="h-px w-8"
+                  style={{ background: accent, opacity: 0.6 }}
+                />
+                {section.kicker}
+              </p>
+            )}
 
-            <h2
-              id={`${section.id}-h`}
-              className={`text-legible relative font-bold leading-[1.08] text-ink ${
-                isDashboard
-                  ? "text-3xl sm:text-4xl md:text-[2.75rem]"
-                  : section.panel
-                  ? "text-3xl sm:text-4xl lg:text-[2.75rem]"
-                  : "text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem]"
-              }`}
-            >
-              {section.headline}
-            </h2>
+            {/* headline block */}
+            {isHero ? (
+              <>
+                <h1
+                  id={`${section.id}-h`}
+                  className="text-legible stagger font-bold leading-[0.98] tracking-tight text-ink"
+                  style={{
+                    fontSize: "clamp(3.2rem, 7.5vw, 6.5rem)",
+                    transitionDelay: "80ms",
+                  }}
+                >
+                  {section.headline.endsWith("360") ? (
+                    <>
+                      {section.headline.slice(0, -3)}
+                      <span className="brand-gradient-text">360</span>
+                    </>
+                  ) : (
+                    section.headline
+                  )}
+                </h1>
+                {section.headlineAccent && (
+                  <p
+                    className="text-legible stagger mt-4 text-xl font-medium sm:text-2xl"
+                    style={{ color: "var(--color-gold-soft)", transitionDelay: "180ms" }}
+                  >
+                    {section.headlineAccent}
+                  </p>
+                )}
+              </>
+            ) : lines && lines.length > 0 ? (
+              <div aria-hidden={false}>
+                <h2
+                  id={`${section.id}-h`}
+                  className="text-legible stagger font-bold leading-[1.12] text-ink"
+                  style={{
+                    fontSize: "clamp(1.9rem, 3.4vw, 3rem)",
+                    transitionDelay: "100ms",
+                  }}
+                >
+                  {lines[0]}
+                </h2>
+                {lines.slice(1).map((ln, k) => (
+                  <p
+                    key={ln}
+                    className="text-legible stagger font-bold leading-[1.12] text-ink"
+                    style={{
+                      fontSize: "clamp(1.9rem, 3.4vw, 3rem)",
+                      transitionDelay: `${180 + k * 90}ms`,
+                    }}
+                  >
+                    {ln}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <>
+                <h2
+                  id={`${section.id}-h`}
+                  className={`text-legible stagger font-bold leading-[1.08] text-ink ${
+                    section.align === "center"
+                      ? "text-3xl sm:text-4xl md:text-[2.9rem]"
+                      : "text-3xl sm:text-4xl lg:text-[3.1rem]"
+                  }`}
+                  style={{ transitionDelay: "100ms" }}
+                >
+                  {section.headline}
+                </h2>
+                {section.headlineAccent && (
+                  <p
+                    className={`text-legible stagger mt-3 font-bold leading-[1.1] ${
+                      section.align === "center"
+                        ? "text-2xl sm:text-3xl md:text-[2.2rem]"
+                        : "text-2xl sm:text-3xl"
+                    }`}
+                    style={{
+                      color: "var(--color-gold)",
+                      transitionDelay: "200ms",
+                    }}
+                  >
+                    {section.headlineAccent}
+                  </p>
+                )}
+              </>
+            )}
 
+            {/* subline */}
             <p
-              className={`text-legible mt-5 text-base leading-relaxed text-ink-dim sm:text-lg ${
+              className={`text-legible stagger mt-5 text-base leading-relaxed text-ink-dim sm:text-lg ${
                 section.align === "center" ? "mx-auto max-w-2xl" : "md:max-w-lg"
               }`}
+              style={{ transitionDelay: lines ? `${220 + (lines.length - 1) * 90}ms` : "260ms" }}
             >
               {section.subline}
             </p>
 
+            {/* CTAs */}
             {section.cta && (
               <div
-                className={`mt-8 flex flex-wrap gap-3 ${
+                className={`stagger mt-8 flex flex-wrap gap-3 ${
                   section.align === "center" ? "justify-center" : ""
                 }`}
+                style={{ transitionDelay: "340ms" }}
               >
-                {section.cta.map((c) => (
-                  <ButtonLink key={c.label} href={c.href} variant={c.variant}>
-                    {c.label}
-                  </ButtonLink>
-                ))}
+                {section.cta.map((c) => {
+                  const ext = c.href.startsWith("http");
+                  return (
+                    <ButtonLink
+                      key={c.label}
+                      href={c.href}
+                      variant={c.variant}
+                      target={ext ? "_blank" : undefined}
+                      rel={ext ? "noopener noreferrer" : undefined}
+                    >
+                      {c.label}
+                    </ButtonLink>
+                  );
+                })}
               </div>
             )}
 
-            {isDashboard && section.panel ? (
-              /* Platform station — Panel 07 beside the cropped app window. */
-              <div className="mt-6 grid w-full items-start gap-6 text-left lg:grid-cols-[400px_minmax(0,1fr)]">
-                <ProductPanel
-                  panel={section.panel}
-                  index={section.index}
-                  side="left"
-                />
-                <div className="relative max-h-[58vh] overflow-hidden rounded-3xl">
-                  {children}
-                  {/* window crop fade — the platform clearly continues */}
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-navy-900/85 to-transparent" />
-                </div>
-              </div>
-            ) : (
-              <>
-                {/* Data-driven floating product card (beat-coupled reveal). */}
-                {section.panel && (
-                  <ProductPanel
-                    panel={section.panel}
-                    index={section.index}
-                    side={section.align}
-                  />
-                )}
+            {children && (
+              <div className="stagger mt-8" style={{ transitionDelay: "300ms" }}>
                 {children}
-              </>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Hero scroll prompt (NRG pattern) */}
-        {section.id === "hero" && (
+        {/* Hero scroll prompt */}
+        {isHero && (
           <div
             aria-hidden
             className="pointer-events-none absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5"
           >
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-dim">
-              Scrollen, um das System zu entdecken
+              Entdecke das Powerhouse
             </span>
             <span className="relative block h-9 w-px overflow-hidden bg-white/15">
-              <span className="scroll-cue absolute left-0 top-0 h-3.5 w-px bg-brand-teal" />
+              <span className="scroll-cue absolute left-0 top-0 h-3.5 w-px bg-gold" />
             </span>
           </div>
         )}
       </div>
+
+      {/* staggered line reveals — driven by the layer's data-on switch */}
+      <style jsx>{`
+        section :global(.stagger) {
+          opacity: 0;
+          transform: translateY(22px);
+          transition: opacity 0.7s var(--ease-calm),
+            transform 0.7s var(--ease-calm);
+        }
+        section :global([data-on="1"] .stagger) {
+          opacity: 1;
+          transform: none;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          section :global(.stagger) {
+            opacity: 1;
+            transform: none;
+            transition: none;
+          }
+        }
+      `}</style>
     </section>
   );
 }

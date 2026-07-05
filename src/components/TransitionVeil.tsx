@@ -18,10 +18,9 @@ import { getSectionFloat } from "@/lib/scrollProgress";
 /** Chapters whose camera sits INSIDE the building / garage / stairwell. */
 const INTERIOR = new Set([
   "powermieter",
-  "hub",
+  "heatmieter",
   "chargemieter",
   "smokemieter",
-  "residents",
 ]);
 
 export default function TransitionVeil() {

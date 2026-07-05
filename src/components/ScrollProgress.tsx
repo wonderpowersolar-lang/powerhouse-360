@@ -31,7 +31,7 @@ export default function ScrollProgress({ className = "" }: { className?: string 
     >
       <div
         ref={fillRef}
-        className="h-full w-full origin-top bg-gradient-to-b from-brand-green via-brand-teal to-brand-aqua"
+        className="h-full w-full origin-top bg-gradient-to-b from-gold-deep via-gold to-gold-soft"
         style={{ transform: "scaleY(0)" }}
       />
     </div>

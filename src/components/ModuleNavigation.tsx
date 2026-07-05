@@ -4,29 +4,18 @@ import { useEffect, useState } from "react";
 import { useLenis } from "lenis/react";
 import { SECTIONS, STATION_LABELS } from "@/content/sections";
 import { getSectionFloat } from "@/lib/scrollProgress";
-import {
-  clearFocus,
-  hotspotIdForSection,
-  setFocus,
-  useFocusId,
-} from "@/lib/focusStore";
 import ScrollProgress from "./ScrollProgress";
 
 /**
- * ModuleNavigation — the slim chapter indicator on the right edge (Radian's
- * expandable chapter menu, reduced to its calm essence). One row per station
- * (00–08): tick + number, the active station carries its label and the brand
- * accent. Click smooth-scrolls into the station's HOLD (mid-band), so the
- * camera lands settled and the panel is revealed. Desktop only — the mobile
- * story stacks naturally.
- *
- * The ScrollProgress phase rail runs behind the ticks so numbers + journey
- * progress read as one instrument.
+ * ModuleNavigation — the slim chapter indicator on the right edge. One row
+ * per station (00–08): tick + number, the active station carries its label
+ * and the gold accent. Click smooth-scrolls into the station's HOLD
+ * (mid-band), so the stage lands settled and the copy is revealed. Desktop
+ * only — the mobile story stacks naturally.
  */
 export default function ModuleNavigation() {
   const [active, setActive] = useState(0);
   const lenis = useLenis();
-  const focusId = useFocusId();
 
   // Track the active station from the scroll core (state update only on change).
   useEffect(() => {
@@ -44,39 +33,19 @@ export default function ModuleNavigation() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  /**
-   * Rail click shares ONE mechanism with the hotspot pins:
-   *  • product zones (Powermieter…Bewohnerportal) → fly the camera in via the
-   *    focus store (the same fly-in the pins trigger). Module→module flies
-   *    directly; from the overview it eases in.
-   *  • non-product rows (Start / Plattform / Kontakt) → clear any focus and
-   *    smooth-scroll to the band's HOLD (camera at rest, panel revealed).
-   */
   const goTo = (id: string) => {
-    const hotspot = hotspotIdForSection(id);
-    if (hotspot) {
-      setFocus(hotspot);
-      return;
-    }
-    if (focusId) clearFocus();
     const el = document.getElementById(id);
     if (!el) return;
-    // land mid-HOLD: camera at rest, panel revealed
-    const y = window.scrollY + el.getBoundingClientRect().top + el.offsetHeight * 0.55;
+    // land mid-HOLD: stage at rest, copy revealed
+    const y =
+      window.scrollY + el.getBoundingClientRect().top + el.offsetHeight * 0.55;
     const target = Math.min(
       y,
       document.documentElement.scrollHeight - window.innerHeight
     );
-    if (lenis) lenis.scrollTo(target, { duration: 1.8 });
+    if (lenis) lenis.scrollTo(target, { duration: 1.8, force: true });
     else window.scrollTo({ top: target, behavior: "smooth" });
   };
-
-  // When a module is focused, light its row in the rail; otherwise follow scroll.
-  const focusedIndex =
-    focusId != null
-      ? SECTIONS.find((s) => hotspotIdForSection(s.id) === focusId)?.index ?? -1
-      : -1;
-  const activeIndex = focusedIndex >= 0 ? focusedIndex : active;
 
   return (
     <nav
@@ -86,7 +55,7 @@ export default function ModuleNavigation() {
       <div className="relative flex flex-col items-end gap-2">
         <ScrollProgress className="absolute -right-2.5 inset-y-1" />
         {SECTIONS.map((s) => {
-          const isActive = s.index === activeIndex;
+          const isActive = s.index === active;
           const num = String(s.index).padStart(2, "0");
           return (
             <button
@@ -108,14 +77,18 @@ export default function ModuleNavigation() {
               </span>
               <span
                 className={`text-[11px] font-semibold tabular-nums transition-colors duration-300 ${
-                  isActive ? "text-brand-teal" : "text-ink-faint group-hover:text-ink-dim"
+                  isActive
+                    ? "text-gold"
+                    : "text-ink-faint group-hover:text-ink-dim"
                 }`}
               >
                 {num}
               </span>
               <span
                 className={`block h-px transition-all duration-300 ${
-                  isActive ? "w-5 bg-brand-teal" : "w-2.5 bg-white/25 group-hover:bg-white/45"
+                  isActive
+                    ? "w-5 bg-gold"
+                    : "w-2.5 bg-white/25 group-hover:bg-white/45"
                 }`}
               />
             </button>

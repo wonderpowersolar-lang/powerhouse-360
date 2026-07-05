@@ -5,6 +5,21 @@ import { useEffect } from "react";
 import { getReduced, setProgress, setSectionRaw } from "@/lib/scrollProgress";
 
 /**
+ * Take over scroll restoration at client-bundle evaluation — BEFORE Lenis
+ * mounts. The journey is a scroll-scrubbed cinema and must open on its
+ * first frame; a browser-restored deep position would leave the orbit
+ * half-finished behind the visitor (hash deep-links keep native behaviour).
+ */
+if (typeof window !== "undefined") {
+  try {
+    history.scrollRestoration = "manual";
+    if (!location.hash) window.scrollTo(0, 0);
+  } catch {
+    /* older engines: harmless */
+  }
+}
+
+/**
  * Compute the DOM-anchored raw section float from the actual `[data-section]`
  * elements: find the section whose band the viewport TOP currently sits in, and
  * return `index + (scrollY - top) / height`. Robust to unequal section heights,
@@ -29,8 +44,16 @@ function computeSectionRaw(): number | null {
   if (y <= tops[0].top) return tops[0].index;
   for (let k = 0; k < tops.length; k++) {
     const s = tops[k];
-    if (y >= s.top && y < s.top + s.height) {
-      return s.index + Math.min(0.9999, (y - s.top) / s.height);
+    // A station's band stretches to the NEXT station's top (not its own
+    // element height) so non-station content between two stations — the
+    // quiet sections — cannot make the float jump discontinuously.
+    const bandEnd =
+      k < tops.length - 1 ? tops[k + 1].top : s.top + s.height;
+    if (y >= s.top && y < bandEnd) {
+      return (
+        s.index +
+        Math.min(0.9999, (y - s.top) / Math.max(1, bandEnd - s.top))
+      );
     }
   }
   return tops[tops.length - 1].index;
@@ -54,9 +77,14 @@ function ScrollBridge() {
   // panel revealed) instead of the band start (which is mid-approach).
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      const a = (e.target as HTMLElement | null)?.closest?.('a[href^="#"]');
+      const a = (e.target as HTMLElement | null)?.closest?.(
+        'a[href^="#"], a[href^="/#"]'
+      );
       if (!a) return;
-      const id = a.getAttribute("href")?.slice(1);
+      const href = a.getAttribute("href") ?? "";
+      // "/#id" von Unterseiten: normale Navigation zur Startseite zulassen.
+      if (href.startsWith("/#") && window.location.pathname !== "/") return;
+      const id = href.slice(href.indexOf("#") + 1);
       const el = id ? document.getElementById(id) : null;
       if (!el || getReduced()) return; // mobile/static keeps native behaviour
       e.preventDefault();
@@ -66,7 +94,8 @@ function ScrollBridge() {
         max,
         window.scrollY + el.getBoundingClientRect().top + el.offsetHeight * 0.45
       );
-      if (lenisInstance) lenisInstance.scrollTo(y, { duration: 1.8 });
+      if (lenisInstance)
+        lenisInstance.scrollTo(y, { duration: 1.8, force: true });
       else window.scrollTo({ top: y, behavior: "smooth" });
     };
     document.addEventListener("click", onClick);

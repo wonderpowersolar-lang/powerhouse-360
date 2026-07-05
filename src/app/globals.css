@@ -2,40 +2,59 @@
 @import "lenis/dist/lenis.css";
 
 /*
-  POWERHOUSE360 — Design tokens
-  Architectural Premium PropTech / EnergyTech.
-  Palette extracted from the stacked-building brand mark.
-  Swap brand colors here; everything downstream uses these tokens.
+  POWERHOUSE 360 — Design tokens
+  Cinematic launch direction: off-black void, deep graphite surfaces,
+  warm-white typography, premium gold for the parent brand. Module accents
+  exist ONLY for orientation (Power=solar gold, Heat=red-orange,
+  Charge=cyan, Smoke=amber). Swap brand colors here; everything downstream
+  uses these tokens.
+
+  NOTE: the historical `navy-*` / `brand-*` token NAMES are kept as aliases
+  (re-pointed at the new palette) so older components keep compiling; new
+  code should prefer the semantic names below them.
 */
 @theme {
-  /* --- Brand: deep navy / anthracite base --- */
-  --color-navy-900: #0d1626;
-  --color-navy-800: #16243f;
-  --color-navy-700: #1b2a4a;
-  --color-navy-600: #20344f;
+  /* --- Base: off-black void + graphite surfaces --- */
+  --color-navy-900: #0a0b0d; /* page void */
+  --color-navy-800: #121316; /* graphite surface */
+  --color-navy-700: #1a1c20; /* raised graphite */
+  --color-navy-600: #23252b; /* highest graphite */
 
-  /* --- Slate blue-gray (structure / secondary text) --- */
-  --color-slate-blue-500: #4a6075;
-  --color-slate-blue-400: #5a7184;
-  --color-slate-blue-300: #8499ab;
+  /* --- Warm gray structure / secondary text (legacy slate aliases) --- */
+  --color-slate-blue-500: #585b63;
+  --color-slate-blue-400: #6c7078;
+  --color-slate-blue-300: #8f939b;
 
-  /* --- Brand green accent --- */
-  --color-brand-green: #43b649;
-  --color-brand-green-soft: #3db36a;
-
-  /* --- Brand teal / cyan accent --- */
+  /* --- Parent brand: der Logo-Verlauf Blau → Teal/Cyan → Grün.
+         Die historischen `gold-*`-Tokennamen bleiben aus Stabilitätsgründen
+         bestehen, zeigen aber auf die Markenfarben aus dem Logo:
+         gold-deep = Logo-Blau, gold = Teal/Cyan (Hauptakzent),
+         gold-soft = Logo-Grün. Verlauf: from-gold-deep via-gold to-gold-soft. --- */
   --color-brand-teal: #2bb6b0;
   --color-brand-teal-soft: #3aa8a0;
+  --color-brand-green: #43b649;
+  --color-brand-green-soft: #3db36a;
   --color-brand-aqua: #80cec1;
 
-  /* --- Warm window light (evening mood, sparingly) --- */
-  --color-warm-light: #f5be75;
-  --color-warm-amber: #ec7b13;
+  /* --- Semantic brand tokens (preferred in new code) --- */
+  --color-gold: #2bb6b0;
+  --color-gold-soft: #43b649;
+  --color-gold-deep: #2f6fc1;
 
-  /* --- Surfaces / text --- */
-  --color-ink: #eef3f8;
-  --color-ink-dim: #aebccb;
-  --color-ink-faint: #6f8294;
+  /* --- Module accents (orientation only, used sparingly) --- */
+  --color-mod-power: #e6b94e; /* Powermieter — solar gold / electric yellow */
+  --color-mod-heat: #e46a3f; /* Heatmieter — red-orange */
+  --color-mod-charge: #56c8e8; /* Chargemieter — cyan / electric blue */
+  --color-mod-smoke: #e8973c; /* Smokemieter — amber / safety orange */
+
+  /* --- Warm light (window glow, sparingly; legacy names) --- */
+  --color-warm-light: #f0c987;
+  --color-warm-amber: #e8973c;
+
+  /* --- Surfaces / text: warm white on void --- */
+  --color-ink: #f4f0e8;
+  --color-ink-dim: #b6b1a6;
+  --color-ink-faint: #7d7970;
 
   /* --- Type --- */
   --font-sans: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
@@ -46,8 +65,8 @@
 }
 
 :root {
-  --background: #0d1626;
-  --foreground: #eef3f8;
+  --background: #0a0b0d;
+  --foreground: #f4f0e8;
 }
 
 * {
@@ -115,68 +134,150 @@ html.lenis body {
   }
 }
 
-/* ── Explorer hotspot pins ────────────────────────────────────────────────
-   A soft pulsing ring around the dot (calm, slow — not a christmas tree). */
-@keyframes hotspot-ring {
-  0% {
-    transform: scale(0.7);
-    opacity: 0.55;
-  }
-  70% {
-    transform: scale(2.1);
+/* Funnel: ruhiger Schritt-Übergang (unter prefers-reduced-motion global deaktiviert) */
+@keyframes funnel-step-in {
+  from {
     opacity: 0;
+    transform: translateY(14px);
   }
-  100% {
-    transform: scale(2.1);
-    opacity: 0;
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
-.hotspot-ring {
-  animation: hotspot-ring 2.8s var(--ease-calm) infinite;
-}
-/* The pin transform is driven imperatively (translate to the projected point);
-   keep the CSS transition only on hover/scale props, never on transform, so the
-   per-frame position write isn't smeared. */
-.hotspot-pin {
-  transition: opacity 0.4s var(--ease-calm);
-}
-/* Enlarge the touch/click hit area without moving the visual. */
-.hotspot-pin::before {
-  content: "";
-  position: absolute;
-  inset: -14px -10px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .hotspot-ring {
-    animation: none;
-    opacity: 0.4;
-  }
+.funnel-step-in {
+  animation: funnel-step-in 0.4s var(--ease-calm) both;
 }
 
-/* Headlines always read over the 3D scene */
+/* Headlines always read over the cinematic stage */
 .text-legible {
-  text-shadow: 0 2px 30px rgba(8, 14, 26, 0.55), 0 1px 2px rgba(8, 14, 26, 0.4);
+  text-shadow: 0 2px 30px rgba(5, 6, 8, 0.6), 0 1px 2px rgba(5, 6, 8, 0.45);
 }
 
-/* Thin brand divider line */
+/* Thin brand divider line — gold, dissolving at both ends */
 .hairline {
   height: 1px;
   background: linear-gradient(
     90deg,
     transparent,
-    color-mix(in srgb, var(--color-brand-teal) 55%, transparent),
+    color-mix(in srgb, var(--color-gold) 55%, transparent),
     transparent
   );
 }
 
-/* Focus ring */
-:where(a, button, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-brand-teal);
+/* Graphite card surface for the quiet sections (why / targets / onboarding / faq) */
+.card-surface {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.012));
+  border: 1px solid rgba(244, 240, 232, 0.08);
+  border-radius: 1rem;
+}
+.card-surface:hover {
+  border-color: rgba(43, 182, 176, 0.35);
+}
+
+/* Marken-Verlauf (aus dem Logo) als Text — z. B. die „360“ im Schriftzug.
+   Bewusst hellere Stufen als die Flächen-Tokens: Text auf Off-Black braucht
+   mehr Leuchtkraft als Buttons/Balken. */
+.brand-gradient-text {
+  background-image: linear-gradient(
+    100deg,
+    #66a3f2 0%,
+    #41d6cd 55%,
+    #68dc6e 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Legal-Seiten Typografie ─────────────────────────────────────────── */
+.legal-prose {
+  color: var(--color-ink-dim);
+  font-size: 0.975rem;
+  line-height: 1.75;
+}
+.legal-prose h2 {
+  margin-top: 2.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+.legal-prose h3 {
+  margin-top: 1.9rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.legal-prose p {
+  margin-top: 0.8rem;
+}
+.legal-prose ul,
+.legal-prose ol {
+  margin-top: 0.8rem;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.35rem;
+}
+.legal-prose ul {
+  list-style: disc;
+}
+.legal-prose ol {
+  list-style: decimal;
+}
+.legal-prose a {
+  color: var(--color-gold);
+  text-decoration: none;
+}
+.legal-prose a:hover {
+  text-decoration: underline;
+}
+.legal-prose strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.legal-prose hr {
+  margin: 2.5rem 0;
+  border: 0;
+  height: 1px;
+  background: rgba(244, 240, 232, 0.1);
+}
+.legal-prose table {
+  margin-top: 1rem;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.legal-prose th,
+.legal-prose td {
+  border: 1px solid rgba(244, 240, 232, 0.12);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+.legal-prose th {
+  color: var(--color-ink);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.03);
+}
+.legal-prose .note {
+  margin-top: 1.25rem;
+  border-left: 2px solid var(--color-gold);
+  padding: 0.75rem 1rem;
+  background: rgba(43, 182, 176, 0.06);
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Focus ring — gold */
+:where(a, button, [tabindex], summary):focus-visible {
+  outline: 2px solid var(--color-gold);
   outline-offset: 3px;
   border-radius: 4px;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-brand-teal) 35%, transparent);
+  background: color-mix(in srgb, var(--color-gold) 35%, transparent);
   color: #fff;
 }

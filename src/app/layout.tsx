@@ -11,16 +11,24 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: "POWERHOUSE360 — Das Building-OS für Mehrfamilienhäuser",
+  title: "Powerhouse 360 — Das Betriebssystem deiner Immobilie",
   description:
-    "POWERHOUSE360 macht Mehrfamilienhäuser energieaktiv: Solarstrom, Wärme, Messung, Abrechnung und Betrieb – verbunden in einem intelligenten Gebäudesystem.",
+    "Powerhouse 360 verbindet Energie, Wärme, Ladeinfrastruktur, Sicherheit und digitale Prozesse in einem zentralen Betriebssystem für Mehrfamilienhäuser.",
   metadataBase: new URL("https://powerhouse360.example"),
   openGraph: {
-    title: "POWERHOUSE360 — Das Building-OS für Mehrfamilienhäuser",
+    title: "Powerhouse 360 — Das Betriebssystem deiner Immobilie",
     description:
-      "Aus einem Mehrfamilienhaus wird ein intelligentes Energie-Asset.",
+      "Eine Plattform für Energie, Wärme, Ladeinfrastruktur, Sicherheit und digitale Prozesse im Mehrfamilienhaus.",
     type: "website",
     locale: "de_DE",
+    images: [
+      {
+        url: "/og.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Powerhouse 360 — Mehrfamilienhaus auf schwarzem Sockel im Studio-Licht",
+      },
+    ],
   },
   icons: {
     icon: "/brand/logo.svg",
@@ -28,7 +36,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d1626",
+  themeColor: "#0a0b0d",
   width: "device-width",
   initialScale: 1,
 };

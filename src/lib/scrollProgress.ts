@@ -99,6 +99,15 @@ function rawFloat(): number {
 }
 
 /**
+ * PUBLIC raw band float (no hold plateau applied). The hero orbit scrubber
+ * reads this: within band 0 the fraction 0..1 maps linearly to scroll
+ * distance through the hero section, which is exactly the scrub timeline.
+ */
+export function getSectionRawFloat(): number {
+  return rawFloat();
+}
+
+/**
  * Section position in [0, NUM_SECTIONS-1], fractional between chapters, with
  * a per-section HOLD plateau pinned on every integer and the travel windows
  * straddling the band boundaries. See file header.

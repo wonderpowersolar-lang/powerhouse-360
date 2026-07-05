@@ -1,8 +1,10 @@
 import Image from "next/image";
 
 /**
- * Brand logo lockup (mark + wordmark). Uses the official asset; never
- * recolored or reproportioned.
+ * Brand lockup for the launch site's off-black ground: the official stacked
+ * mark + a typeset wordmark (warm white / gold). The original full-color
+ * lockup asset carries dark navy type that disappears on the noir ground,
+ * so the wordmark is set live in the brand font instead.
  */
 export function LogoLockup({
   className = "",
@@ -12,18 +14,22 @@ export function LogoLockup({
   priority?: boolean;
 }) {
   return (
-    <Image
-      src="/brand/logo-lockup.png"
-      alt="POWERHOUSE 360"
-      width={300}
-      height={70}
-      priority={priority}
-      /* Sizing comes from the caller's classes (e.g. h-7 w-auto). NEVER set an
-         inline height/width style here — inline styles beat the Tailwind
-         classes and the logo renders at its natural ~192px height, blowing the
-         nav up to >200px and occluding the station headlines. */
-      className={className}
-    />
+    <span className={`inline-flex items-center gap-3 ${className}`}>
+      <Image
+        src="/brand/logo-icon.svg"
+        alt=""
+        width={64}
+        height={64}
+        priority={priority}
+        unoptimized
+        className="h-full w-auto drop-shadow-[0_2px_10px_rgba(43,182,176,0.25)]"
+        aria-hidden
+      />
+      <span className="whitespace-nowrap text-lg font-bold leading-none tracking-tight text-ink sm:text-xl">
+        POWERHOUSE
+        <span className="brand-gradient-text"> 360</span>
+      </span>
+    </span>
   );
 }
 
@@ -36,10 +42,11 @@ export function LogoMark({
 }) {
   return (
     <Image
-      src="/brand/logo-mark.png"
+      src="/brand/logo-icon.svg"
       alt="POWERHOUSE 360"
       width={size}
       height={size}
+      unoptimized
       className={className}
     />
   );

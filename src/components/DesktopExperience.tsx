@@ -6,23 +6,24 @@ import { SECTIONS } from "@/content/sections";
 import { STAGE } from "@/config/stage";
 import SectionPanel from "./SectionPanel";
 import DashboardOverlay from "./DashboardOverlay";
+import QuietSections from "./QuietSections";
 import SceneLoader from "./SceneLoader";
 import BuildingArt from "./BuildingArt";
 import ModuleNavigation from "./ModuleNavigation";
 import TransitionVeil from "./TransitionVeil";
-import HotspotPins from "./HotspotPins";
-import ImageHotspotPins from "./ImageHotspotPins";
-import DashboardBackdropDim from "./DashboardBackdropDim";
-import FocusOverlay from "./FocusOverlay";
-import FocusScrollLock from "./FocusScrollLock";
 
 /** R3F canvas — client only, no SSR. Preserved; mounted only when STAGE==="r3f". */
 const BuildingScene = dynamic(() => import("./three/BuildingScene"), {
   ssr: false,
 });
 
-/** Photoreal cinematic image stage — client only. Default stage (STAGE==="image"). */
+/** Previous photoreal still stage — preserved (STAGE==="image"). */
 const ImageStage = dynamic(() => import("./ImageStage"), { ssr: false });
+
+/** Cinematic launch stage (scrubbed hero orbit + station clips) — default. */
+const CinematicStage = dynamic(() => import("./CinematicStage"), {
+  ssr: false,
+});
 
 /** Feature-detect a usable WebGL context. */
 function hasWebGL(): boolean {
@@ -40,24 +41,21 @@ function hasWebGL(): boolean {
 /**
  * Desktop / capable-viewport experience.
  *
- * A single pinned (position: fixed) 3D canvas fills the viewport. Over it,
- * eight full-height section panels scroll. The shared scrollProgress store
- * (fed by Lenis) drives the camera inside the canvas, so the building
- * "unfolds" its story as the user scrolls. An IntersectionObserver toggles a
- * reveal class on each panel for calm fade-in of the copy.
+ * One pinned (position: fixed) cinematic stage fills the viewport. Over it,
+ * the station panels scroll: hero (scrubbed orbit) → system reveal → the
+ * four module fly-throughs → exploded assembly → platform. The journey then
+ * hands over to the QUIET sections (why / targets / onboarding / faq) on an
+ * opaque ground, and closes with the atmosphere CTA station.
  */
 export default function DesktopExperience() {
   const [ready, setReady] = useState(false);
-  // DesktopExperience only mounts client-side (Experience decides after
-  // mount), so WebGL support can be detected in the state initializer.
   const [webgl] = useState<boolean | null>(() =>
     typeof window === "undefined" ? null : hasWebGL()
   );
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Perceived-loader cap (§9: max ~2.5s): if the scene hasn't signalled ready
-  // by then (slow device, lost WebGL context), reveal anyway — the canvas
-  // keeps warming up behind the content.
+  // Perceived-loader cap: reveal after max ~2.5s even if the stage is still
+  // warming up behind the content.
   useEffect(() => {
     if (ready) return;
     const t = setTimeout(() => setReady(true), 2500);
@@ -78,11 +76,16 @@ export default function DesktopExperience() {
     return () => io.disconnect();
   }, []);
 
+  const stations = SECTIONS.filter((s) => s.id !== "cta");
+  const ctaSection = SECTIONS.find((s) => s.id === "cta")!;
+
   return (
     <div ref={rootRef} className="relative">
-      {/* Pinned stage — photoreal image stage (default) or the preserved R3F
-          canvas (STAGE==="r3f"), with a static fallback if WebGL is missing. */}
+      {/* Pinned cinematic stage */}
       <div className="fixed inset-0 z-0 h-dvh w-full overflow-hidden">
+        {STAGE === "cinema" && (
+          <CinematicStage onReady={() => setReady(true)} />
+        )}
         {STAGE === "image" && <ImageStage onReady={() => setReady(true)} />}
         {STAGE === "r3f" && webgl === true && (
           <BuildingScene onReady={() => setReady(true)} />
@@ -92,60 +95,49 @@ export default function DesktopExperience() {
             className="absolute inset-0 flex items-center justify-center"
             style={{
               background:
-                "radial-gradient(120% 90% at 50% 30%, #16243f 0%, #0d1626 65%, #090f1a 100%)",
+                "radial-gradient(120% 90% at 50% 30%, #17181c 0%, #0e0f12 65%, #0a0b0d 100%)",
             }}
           >
             <BuildingArt className="h-[80vh] w-auto opacity-90" />
           </div>
         )}
-        {/* Vignette and top fade keep headlines legible. The ImageStage carries
-            its own graded vignette, so the DOM vignette is lighter in image
-            mode (avoid double-darkening the photoreal renders). */}
+        {/* Light DOM vignette on top of the stage's own grade. */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              STAGE === "image"
-                ? "radial-gradient(135% 105% at 50% 45%, transparent 62%, rgba(9,15,26,0.32) 100%)"
-                : "radial-gradient(130% 100% at 50% 45%, transparent 55%, rgba(9,15,26,0.55) 100%)",
+              "radial-gradient(135% 105% at 50% 45%, transparent 62%, rgba(6,7,9,0.35) 100%)",
           }}
         />
-        {/* Darken pulse during big interior↔exterior transitions (§5). */}
+        {/* Darken pulse during big station transitions. */}
         <TransitionVeil />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-navy-900/80 to-transparent" />
       </div>
 
-      {/* Dim the photoreal tower behind the platform dashboard so the DOM window
-          is unmistakably the hero of that station (image stage only). */}
-      {STAGE === "image" && <DashboardBackdropDim />}
-
       <SceneLoader hidden={ready} />
 
-      {/* Interactive building explorer — labelled hotspot pins (the image stage
-          anchors them to fixed hero-image coordinates; the R3F stage projects
-          the 3D anchors), the focused-module stage overlay, and the scroll lock
-          that holds the stage during a fly-in. */}
-      {STAGE === "image" ? <ImageHotspotPins /> : <HotspotPins />}
-      <FocusOverlay />
-      <FocusScrollLock />
-
-      {/* Chapter indicator 00–08 + phase rail (desktop only) */}
+      {/* Chapter indicator + phase rail (desktop only) */}
       <ModuleNavigation />
 
-      {/* Scrolling copy panels over the pinned scene */}
+      {/* Scrolling copy panels over the pinned stage, the quiet zone, finale */}
       <div className="relative z-10">
-        {SECTIONS.map((s) => (
+        {stations.map((s) => (
           <SectionPanel key={s.id} section={s}>
-            {s.id === "dashboard" && <DashboardOverlay />}
+            {s.id === "dashboard" ? <DashboardOverlay /> : undefined}
           </SectionPanel>
         ))}
+
+        <QuietSections />
+
+        <SectionPanel section={ctaSection} />
       </div>
 
       <style jsx global>{`
         .reveal .reveal-inner {
           opacity: 0;
           transform: translateY(28px);
-          transition: opacity 0.8s var(--ease-calm), transform 0.8s var(--ease-calm);
+          transition: opacity 0.8s var(--ease-calm),
+            transform 0.8s var(--ease-calm);
         }
         .reveal.is-visible .reveal-inner {
           opacity: 1;
