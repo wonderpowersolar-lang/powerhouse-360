@@ -4,7 +4,6 @@ import Image from "next/image";
 import { SECTIONS, ACCENT_VAR } from "@/content/sections";
 import { STATION_IMAGE } from "@/config/stage";
 import { ButtonLink } from "./ui/Button";
-import DashboardOverlay from "./DashboardOverlay";
 import QuietSections from "./QuietSections";
 
 /**
@@ -179,11 +178,6 @@ export default function MobileExperience() {
                   </div>
                 )}
 
-                {s.id === "dashboard" && (
-                  <div className="mt-5">
-                    <DashboardOverlay />
-                  </div>
-                )}
               </div>
             </section>
           );

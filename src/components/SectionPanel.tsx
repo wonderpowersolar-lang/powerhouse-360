@@ -110,7 +110,9 @@ export default function SectionPanel({
         data-on={section.index === 0 || isCta ? "1" : "0"}
         className={`${
           isCta ? "sticky" : "pointer-events-none fixed inset-x-0"
-        } top-0 flex h-dvh w-full ${alignClasses}`}
+        } top-0 flex h-dvh w-full ${
+          isHero ? "" : "pt-[4.75rem]"
+        } ${alignClasses}`}
         style={
           isCta
             ? undefined
@@ -128,11 +130,7 @@ export default function SectionPanel({
         >
           <div
             className={`pointer-events-auto relative ${
-              section.id === "dashboard"
-                ? "w-full max-w-5xl"
-                : section.align === "center"
-                ? "max-w-3xl"
-                : "max-w-xl"
+              section.align === "center" ? "max-w-3xl" : "max-w-xl"
             }`}
           >
             {/* ghost chapter numeral (module leitmotif) */}

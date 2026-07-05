@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { SECTIONS } from "@/content/sections";
 import { STAGE } from "@/config/stage";
 import SectionPanel from "./SectionPanel";
-import DashboardOverlay from "./DashboardOverlay";
 import QuietSections from "./QuietSections";
 import SceneLoader from "./SceneLoader";
 import BuildingArt from "./BuildingArt";
@@ -122,9 +121,7 @@ export default function DesktopExperience() {
       {/* Scrolling copy panels over the pinned stage, the quiet zone, finale */}
       <div className="relative z-10">
         {stations.map((s) => (
-          <SectionPanel key={s.id} section={s}>
-            {s.id === "dashboard" ? <DashboardOverlay /> : undefined}
-          </SectionPanel>
+          <SectionPanel key={s.id} section={s} />
         ))}
 
         <QuietSections />
