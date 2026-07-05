@@ -144,7 +144,14 @@ export default function MobileExperience() {
                       id={`m-${s.id}-h`}
                       className="text-2xl font-bold leading-tight text-ink"
                     >
-                      {s.headline}
+                      {s.headline.endsWith("360") ? (
+                        <>
+                          {s.headline.slice(0, -3)}
+                          <span className="brand-gradient-text">360</span>
+                        </>
+                      ) : (
+                        s.headline
+                      )}
                     </h2>
                     {s.headlineAccent && (
                       <p className="mt-2 text-xl font-bold leading-tight text-gold">
@@ -154,9 +161,11 @@ export default function MobileExperience() {
                   </>
                 )}
 
-                <p className="mt-3 text-[15px] leading-relaxed text-ink-dim">
-                  {s.subline}
-                </p>
+                {s.subline && (
+                  <p className="mt-3 text-[15px] leading-relaxed text-ink-dim">
+                    {s.subline}
+                  </p>
+                )}
 
                 {s.cta && (
                   <div className="mt-5 flex flex-col gap-3">

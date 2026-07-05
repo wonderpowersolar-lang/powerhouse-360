@@ -48,7 +48,7 @@ const BAND_HEIGHT: Record<string, number> = {
   hero: 300, // scrubbed orbit runway
   system: 210,
   exploded: 210,
-  dashboard: 220,
+  dashboard: 320, // längere Standzeit für das Powerhouse-360-Schlussstatement
   cta: 190,
 };
 

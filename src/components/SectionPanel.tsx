@@ -27,6 +27,8 @@ export default function SectionPanel({
   const layerRef = useRef<HTMLDivElement>(null);
   const isHero = section.index === 0;
   const isCta = section.id === "cta";
+  /** Plattform-Station: großes Marken-Schlussstatement (wie der Hero). */
+  const isStatement = section.id === "dashboard";
   const accent = ACCENT_VAR[section.accent ?? "gold"];
   /** ghost numeral for numbered module stations ("01 / Powermieter") */
   const numeral = /^\d\d\s\//.test(section.kicker)
@@ -221,24 +223,37 @@ export default function SectionPanel({
               <>
                 <h2
                   id={`${section.id}-h`}
-                  className={`text-legible stagger font-bold leading-[1.08] text-ink ${
-                    section.align === "center"
-                      ? "text-3xl sm:text-4xl md:text-[2.9rem]"
-                      : "text-3xl sm:text-4xl lg:text-[3.1rem]"
+                  className={`text-legible stagger font-bold text-ink ${
+                    isStatement
+                      ? "leading-[1.0] tracking-tight text-[2.9rem] sm:text-6xl md:text-7xl"
+                      : section.align === "center"
+                      ? "leading-[1.08] text-3xl sm:text-4xl md:text-[2.9rem]"
+                      : "leading-[1.08] text-3xl sm:text-4xl lg:text-[3.1rem]"
                   }`}
                   style={{ transitionDelay: "100ms" }}
                 >
-                  {section.headline}
+                  {section.headline.endsWith("360") ? (
+                    <>
+                      {section.headline.slice(0, -3)}
+                      <span className="brand-gradient-text">360</span>
+                    </>
+                  ) : (
+                    section.headline
+                  )}
                 </h2>
                 {section.headlineAccent && (
                   <p
-                    className={`text-legible stagger mt-3 font-bold leading-[1.1] ${
-                      section.align === "center"
-                        ? "text-2xl sm:text-3xl md:text-[2.2rem]"
-                        : "text-2xl sm:text-3xl"
+                    className={`text-legible stagger ${
+                      isStatement
+                        ? "mt-5 text-xl font-medium leading-snug sm:text-2xl md:text-3xl"
+                        : section.align === "center"
+                        ? "mt-3 text-2xl font-bold leading-[1.1] sm:text-3xl md:text-[2.2rem]"
+                        : "mt-3 text-2xl font-bold leading-[1.1] sm:text-3xl"
                     }`}
                     style={{
-                      color: "var(--color-gold)",
+                      color: isStatement
+                        ? "var(--color-gold-soft)"
+                        : "var(--color-gold)",
                       transitionDelay: "200ms",
                     }}
                   >
@@ -249,14 +264,16 @@ export default function SectionPanel({
             )}
 
             {/* subline */}
-            <p
-              className={`text-legible stagger mt-5 text-base leading-relaxed text-ink-dim sm:text-lg ${
-                section.align === "center" ? "mx-auto max-w-2xl" : "md:max-w-lg"
-              }`}
-              style={{ transitionDelay: lines ? `${220 + (lines.length - 1) * 90}ms` : "260ms" }}
-            >
-              {section.subline}
-            </p>
+            {section.subline && (
+              <p
+                className={`text-legible stagger mt-5 text-base leading-relaxed text-ink-dim sm:text-lg ${
+                  section.align === "center" ? "mx-auto max-w-2xl" : "md:max-w-lg"
+                }`}
+                style={{ transitionDelay: lines ? `${220 + (lines.length - 1) * 90}ms` : "260ms" }}
+              >
+                {section.subline}
+              </p>
+            )}
 
             {/* CTAs */}
             {section.cta && (
