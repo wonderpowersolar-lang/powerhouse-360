@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: "Powerhouse 360 — Das Betriebssystem deiner Immobilie",
   description:
     "Powerhouse 360 verbindet Energie, Wärme, Ladeinfrastruktur, Sicherheit und digitale Prozesse in einem zentralen Betriebssystem für Mehrfamilienhäuser.",
-  metadataBase: new URL("https://powerhouse360.example"),
+  metadataBase: new URL("https://powerhouse360.de"),
   openGraph: {
     title: "Powerhouse 360 — Das Betriebssystem deiner Immobilie",
     description:
