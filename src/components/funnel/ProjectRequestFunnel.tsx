@@ -316,7 +316,7 @@ export default function ProjectRequestFunnel() {
           {QUESTIONS[step]}
         </h2>
 
-        <div className="mt-6">
+        <div className="mt-8">
           {step === 0 && (
             <OptionGrid>
               {TYPE_OPTIONS.map((o) => (

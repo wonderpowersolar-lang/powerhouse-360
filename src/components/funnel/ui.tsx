@@ -359,7 +359,7 @@ export function OptionCard({
 }
 
 export function OptionGrid({ children }: { children: React.ReactNode }) {
-  return <div className="grid gap-3 sm:grid-cols-2">{children}</div>;
+  return <div className="grid gap-3.5 sm:grid-cols-2">{children}</div>;
 }
 
 /* ─────────────────────────────── Eingaben ─────────────────────────────── */
@@ -502,7 +502,7 @@ export function LiveInsightPanel({ insights }: { insights: Insights }) {
   return (
     <div
       data-testid="insight-panel"
-      className="rounded-2xl border border-white/10 bg-[#0e0f12]/90 p-5"
+      className="rounded-2xl border border-white/10 bg-[#0e0f12]/90 p-6"
     >
       <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">
         <span className="h-px w-6 bg-gold/60" />
@@ -510,13 +510,13 @@ export function LiveInsightPanel({ insights }: { insights: Insights }) {
       </p>
 
       {insights.chips.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-5 flex flex-wrap gap-2">
           {insights.chips.map((c) => {
             const col = CHIP_TONE_VAR[c.tone];
             return (
               <span
                 key={c.label}
-                className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold"
                 style={{
                   borderColor: `color-mix(in srgb, ${col} 40%, transparent)`,
                   color: col,
@@ -534,20 +534,24 @@ export function LiveInsightPanel({ insights }: { insights: Insights }) {
         </div>
       )}
 
-      <div className="mt-4 space-y-4">
+      {/* Detail-Blöcke: durch Hairlines getrennt, damit die Einschätzungen
+          als eigenständige Zeilen lesbar bleiben statt als dichte Wand. */}
+      <div className="mt-6 divide-y divide-white/[0.07] border-y border-white/[0.07]">
         {insights.blocks.map((b) => (
-          <div key={b.title}>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-ink-faint">
+          <div key={b.title} className="py-4">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
               {b.title}
             </p>
             {b.ordered ? (
-              <ol className="mt-1.5 list-decimal space-y-1 pl-5 text-[13px] leading-relaxed text-ink-dim marker:text-gold/70">
+              <ol className="mt-2.5 list-decimal space-y-1.5 pl-5 text-[13.5px] leading-relaxed text-ink-dim marker:text-gold/70">
                 {b.lines.map((l) => (
-                  <li key={l}>{l}</li>
+                  <li key={l} className="pl-1">
+                    {l}
+                  </li>
                 ))}
               </ol>
             ) : (
-              <div className="mt-1.5 space-y-1.5 text-[13px] leading-relaxed text-ink-dim">
+              <div className="mt-2 space-y-2 text-[13.5px] leading-relaxed text-ink-dim">
                 {b.lines.map((l) => (
                   <p key={l}>{l}</p>
                 ))}
@@ -557,7 +561,7 @@ export function LiveInsightPanel({ insights }: { insights: Insights }) {
         ))}
       </div>
 
-      <p className="mt-5 border-t border-white/8 pt-3 text-[11px] leading-relaxed text-ink-faint">
+      <p className="mt-4 text-[11px] leading-relaxed text-ink-faint">
         {insights.disclaimer}
       </p>
     </div>
@@ -607,11 +611,11 @@ export function NavButtons({
   error?: string | null;
 }) {
   return (
-    <div className="mt-8">
+    <div className="mt-10 border-t border-white/8 pt-6">
       {error && (
         <p
           role="alert"
-          className="mb-3 rounded-xl border border-mod-heat/40 bg-mod-heat/10 px-4 py-2.5 text-[13px] text-ink"
+          className="mb-4 rounded-xl border border-mod-heat/40 bg-mod-heat/10 px-4 py-2.5 text-[13px] text-ink"
         >
           {error}
         </p>
@@ -695,35 +699,30 @@ export function FunnelShell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5 pb-24 pt-10 sm:px-8 sm:pt-14">
+      <main className="mx-auto max-w-6xl px-5 pb-28 pt-12 sm:px-8 sm:pt-16">
         <div className="max-w-2xl">
           <h1 className="text-2xl font-bold leading-tight tracking-tight text-ink sm:text-3xl">
             {title}
           </h1>
-          <p className="mt-2 text-[15px] leading-relaxed text-ink-dim">
+          <p className="mt-3 text-[15px] leading-relaxed text-ink-dim">
             {subline}
           </p>
         </div>
 
         {showProgress && (
-          <div className="mt-8 max-w-2xl">
+          <div className="mt-10 max-w-2xl">
             <FunnelProgress step={step} total={total} />
           </div>
         )}
 
-        <div className="mt-8 grid items-stretch gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="mt-12 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14">
           <div className="min-w-0">{children}</div>
 
-          {/* Desktop: Live-Panel rechts. Der absolute Träger sorgt dafür,
-              dass das Panel NIE höher wird als der Funnel-Bereich links —
-              die Zeilenhöhe bestimmt allein der Schritt-Inhalt; längere
-              Panels scrollen intern (sticky, viewport-gedeckelt). */}
-          <aside className="relative hidden lg:block">
-            <div className="absolute inset-0">
-              <div className="sticky top-8 max-h-[min(calc(100dvh-4rem),100%)] overflow-y-auto overscroll-contain">
-                {panel}
-              </div>
-            </div>
+          {/* Desktop: Live-Panel als sticky Sidebar in VOLLER Höhe — der
+              gesamte Einschätzungs-Inhalt ist sichtbar. Ist das Panel höher
+              als der Viewport, scrollt die Seite (kein internes Abschneiden). */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-8">{panel}</div>
           </aside>
         </div>
 
@@ -739,7 +738,7 @@ export function FunnelShell({
                 +
               </span>
             </summary>
-            <div className="max-h-[55dvh] overflow-y-auto border-t border-white/8 p-2">
+            <div className="funnel-scroll max-h-[55dvh] overflow-y-auto overscroll-contain border-t border-white/8 p-2">
               {panel}
             </div>
           </details>

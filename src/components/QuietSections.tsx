@@ -80,10 +80,11 @@ export default function QuietSections() {
           className="absolute inset-0 h-full w-full object-cover"
           style={{ objectPosition: "50% 46%" }}
         />
-        {/* Lesbarkeits-Scrim links + nahtlose Splice-Fades oben/unten */}
+        {/* Leichter Scrim (Video behält Wirkung) + nahtlose Fades oben/unten.
+            Die Lesbarkeit übernimmt jetzt vor allem die Glasbox um den Text. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy-900/90 via-navy-900/40 to-navy-900/20"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy-900/75 via-navy-900/25 to-transparent"
         />
         <div
           aria-hidden
@@ -95,7 +96,7 @@ export default function QuietSections() {
         />
 
         <div className="relative mx-auto w-full max-w-6xl px-5 py-24 sm:px-8">
-          <div className="q-reveal max-w-xl">
+          <div className="q-reveal max-w-xl rounded-3xl border border-white/12 bg-navy-900/50 p-8 shadow-[0_24px_70px_-24px_rgba(0,0,0,0.7)] backdrop-blur-xl sm:p-10">
             <p className="mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-gold">
               <span className="h-px w-8 bg-gold/60" />
               POWERHOUSE Hub v1

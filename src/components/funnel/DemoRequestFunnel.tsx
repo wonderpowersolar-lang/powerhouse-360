@@ -298,7 +298,7 @@ export default function DemoRequestFunnel() {
           {QUESTIONS[step]}
         </h2>
 
-        <div className="mt-6">
+        <div className="mt-8">
           {step === 0 && (
             <OptionGrid>
               {ROLE_OPTIONS.map((o) => (
