@@ -51,6 +51,7 @@ export default function SmokeStory() {
   const familyRef = useRef<HTMLDivElement>(null);
   const dangerRef = useRef<HTMLDivElement>(null);
   const amberRef = useRef<HTMLDivElement>(null);
+  const blueRef = useRef<HTMLDivElement>(null);
   const clockRef = useRef<HTMLDivElement>(null);
   const burnCopyRef = useRef<HTMLDivElement>(null);
   const burnLineRefs = useRef<(HTMLParagraphElement | null)[]>([]);
@@ -197,6 +198,8 @@ export default function SmokeStory() {
         dangerRef.current.style.opacity = (0.36 * smDangerWeight(p)).toFixed(3);
       if (amberRef.current)
         amberRef.current.style.opacity = (0.22 * resolveW).toFixed(3);
+      if (blueRef.current)
+        blueRef.current.style.opacity = (0.22 * fireW).toFixed(3);
 
       /* Uhr (blendet zur Morgen-Auflösung aus — der Morgen ist zeitlos) */
       if (clockRef.current) {
@@ -361,6 +364,16 @@ export default function SmokeStory() {
             opacity: 0,
             background:
               "linear-gradient(180deg, rgba(232,151,60,0.5) 0%, rgba(232,151,60,0.12) 60%, transparent 100%)",
+          }}
+        />
+        <div
+          ref={blueRef}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 will-change-[opacity]"
+          style={{
+            opacity: 0,
+            background:
+              "linear-gradient(200deg, rgba(64,120,255,0.45) 0%, rgba(64,120,255,0.1) 55%, transparent 100%)",
           }}
         />
 

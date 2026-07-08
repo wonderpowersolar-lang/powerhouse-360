@@ -38,7 +38,7 @@ export const SM_HERO = {
   headlineAccent:
     "Rauchwarnmelder im Mehrfamilienhaus — montiert, ferngeprüft und lückenlos dokumentiert.",
   subline:
-    "SmokeMieter macht die Rauchwarnmelder-Pflicht einfach betreibbar: Geräte, Montage, Ferninspektion, Ereigniskommunikation und eine Dokumentation, die jeder Prüfung standhält — für Eigentümer, WEGs und Hausverwaltungen.",
+    "SmokeMieter plant, montiert und wartet Rauchwarnmelder nach DIN 14676 — mit Geräten nach DIN EN 14604. Für die Sicherheit aller Bewohner Ihrer Immobilie, mit Ferninspektion, Ereigniskommunikation und einer Dokumentation, die jeder Prüfung standhält.",
   scrollHint: "Eine Nacht, zwei Ausgänge — scrollen Sie.",
   cta: [
     { ...SM_CTA.bestandscheck, variant: "primary" as const },
@@ -80,7 +80,8 @@ export const SM_STORY = {
       "Der Unterschied zwischen diesen zwei Nächten hängt an der Decke.",
     resolveSubline:
       "Ein Melder rettet nur, wenn er hängt, funktioniert und geprüft ist. Genau dafür gibt es SmokeMieter.",
-    resolveClaim: "SmokeMieter — für Sicherheit in Ihrer Immobilie.",
+    resolveClaim:
+      "SmokeMieter — für die Sicherheit aller Bewohner Ihrer Immobilie.",
   },
 } as const;
 
@@ -112,8 +113,12 @@ export const SM_BEATS: SmBeat[] = [
     at: 0.32,
   },
   { clock: "03:13", text: "Alle sind wach. Ein Anruf: 112.", at: 0.4 },
-  { clock: "03:15", text: "Alle im Treppenhaus.", at: 0.48 },
-  { clock: "03:19", text: "Die Feuerwehr ist da.", at: 0.56 },
+  {
+    clock: "03:15",
+    text: "Alle sicher draußen — in der Straße das erste Blaulicht.",
+    at: 0.48,
+  },
+  { clock: "03:19", text: "Die Feuerwehr übernimmt.", at: 0.56 },
   {
     clock: "03:26",
     text: "Gelöscht. Der Brand bleibt eine Randnotiz.",
@@ -136,7 +141,8 @@ export const SM_IMAGE = {
   night: "/media/smokemieter/night.jpg",
   /** Sektions-Motive (Akt 3) */
   flur: "/media/smokemieter/flur.jpg",
-  etagen: "/media/smokemieter/etagen.jpg",
+  objekt: "/media/smokemieter/objekt.jpg",
+  produkt: "/media/smokemieter/produkt.jpg",
   wohnen: "/media/smokemieter/wohnen.jpg",
   geraet: "/media/smokemieter/geraet.jpg",
   /** Bestands-Assets der Startseite */
@@ -183,7 +189,7 @@ export const SM_SECTIONS: SmSection[] = [
     kicker: "Die Pflicht",
     headline: "Pflicht ist das Minimum. Nachweis ist der Standard.",
     subline:
-      "Rauchwarnmelder sind in Deutschland Pflicht — die Details regeln die Landesbauordnungen. SmokeMieter macht daraus einen dokumentierten Zustand: Bestand, Prüfstatus und Nachweise, jederzeit abrufbar.",
+      "Rauchwarnmelder sind in Deutschland Pflicht — die Details regeln die Landesbauordnungen. SmokeMieter plant, montiert und wartet nach DIN 14676 mit Geräten nach DIN EN 14604 und macht aus der Pflicht einen dokumentierten Zustand: Bestand, Prüfstatus und Nachweise, jederzeit abrufbar.",
     points: [
       "Bestand je Wohnung und Raum",
       "Prüfstatus auf einen Blick",
@@ -202,8 +208,7 @@ export const SM_SECTIONS: SmSection[] = [
       "Live-Status je Melder",
       "Alarm, Demontage und Störung gemeldet",
     ],
-    media: "detector",
-    video: "detector",
+    media: "produkt",
   },
   {
     id: "verwaltung",
@@ -216,7 +221,7 @@ export const SM_SECTIONS: SmSection[] = [
       "Ereignisprotokoll je Objekt",
       "Dokumentation, die Prüfungen standhält",
     ],
-    media: "etagen",
+    media: "objekt",
   },
   {
     id: "mieter",
@@ -236,7 +241,7 @@ export const SM_SECTIONS: SmSection[] = [
     kicker: "Wartung & Austausch",
     headline: "Melder altern. Das System vergisst es nicht.",
     subline:
-      "Montage, laufende Wartung und der altersbedingte Gerätetausch — spätestens nach zehn Jahren — sind Teil des Modells. Jede Maßnahme landet in der Historie.",
+      "Montage, laufende Wartung nach DIN 14676 und der altersbedingte Gerätetausch — spätestens nach zehn Jahren — sind Teil des Modells. Jede Maßnahme landet in der Historie.",
     points: [
       "Montage durch Fachpartner",
       "Tausch rechtzeitig geplant",
@@ -311,7 +316,7 @@ export const SM_FINAL = {
   kicker: "SmokeMieter",
   headline: "Die zweite Version der Nacht beginnt mit einem Gespräch.",
   subline:
-    "Mit SmokeMieter wird die Rauchwarnmelder-Pflicht zum verwalteten Zustand: montiert, ferngeprüft, dokumentiert und abrechnungsfähig strukturiert.",
+    "Für die Sicherheit aller Bewohner Ihrer Immobilie: geplant, montiert und gewartet nach DIN 14676 — ferngeprüft, dokumentiert und abrechnungsfähig strukturiert.",
   support: "Für Eigentümer, WEGs, Hausverwaltungen und Wohnungsunternehmen.",
   cta: [
     { ...SM_CTA.bestandscheck, variant: "primary" as const },
