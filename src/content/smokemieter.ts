@@ -330,7 +330,7 @@ export const SM_ADMIN_WIDGETS: {
 
 export const SM_FINAL = {
   kicker: "SmokeMieter",
-  headline: "Die zweite Version der Nacht beginnt mit einem Gespräch.",
+  headline: "Die Sicherheit deiner Bewohner beginnt mit einem Gespräch.",
   subline:
     "Für die Sicherheit aller Bewohner Ihrer Immobilie: geplant, montiert und gewartet nach DIN 14676 — ferngeprüft, dokumentiert und abrechnungsfähig strukturiert.",
   support: "Für Eigentümer, WEGs, Hausverwaltungen und Wohnungsunternehmen.",
