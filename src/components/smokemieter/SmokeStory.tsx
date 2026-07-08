@@ -57,6 +57,7 @@ export default function SmokeStory() {
   const rewindCopyRef = useRef<HTMLDivElement>(null);
   const rescueCopyRef = useRef<HTMLDivElement>(null);
   const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const beatMobileRefs = useRef<(HTMLDivElement | null)[]>([]);
   const resolveRef = useRef<HTMLDivElement>(null);
 
   const framesRef = useRef<(HTMLImageElement | null)[]>([]);
@@ -222,9 +223,12 @@ export default function SmokeStory() {
         smCopyWeight("rescue", p) * (1 - smResolveWeight(p));
       setW(rescueCopyRef.current, rescueCopyW);
 
-      /* Beats + Auflösung */
+      /* Beats + Auflösung (Desktop: Stack · Mobil: ein Slot, jüngster Beat) */
+      const beatWs = SM_BEATS.map((_, i) => smBeatWeight(i, p));
       SM_BEATS.forEach((_, i) => {
-        setW(beatRefs.current[i], smBeatWeight(i, p), 18);
+        setW(beatRefs.current[i], beatWs[i], 18);
+        const solo = Math.max(0, beatWs[i] - (beatWs[i + 1] ?? 0));
+        setW(beatMobileRefs.current[i], solo, 12);
       });
       setW(resolveRef.current, resolveW, 20);
     };
@@ -486,7 +490,33 @@ export default function SmokeStory() {
           </h2>
         </div>
 
-        <div className="absolute inset-x-5 bottom-10 flex flex-col gap-2.5 sm:inset-x-8 md:inset-x-auto md:bottom-auto md:right-[7%] md:top-1/2 md:w-[360px] md:-translate-y-1/2 md:gap-3">
+        {/* Mobil: ein Beat-Slot (Crossfade), damit Push-Karte + Copy Platz haben */}
+        <div className="absolute inset-x-5 bottom-12 min-h-[96px] md:hidden">
+          {SM_BEATS.map((b, i) => (
+            <div
+              key={`m-${b.at}`}
+              ref={(el) => {
+                beatMobileRefs.current[i] = el;
+              }}
+              className="absolute inset-x-0 bottom-0 rounded-xl border border-white/12 bg-black/45 px-3.5 py-2.5 backdrop-blur-md"
+              style={{ opacity: 0, visibility: "hidden" }}
+            >
+              <div className="flex items-baseline gap-3">
+                <span
+                  className="shrink-0 font-mono text-sm font-semibold tabular-nums"
+                  style={{ color: ACCENT }}
+                >
+                  {b.clock}
+                </span>
+                <p className="text-legible text-sm leading-snug text-ink">
+                  {b.text}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="absolute right-[7%] top-1/2 hidden w-[360px] -translate-y-1/2 flex-col gap-3 md:flex">
           {SM_BEATS.map((b, i) => (
             <div
               key={b.clock + b.at}
