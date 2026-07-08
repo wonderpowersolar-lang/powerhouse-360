@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { ButtonLink } from "@/components/ui/Button";
 import {
   HM_SECTIONS,
@@ -8,11 +11,13 @@ import {
   HM_VIDEO,
   type HmSection,
 } from "@/content/heatmieter";
+import { hmFrameLoop } from "@/lib/heatProgress";
 
 /**
- * HeatSections — Akt 3: acht ruhige, klassisch gestapelte Sachsektionen.
- * Bewusst ohne Scroll-Choreografie: Nach dem Kino der Story darf der
- * Sachteil schnell gelesen und gescannt werden.
+ * HeatSections — Akt 3: acht Sachsektionen mit durchgehender Scroll-Motion.
+ * Reveal-Muster wie die Homepage (IntersectionObserver → `.is-in`), zusätzlich
+ * ein sanfter Parallax auf den Medien: der lange Sachteil „lebt" beim Scrollen
+ * statt statisch dazustehen. Unter prefers-reduced-motion: alles ruhig sichtbar.
  */
 
 const ACCENT = "var(--color-mod-heat)";
@@ -27,7 +32,11 @@ function Points({ section }: { section: HmSection }) {
       }
     >
       {section.points.map((p, i) => (
-        <li key={p} className="flex items-baseline gap-3">
+        <li
+          key={p}
+          className="hm-reveal flex items-baseline gap-3"
+          style={{ transitionDelay: `${120 + i * 70}ms` }}
+        >
           {numbered ? (
             <span
               className="shrink-0 font-mono text-sm font-semibold tabular-nums"
@@ -61,15 +70,16 @@ function Media({ section }: { section: HmSection }) {
 
   if (section.id === "abrechnung") {
     return (
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+      <div className="hm-reveal w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] p-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
           Beleg-Struktur
         </p>
         <dl className="mt-4 space-y-3">
-          {HM_BILL_CLEAR.rows.map((r) => (
+          {HM_BILL_CLEAR.rows.map((r, i) => (
             <div
               key={r.label}
-              className="flex items-baseline justify-between gap-4 border-b border-white/5 pb-3 last:border-b-0 last:pb-0"
+              className="hm-reveal flex items-baseline justify-between gap-4 border-b border-white/5 pb-3 last:border-b-0 last:pb-0"
+              style={{ transitionDelay: `${120 + i * 70}ms` }}
             >
               <dt className="shrink-0 text-sm text-ink-faint">{r.label}</dt>
               <dd className="text-right text-sm font-semibold text-ink">
@@ -95,10 +105,11 @@ function Media({ section }: { section: HmSection }) {
   if (section.id === "plattform") {
     return (
       <div className="grid w-full max-w-md grid-cols-2 gap-3 sm:grid-cols-2">
-        {HM_ADMIN_WIDGETS.map((w) => (
+        {HM_ADMIN_WIDGETS.map((w, i) => (
           <div
             key={w.label}
-            className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5"
+            className="hm-reveal rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5"
+            style={{ transitionDelay: `${i * 80}ms` }}
           >
             <div className="flex items-center gap-2">
               <span
@@ -129,41 +140,96 @@ function Media({ section }: { section: HmSection }) {
   if (!img) return null;
 
   return (
-    <div className="relative aspect-[16/10] w-full max-w-lg overflow-hidden rounded-2xl border border-white/10">
-      {vid ? (
-        <video
-          muted
-          loop
-          playsInline
-          autoPlay
-          preload="metadata"
-          poster={img}
-          aria-hidden
-          tabIndex={-1}
-          className="absolute inset-0 h-full w-full object-cover"
-        >
-          <source src={vid} type="video/mp4" />
-        </video>
-      ) : (
-        <Image
-          src={img}
-          alt=""
-          fill
-          loading="lazy"
-          sizes="(min-width: 1024px) 40vw, 90vw"
-          unoptimized
-          className="object-cover"
-          draggable={false}
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-navy-900/40 to-transparent" />
+    <div className="hm-reveal relative aspect-[16/10] w-full max-w-lg overflow-hidden rounded-2xl border border-white/10">
+      {/* Parallax-Ebene: leicht größer als der Rahmen, verschiebt beim Scrollen */}
+      <div
+        data-hm-par
+        className="absolute inset-0 will-change-transform"
+        style={{ transform: "scale(1.16)" }}
+      >
+        {vid ? (
+          <video
+            muted
+            loop
+            playsInline
+            autoPlay
+            preload="metadata"
+            poster={img}
+            aria-hidden
+            tabIndex={-1}
+            className="absolute inset-0 h-full w-full object-cover"
+          >
+            <source src={vid} type="video/mp4" />
+          </video>
+        ) : (
+          <Image
+            src={img}
+            alt=""
+            fill
+            loading="lazy"
+            sizes="(min-width: 1024px) 40vw, 90vw"
+            unoptimized
+            className="object-cover"
+            draggable={false}
+          />
+        )}
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy-900/40 to-transparent" />
     </div>
   );
 }
 
 export default function HeatSections() {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const reduced = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    // Reveal beim Reinscrollen
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-in");
+            io.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
+    );
+    root.querySelectorAll(".hm-reveal").forEach((el) => io.observe(el));
+
+    if (reduced) return () => io.disconnect();
+
+    // Sanfter Medien-Parallax
+    const pars = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-hm-par]")
+    );
+    const stop = hmFrameLoop(() => {
+      const vh = window.innerHeight || 1;
+      for (const el of pars) {
+        const r = el.getBoundingClientRect();
+        if (r.bottom < -80 || r.top > vh + 80) continue;
+        const center = r.top + r.height / 2;
+        const rel = (center - vh / 2) / vh; // -0.5..0.5 im Viewport
+        const shift = -rel * 42; // px
+        el.style.transform = `scale(1.16) translate3d(0, ${shift.toFixed(
+          1
+        )}px, 0)`;
+      }
+    });
+
+    return () => {
+      io.disconnect();
+      stop();
+    };
+  }, []);
+
   return (
-    <div className="relative bg-navy-900">
+    <div ref={rootRef} className="relative bg-navy-900">
       {HM_SECTIONS.map((s, i) => {
         const mediaNode = <Media section={s} />;
         const hasMedia =
@@ -188,7 +254,7 @@ export default function HeatSections() {
             >
               <div className={hasMedia ? "lg:w-1/2" : "max-w-3xl"}>
                 <p
-                  className="mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em]"
+                  className="hm-reveal mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em]"
                   style={{ color: ACCENT }}
                 >
                   <span className="h-px w-8 bg-current opacity-60" />
@@ -196,16 +262,23 @@ export default function HeatSections() {
                 </p>
                 <h2
                   id={`${s.id}-h`}
-                  className="text-legible text-3xl font-bold leading-[1.1] text-ink sm:text-4xl"
+                  className="hm-reveal text-legible text-3xl font-bold leading-[1.1] text-ink sm:text-4xl"
+                  style={{ transitionDelay: "50ms" }}
                 >
                   {s.headline}
                 </h2>
-                <p className="text-legible mt-5 max-w-xl text-base leading-relaxed text-ink-dim sm:text-lg">
+                <p
+                  className="hm-reveal text-legible mt-5 max-w-xl text-base leading-relaxed text-ink-dim sm:text-lg"
+                  style={{ transitionDelay: "90ms" }}
+                >
                   {s.subline}
                 </p>
                 <Points section={s} />
                 {s.cta && (
-                  <div className="mt-8 flex flex-wrap gap-3">
+                  <div
+                    className="hm-reveal mt-8 flex flex-wrap gap-3"
+                    style={{ transitionDelay: "140ms" }}
+                  >
                     {s.cta.map((c) => (
                       <ButtonLink
                         key={c.label}
@@ -227,6 +300,26 @@ export default function HeatSections() {
           </section>
         );
       })}
+
+      <style jsx>{`
+        div :global(.hm-reveal) {
+          opacity: 0;
+          transform: translateY(28px);
+          transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        div :global(.hm-reveal.is-in) {
+          opacity: 1;
+          transform: none;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          div :global(.hm-reveal) {
+            opacity: 1;
+            transform: none;
+            transition: none;
+          }
+        }
+      `}</style>
     </div>
   );
 }
