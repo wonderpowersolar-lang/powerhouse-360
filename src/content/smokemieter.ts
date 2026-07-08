@@ -116,6 +116,11 @@ export const SM_IMAGE = {
   alarm: "/media/smokemieter/alarm.jpg",
   dawn: "/media/smokemieter/dawn.jpg",
   night: "/media/smokemieter/night.jpg",
+  /** Sektions-Motive (Akt 3) */
+  flur: "/media/smokemieter/flur.jpg",
+  etagen: "/media/smokemieter/etagen.jpg",
+  wohnen: "/media/smokemieter/wohnen.jpg",
+  geraet: "/media/smokemieter/geraet.jpg",
   /** Bestands-Assets der Startseite */
   detector: "/media/stills/smokemieter.jpg",
 } as const;
@@ -166,6 +171,7 @@ export const SM_SECTIONS: SmSection[] = [
       "Prüfstatus auf einen Blick",
       "Nachweise für die Akte",
     ],
+    media: "flur",
   },
   {
     id: "ferninspektion",
@@ -192,6 +198,7 @@ export const SM_SECTIONS: SmSection[] = [
       "Ereignisprotokoll je Objekt",
       "Dokumentation, die Prüfungen standhält",
     ],
+    media: "etagen",
   },
   {
     id: "mieter",
@@ -204,6 +211,7 @@ export const SM_SECTIONS: SmSection[] = [
       "Ungestörter Alltag",
       "Klare Information im Ereignisfall",
     ],
+    media: "wohnen",
   },
   {
     id: "wartung",
@@ -216,6 +224,7 @@ export const SM_SECTIONS: SmSection[] = [
       "Tausch rechtzeitig geplant",
       "Lückenlose Gerätehistorie",
     ],
+    media: "geraet",
   },
   {
     id: "abrechnung",
@@ -244,6 +253,7 @@ export const SM_SECTIONS: SmSection[] = [
       "Nachweise dokumentieren",
       "Abrechnung vorbereiten",
     ],
+    media: "dawn",
   },
   {
     id: "plattform",
@@ -253,6 +263,15 @@ export const SM_SECTIONS: SmSection[] = [
       "SmokeMieter ist Teil von Powerhouse 360: Melder, Räume, Status, Ereignisse und Nachweise laufen in einer Ansicht zusammen.",
     cta: [{ ...SM_CTA.demo, variant: "secondary" }],
   },
+];
+
+/** Abrechnungs-Beleg (Sektion »abrechnung« — Struktur, keine Preise). */
+export const SM_BILLING_ROWS: { label: string; value: string }[] = [
+  { label: "Modell", value: "Gerätemiete statt Investition" },
+  { label: "Leistung", value: "Wartung · Ferninspektion · Tausch" },
+  { label: "Zeitraum", value: "Monatlich, planbar" },
+  { label: "Beleg", value: "Je Objekt und Wohnung" },
+  { label: "Status", value: "Abrechnungsfähig strukturiert" },
 ];
 
 /** Verwaltungs-Widgets (glaubwürdige Zustände — 14 Wohnungen × 3 Melder). */

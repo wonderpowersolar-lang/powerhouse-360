@@ -3,6 +3,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import {
   SM_SECTIONS,
   SM_ADMIN_WIDGETS,
+  SM_BILLING_ROWS,
   SM_IMAGE,
   SM_VIDEO,
   type SmSection,
@@ -53,7 +54,41 @@ function Points({ section }: { section: SmSection }) {
 }
 
 function Media({ section }: { section: SmSection }) {
-  if (!section.media && section.id !== "plattform") return null;
+  if (!section.media && section.id !== "plattform" && section.id !== "abrechnung")
+    return null;
+
+  if (section.id === "abrechnung") {
+    return (
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
+          Beleg-Struktur
+        </p>
+        <dl className="mt-4 space-y-3">
+          {SM_BILLING_ROWS.map((r) => (
+            <div
+              key={r.label}
+              className="flex items-baseline justify-between gap-4 border-b border-white/5 pb-3 last:border-b-0 last:pb-0"
+            >
+              <dt className="shrink-0 text-sm text-ink-faint">{r.label}</dt>
+              <dd className="text-right text-sm font-semibold text-ink">
+                {r.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <div className="mt-4 flex items-center gap-2">
+          <span
+            aria-hidden
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ background: ACCENT }}
+          />
+          <span className="text-xs text-ink-dim">
+            Grundlage für die Betriebskostenabrechnung
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   if (section.id === "plattform") {
     return (
@@ -129,7 +164,8 @@ export default function SmokeSections() {
     <div className="relative bg-navy-900">
       {SM_SECTIONS.map((s, i) => {
         const mediaNode = <Media section={s} />;
-        const hasMedia = s.media || s.id === "plattform";
+        const hasMedia =
+          s.media || s.id === "plattform" || s.id === "abrechnung";
         const mediaRight = i % 2 === 0;
 
         return (
