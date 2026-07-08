@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   icons: {
-    icon: [{ url: "/smokemieter-icon.svg", type: "image/svg+xml" }],
+    icon: [{ url: "/brand/smokemieter-mark.svg", type: "image/svg+xml" }],
   },
   title: "SmokeMieter — Rauchwarnmelder im Mehrfamilienhaus | Powerhouse 360",
   description:
