@@ -330,3 +330,301 @@ export function hmStoryFramePath(i: number): string {
     String(Math.max(1, Math.min(HM_STORY_FRAMES.count, i))).padStart(3, "0")
   );
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * CINE-JOURNEY (Desktop) — ein durchgehender Runway auf ChargeMieter-Niveau.
+ *
+ * EINE fixierte Bühne trägt die ganze Seite; darüber schweben 14 Szenen-Panels.
+ * Szenen 1–4 sind die bestehende Zwei-Winter-Story (Frame-Scrub-Herzstück aus
+ * lib/heatProgress) — als „Story-Mega-Layer" in die Bühne gefaltet, getrieben
+ * von einem Story-Float, der aus dem Szenen-Float remapped wird. Szenen 5–12
+ * sind die Sachthemen als cinematische Szenen (Charge-Panel-Muster); 0/13 wie
+ * Charge (Hero-Push-in, sticky CTA). Copy der Sachthemen referenziert
+ * HM_SECTIONS (Mobile nutzt weiterhin dieselben Daten).
+ * ════════════════════════════════════════════════════════════════════════ */
+
+export type HmCineOverlay =
+  | "none"
+  | "story"
+  | "livedata"
+  | "einsparen"
+  | "beleg"
+  | "timeline"
+  | "system";
+
+export interface HmScene {
+  id: string;
+  index: number;
+  /** Scroll-Runway-Höhe des Szenen-Bands (vh). */
+  heightVh: number;
+  /** Plateau-Anteil des Bands, in dem die Bühne ruht (0..1). */
+  hold: number;
+  kicker: string;
+  headline: string;
+  /** optionale zweite Headline-Zeile im Heat-Akzent (die Schlüsselzeile). */
+  headlineAccent?: string;
+  subline: string;
+  /** Aufzählungspunkte (Sachthemen). */
+  points?: string[];
+  align: "left" | "right" | "center";
+  overlay: HmCineOverlay;
+  /** Medien-Ebene hinter der Szene (Story-Szenen: undefined → Story-Layer). */
+  media?: keyof typeof HM_IMAGE;
+  /** optionaler Loop-Clip (Key aus HM_VIDEO). */
+  video?: keyof typeof HM_VIDEO;
+  /** 0 = Bild voll sichtbar, 1 = komplett abgedunkelt (Karten tragen die Szene). */
+  mediaDim: number;
+  cta?: { label: string; href: string; variant: "primary" | "secondary" }[];
+}
+
+/** Sachthemen-Copy aus den bestehenden Sektionen ziehen (eine Quelle). */
+const hmSec = (id: string): HmSection =>
+  HM_SECTIONS.find((s) => s.id === id) ?? HM_SECTIONS[0];
+
+export const HM_SCENES: HmScene[] = [
+  // ───────────────────────────────────────────── 0 · HERO (Winter-Push-in)
+  {
+    id: "hero",
+    index: 0,
+    heightVh: 250,
+    hold: 0.82,
+    kicker: HM_HERO.kicker,
+    headline: HM_HERO.headline,
+    headlineAccent: HM_HERO.headlineAccent,
+    subline: HM_HERO.subline,
+    align: "left",
+    overlay: "none",
+    media: "winter",
+    mediaDim: 0,
+    cta: [...HM_HERO.cta],
+  },
+
+  // ───────────────────────────────────────────── 1 · WINTER 1 (Story)
+  {
+    id: "winter1",
+    index: 1,
+    heightVh: 260,
+    hold: 0.62,
+    kicker: HM_STORY.winter1.kicker,
+    headline: HM_STORY.winter1.headline,
+    subline: HM_STORY.winter1.lines[0],
+    align: "left",
+    overlay: "story",
+    mediaDim: 0,
+  },
+
+  // ───────────────────────────────────────────── 2 · WECHSEL (Story)
+  {
+    id: "wechsel",
+    index: 2,
+    heightVh: 210,
+    hold: 0.58,
+    kicker: HM_STORY.wechsel.kicker,
+    headline: HM_STORY.wechsel.headline,
+    subline: HM_STORY.wechsel.subline,
+    align: "center",
+    overlay: "story",
+    mediaDim: 0,
+  },
+
+  // ───────────────────────────────────────────── 3 · WINTER 2 (Story)
+  {
+    id: "winter2",
+    index: 3,
+    heightVh: 260,
+    hold: 0.62,
+    kicker: HM_STORY.winter2.kicker,
+    headline: HM_STORY.winter2.headline,
+    subline: HM_STORY.winter1.lines[1],
+    align: "left",
+    overlay: "story",
+    mediaDim: 0,
+  },
+
+  // ───────────────────────────────────────────── 4 · AUFLÖSUNG (Story)
+  {
+    id: "aufloesung",
+    index: 4,
+    heightVh: 230,
+    hold: 0.6,
+    kicker: HM_STORY.winter2.kicker,
+    headline: HM_STORY.winter2.resolveHeadline,
+    subline: HM_STORY.winter2.resolveSubline,
+    align: "left",
+    overlay: "story",
+    mediaDim: 0,
+  },
+
+  // ───────────────────────────────────────────── 5 · PFLICHT & FRISTEN
+  {
+    id: "pflicht",
+    index: 5,
+    heightVh: 200,
+    hold: 0.76,
+    kicker: hmSec("pflicht").kicker,
+    headline: hmSec("pflicht").headline,
+    subline: hmSec("pflicht").subline,
+    points: hmSec("pflicht").points,
+    align: "left",
+    overlay: "none",
+    media: "winter",
+    mediaDim: 0.58,
+  },
+
+  // ───────────────────────────────────────────── 6 · ERFASSUNG & LIVE-DATEN
+  {
+    id: "erfassung",
+    index: 6,
+    heightVh: 210,
+    hold: 0.76,
+    kicker: hmSec("erfassung").kicker,
+    headline: hmSec("erfassung").headline,
+    subline: hmSec("erfassung").subline,
+    points: hmSec("erfassung").points,
+    align: "right",
+    overlay: "livedata",
+    media: "anlage",
+    video: "anlage",
+    mediaDim: 0.12,
+  },
+
+  // ───────────────────────────────────────────── 7 · FÜR HAUSVERWALTUNGEN
+  {
+    id: "verwaltung",
+    index: 7,
+    heightVh: 195,
+    hold: 0.76,
+    kicker: hmSec("verwaltung").kicker,
+    headline: hmSec("verwaltung").headline,
+    subline: hmSec("verwaltung").subline,
+    points: hmSec("verwaltung").points,
+    align: "left",
+    overlay: "none",
+    media: "winter",
+    mediaDim: 0.5,
+  },
+
+  // ───────────────────────────────────────────── 8 · FÜR BEWOHNER
+  {
+    id: "bewohner",
+    index: 8,
+    heightVh: 195,
+    hold: 0.76,
+    kicker: hmSec("bewohner").kicker,
+    headline: hmSec("bewohner").headline,
+    subline: hmSec("bewohner").subline,
+    points: hmSec("bewohner").points,
+    align: "right",
+    overlay: "none",
+    media: "thaw",
+    mediaDim: 0.5,
+  },
+
+  // ───────────────────────────────────────────── 9 · EINSPARPOTENZIALE
+  {
+    id: "einsparen",
+    index: 9,
+    heightVh: 200,
+    hold: 0.76,
+    kicker: hmSec("einsparen").kicker,
+    headline: hmSec("einsparen").headline,
+    subline: hmSec("einsparen").subline,
+    points: hmSec("einsparen").points,
+    align: "left",
+    overlay: "einsparen",
+    media: "pump",
+    mediaDim: 0.2,
+  },
+
+  // ───────────────────────────────────────────── 10 · ABRECHNUNG & CO₂
+  {
+    id: "abrechnung",
+    index: 10,
+    heightVh: 210,
+    hold: 0.78,
+    kicker: hmSec("abrechnung").kicker,
+    headline: hmSec("abrechnung").headline,
+    subline: hmSec("abrechnung").subline,
+    points: hmSec("abrechnung").points,
+    align: "left",
+    overlay: "beleg",
+    media: "pump",
+    mediaDim: 0.72,
+  },
+
+  // ───────────────────────────────────────────── 11 · ABLAUF (nummeriert)
+  {
+    id: "ablauf",
+    index: 11,
+    heightVh: 220,
+    hold: 0.8,
+    kicker: hmSec("ablauf").kicker,
+    headline: hmSec("ablauf").headline,
+    subline: hmSec("ablauf").subline,
+    points: hmSec("ablauf").points,
+    align: "center",
+    overlay: "timeline",
+    media: "winter",
+    mediaDim: 0.55,
+  },
+
+  // ───────────────────────────────────────────── 12 · SYSTEM (Plattform)
+  {
+    id: "plattform",
+    index: 12,
+    heightVh: 200,
+    hold: 0.8,
+    kicker: hmSec("plattform").kicker,
+    headline: hmSec("plattform").headline,
+    subline: hmSec("plattform").subline,
+    align: "center",
+    overlay: "system",
+    media: "pump",
+    mediaDim: 0.46,
+    cta: [{ ...HM_CTA.demo, variant: "secondary" }],
+  },
+
+  // ───────────────────────────────────────────── 13 · FINAL-CTA (sticky)
+  {
+    id: "cta",
+    index: 13,
+    heightVh: 165,
+    hold: 0.84,
+    kicker: HM_FINAL.kicker,
+    headline: HM_FINAL.headline,
+    subline: HM_FINAL.subline,
+    align: "center",
+    overlay: "none",
+    media: "thaw",
+    mediaDim: 0.05,
+    cta: [...HM_FINAL.cta],
+  },
+];
+
+export const HM_CINE_NUM_SCENES = HM_SCENES.length;
+
+/** Stützzeile unter dem Final-CTA. */
+export const HM_CTA_SUPPORT = HM_FINAL.support;
+
+/** Kapitel-Labels für die Fortschrittsleiste (HeatRail). */
+export const HM_SCENE_LABELS: Record<string, string> = {
+  hero: "Start",
+  winter1: "Winter 1",
+  wechsel: "Wechsel",
+  winter2: "Winter 2",
+  aufloesung: "Auflösung",
+  pflicht: "Pflicht",
+  erfassung: "Erfassung",
+  verwaltung: "Verwaltung",
+  bewohner: "Bewohner",
+  einsparen: "Einsparen",
+  abrechnung: "Abrechnung",
+  ablauf: "Ablauf",
+  plattform: "System",
+  cta: "Kontakt",
+};
+
+/** Cine-Clips je Media-Key (silent, scrub-optimiert). */
+export const HM_CINE_VIDEO: Record<string, string | undefined> = {
+  anlage: HM_VIDEO.anlage,
+};

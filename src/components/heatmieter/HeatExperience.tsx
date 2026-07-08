@@ -1,23 +1,40 @@
-import HeatStoryBridge from "./HeatStoryBridge";
-import HeatHero from "./HeatHero";
-import HeatStory from "./HeatStory";
-import HeatSections from "./HeatSections";
-import HeatCta from "./HeatCta";
+"use client";
+
+import { useEffect, useState } from "react";
+import HeatDesktop from "./HeatDesktop";
+import HeatMobile from "./HeatMobile";
+import { hmCineSetReduced } from "@/lib/heatCine";
 
 /**
- * HeatExperience — komponiert die vier Akte der /heatmieter-Seite:
- * klassischer Hero → Scroll-Story (Zwei Winter) → Sachsektionen →
- * Final-CTA. Die Bridge speist den Story-Store; nur Story/Bridge/Nav
- * sind Client-Komponenten, der Rest rendert serverseitig.
+ * Entscheidet das HeatMieter-Erlebnis: die volle cinematische Journey (fixierte
+ * Bühne + Szenen-Panels, ChargeMieter-Niveau) nur auf breiten Viewports mit
+ * feinem Pointer und erlaubter Bewegung — sonst die leichte gestapelte Journey
+ * (HeatMobile). Hydration-sicher: bis zur Entscheidung rendert (auch SSR) das
+ * Mobile-Layout. Port von ChargeExperience.
  */
 export default function HeatExperience() {
-  return (
-    <>
-      <HeatStoryBridge />
-      <HeatHero />
-      <HeatStory />
-      <HeatSections />
-      <HeatCta />
-    </>
-  );
+  const [mode, setMode] = useState<"mobile" | "desktop" | null>(null);
+
+  useEffect(() => {
+    const decide = () => {
+      const wide = window.matchMedia("(min-width: 1024px)").matches;
+      const fine = window.matchMedia("(pointer: fine)").matches;
+      const reduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      hmCineSetReduced(reduced);
+      setMode(wide && fine && !reduced ? "desktop" : "mobile");
+    };
+    decide();
+    const mq = window.matchMedia("(min-width: 1024px)");
+    mq.addEventListener?.("change", decide);
+    window.addEventListener("resize", decide);
+    return () => {
+      mq.removeEventListener?.("change", decide);
+      window.removeEventListener("resize", decide);
+    };
+  }, []);
+
+  if (mode === null || mode === "mobile") return <HeatMobile />;
+  return <HeatDesktop />;
 }
