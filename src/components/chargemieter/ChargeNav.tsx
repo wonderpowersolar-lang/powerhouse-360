@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LogoMark } from "@/components/ui/Logo";
+import Image from "next/image";
 import { ButtonLink } from "@/components/ui/Button";
 import { CM_CTA } from "@/content/chargemieter";
 
@@ -45,26 +45,36 @@ export default function ChargeNav() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-3.5 sm:px-8">
         <div className="flex min-w-0 items-center gap-3">
-          {/* Absolute URL: funktioniert auf powerhouse360.de/chargemieter UND
-              auf der eigenen Domain chargemieter.de gleichermaßen. */}
-          <a
-            href="https://powerhouse360.de"
-            aria-label="Zur Powerhouse 360 Startseite"
-            className="shrink-0"
-          >
-            <LogoMark size={36} className="h-9 w-9" />
-          </a>
-          <span className="hidden h-5 w-px bg-white/12 sm:block" aria-hidden />
-          <a href="#hero" className="min-w-0">
-            <span className="block truncate text-lg font-bold leading-none tracking-tight text-ink">
-              Charge
-              <span className="text-[color:var(--color-mod-charge)]">
-                Mieter
+          {/* ChargeMieter-Marke (Icon + Wortzug); der Wortzug bleibt Live-Text —
+              »Charge« weiß statt schwarz, damit er auf dem Noir-Grund lesbar
+              ist, »Mieter« im Logo-Verlauf Cyan→Grün. */}
+          <a href="#hero" className="flex min-w-0 items-center gap-2.5">
+            <Image
+              src="/brand/chargemieter-mark.png"
+              alt=""
+              width={72}
+              height={72}
+              priority
+              unoptimized
+              className="h-10 w-10 shrink-0 drop-shadow-[0_2px_10px_rgba(60,190,180,0.3)]"
+              aria-hidden
+            />
+            <span className="min-w-0">
+              <span className="block truncate text-lg font-bold leading-none tracking-tight text-ink">
+                Charge
+                <span className="cm-brand-gradient">Mieter</span>
+              </span>
+              <span className="mt-0.5 hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-faint sm:block">
+                Laden im Mehrfamilienhaus
               </span>
             </span>
-            <span className="mt-0.5 hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-faint sm:block">
-              Laden im Mehrfamilienhaus
-            </span>
+          </a>
+          <span className="hidden h-5 w-px bg-white/12 sm:block" aria-hidden />
+          <a
+            href="https://powerhouse360.de"
+            className="hidden shrink-0 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink lg:block"
+          >
+            Powerhouse 360
           </a>
         </div>
 
