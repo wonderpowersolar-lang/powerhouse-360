@@ -1,18 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Domain-Routing: Die Modul-Domain chargemieter.de zeigt an der Wurzel die
- * ChargeMieter-One-Page (Rewrite, keine Redirect — die URL bleibt sauber).
- * Alle übrigen Pfade (Funnel, Impressum, Datenschutz …) laufen unverändert
- * durch dieselbe App. powerhouse360.de bleibt komplett unberührt.
+ * Domain-Routing: Modul-Domains zeigen an der Wurzel ihre One-Page
+ * (Rewrite, keine Redirect — die URL bleibt sauber). Alle übrigen Pfade
+ * (Funnel, Impressum, Datenschutz …) laufen unverändert durch dieselbe
+ * App. powerhouse360.de bleibt komplett unberührt.
  */
-const CHARGE_HOSTS = new Set(["chargemieter.de", "www.chargemieter.de"]);
+const MODULE_HOSTS: Record<string, string> = {
+  "chargemieter.de": "/chargemieter",
+  "www.chargemieter.de": "/chargemieter",
+  "smokemieter.de": "/smokemieter",
+  "www.smokemieter.de": "/smokemieter",
+};
 
 export function middleware(req: NextRequest) {
   const host = (req.headers.get("host") ?? "").toLowerCase().split(":")[0];
-  if (CHARGE_HOSTS.has(host)) {
+  const target = MODULE_HOSTS[host];
+  if (target) {
     const url = req.nextUrl.clone();
-    url.pathname = "/chargemieter";
+    url.pathname = target;
     return NextResponse.rewrite(url);
   }
   return NextResponse.next();
