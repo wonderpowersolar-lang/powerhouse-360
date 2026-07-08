@@ -4,6 +4,9 @@ import SmokeExperience from "@/components/smokemieter/SmokeExperience";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
+  icons: {
+    icon: [{ url: "/smokemieter-icon.svg", type: "image/svg+xml" }],
+  },
   title: "SmokeMieter — Rauchwarnmelder im Mehrfamilienhaus | Powerhouse 360",
   description:
     "SmokeMieter macht die Rauchwarnmelder-Pflicht betreibbar: Montage, Ferninspektion ohne Wohnungszutritt, Live-Status, Ereigniskommunikation und lückenlose Dokumentation — für Eigentümer, WEGs und Hausverwaltungen.",
