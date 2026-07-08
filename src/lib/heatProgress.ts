@@ -92,13 +92,16 @@ export function hmTicker(p: number): {
   return { winter: phase === "winter1" ? 1 : 2, month: HM_MONTHS[idx] };
 }
 
-/** Sichtbarkeit [0,1] eines Phasen-Copy-Blocks (weich rein/raus). */
+/** Sichtbarkeit [0,1] eines Phasen-Copy-Blocks (weich rein/raus).
+ *  winter2 räumt früher (0.66–0.76) — die Auflösung (ab 0.78) übernimmt. */
 export function hmCopyWeight(phase: HmPhase, p: number): number {
   const cur = hmPhaseT(p);
   if (cur.phase !== phase) return 0;
   const inn = smoothstep(cur.t / 0.14);
   const out =
-    phase === "winter2" ? 1 : 1 - smoothstep((cur.t - 0.82) / 0.16);
+    phase === "winter2"
+      ? 1 - smoothstep((cur.t - 0.66) / 0.1)
+      : 1 - smoothstep((cur.t - 0.82) / 0.16);
   return Math.min(inn, out);
 }
 
@@ -108,7 +111,8 @@ export function hmBeatWeight(i: number, p: number): number {
   if (phase !== "winter2") return 0;
   const beat = HM_BEATS[i];
   if (!beat) return 0;
-  const fadeOut = 1 - smoothstep((t - (HM_RESOLVE_AT + 0.04)) / 0.08);
+  /* Beats sind vollständig geräumt, bevor die Abrechnungs-Karte (0.78) kommt. */
+  const fadeOut = 1 - smoothstep((t - (HM_RESOLVE_AT - 0.08)) / 0.06);
   return Math.min(smoothstep((t - beat.at) / 0.06), fadeOut);
 }
 
