@@ -127,7 +127,7 @@ export const SM_VIDEO = {
 /** Brand-Scrub-Sequenz — count/height nach dem Frame-Export verifiziert. */
 export const SM_STORY_FRAMES = {
   pattern: "/media/smokemieter/story-frames/frame_%03d.jpg",
-  count: 96,
+  count: 97,
   width: 1600,
   height: 900,
 };
