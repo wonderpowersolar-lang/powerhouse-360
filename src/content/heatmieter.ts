@@ -319,7 +319,7 @@ export const HM_VIDEO = {
 /** Winter-Scrub-Sequenz — count/height nach Task 2 mit Ist-Werten füllen. */
 export const HM_STORY_FRAMES = {
   pattern: "/media/heatmieter/story-frames/frame_%03d.jpg",
-  count: 96,
+  count: 97,
   width: 1600,
   height: 900,
 };
