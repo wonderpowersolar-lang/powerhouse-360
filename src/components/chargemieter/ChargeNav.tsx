@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { LogoMark } from "@/components/ui/Logo";
 import { ButtonLink } from "@/components/ui/Button";
 import { CM_CTA } from "@/content/chargemieter";
@@ -46,13 +45,15 @@ export default function ChargeNav() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-3.5 sm:px-8">
         <div className="flex min-w-0 items-center gap-3">
-          <Link
-            href="/"
-            aria-label="Zurück zur Powerhouse 360 Startseite"
+          {/* Absolute URL: funktioniert auf powerhouse360.de/chargemieter UND
+              auf der eigenen Domain chargemieter.de gleichermaßen. */}
+          <a
+            href="https://powerhouse360.de"
+            aria-label="Zur Powerhouse 360 Startseite"
             className="shrink-0"
           >
             <LogoMark size={36} className="h-9 w-9" />
-          </Link>
+          </a>
           <span className="hidden h-5 w-px bg-white/12 sm:block" aria-hidden />
           <a href="#hero" className="min-w-0">
             <span className="block truncate text-lg font-bold leading-none tracking-tight text-ink">
@@ -136,13 +137,13 @@ export default function ChargeNav() {
                 {l.label}
               </a>
             ))}
-            <Link
-              href="/"
+            <a
+              href="https://powerhouse360.de"
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base font-medium text-ink-faint hover:bg-white/5 hover:text-ink"
             >
               ← Powerhouse 360
-            </Link>
+            </a>
             <ButtonLink
               href={CM_CTA.foerderung.href}
               variant="primary"
