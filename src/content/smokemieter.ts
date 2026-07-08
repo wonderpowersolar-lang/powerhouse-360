@@ -75,13 +75,12 @@ export const SM_STORY = {
   },
   rescue: {
     kicker: "Dieselbe Nacht · Mit Melder",
-    headline: "Diesmal wacht jemand.",
+    headline: "SmokeMieter — Sicherheit für die Bewohner Ihrer Immobilie.",
     resolveHeadline:
       "Der Unterschied zwischen diesen zwei Nächten hängt an der Decke.",
     resolveSubline:
       "Ein Melder rettet nur, wenn er hängt, funktioniert und geprüft ist. Genau dafür gibt es SmokeMieter.",
-    resolveClaim:
-      "SmokeMieter — für die Sicherheit aller Bewohner Ihrer Immobilie.",
+    resolveClaim: "Geplant, montiert und gewartet nach DIN 14676.",
   },
 } as const;
 
