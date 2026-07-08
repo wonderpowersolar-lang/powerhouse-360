@@ -71,7 +71,7 @@ export const CM_SCENES: CmScene[] = [
     headlineAccent:
       "Wallboxen im Mehrfamilienhaus — geplant, gesteuert und sauber abgerechnet.",
     subline:
-      "ChargeMieter macht Ladeinfrastruktur für WEGs, Hausverwaltungen und Eigentümer einfach betreibbar: von der Förderprüfung über Planung und Lastmanagement bis zur nutzerbezogenen Abrechnung.",
+      "ChargeMieter macht Ladeinfrastruktur für WEGs, Hausverwaltungen und Eigentümer einfach betreibbar — von der Förderprüfung über Planung und Lastmanagement bis zur nutzerbezogenen Abrechnung.",
     align: "left",
     overlay: "none",
     cta: [
@@ -104,7 +104,7 @@ export const CM_SCENES: CmScene[] = [
     kicker: "Die Komplettlösung",
     headline: "ChargeMieter bringt Struktur in Ihr Ladeinfrastruktur-Projekt.",
     subline:
-      "Wir verbinden technische Planung, Förderberatung, Ladepunktverwaltung, Nutzerzuordnung, Lastmanagement und Abrechnung zu einem klaren System für Mehrfamilienhäuser.",
+      "Wir verbinden Planung, Förderung, Lastmanagement und Abrechnung zu einem klaren System — statt einzelner Gewerke, die niemand zusammenführt.",
     align: "right",
     overlay: "benefits",
   },
@@ -223,7 +223,7 @@ export const CM_SCENES: CmScene[] = [
     kicker: "Das System",
     headline: "Ein System für Ladepunkte, Nutzer und Abrechnung.",
     subline:
-      "ChargeMieter bündelt alle relevanten Informationen: Ladepunkte, Nutzer, Stellplätze, Ladevorgänge, Tarife, Lastmanagement und Abrechnungsstatus.",
+      "Ladepunkte, Nutzer, Ladevorgänge, Lastmanagement und Abrechnungsstatus — an einem Ort, in Echtzeit.",
     align: "center",
     overlay: "dashboard",
     cta: [{ ...CM_CTA.demo, variant: "secondary" }],
@@ -239,7 +239,7 @@ export const CM_SCENES: CmScene[] = [
     headline:
       "Ladeinfrastruktur im Mehrfamilienhaus — endlich sauber organisiert.",
     subline:
-      "Mit ChargeMieter planen, steuern und rechnen Sie Wallboxen im Mehrfamilienhaus digital ab. Für Eigentümer, WEGs, Verwaltungen und Mieter.",
+      "Planen, steuern und rechnen Sie Wallboxen digital ab — für Eigentümer, WEGs, Verwaltungen und Mieter.",
     align: "center",
     overlay: "none",
     cta: [
@@ -432,24 +432,24 @@ export function cmHeroFramePath(i: number): string {
 }
 
 /**
- * Welche Media-Ebene liegt hinter welcher Szene — und wie stark die Karte
- * (ChargeMap) sie überlagert. mediaDim 0 = Bild voll sichtbar, 1 = Karte trägt
- * die Szene allein.
+ * Welche Media-Ebene liegt hinter welcher Szene und wie stark sie abgedunkelt
+ * wird. mediaDim 0 = Bild voll sichtbar, 1 = Bild komplett abgedunkelt — die
+ * schwebenden UI-Karten und der Richtungs-Scrim tragen die Szene dann allein.
  */
 export const CM_SCENE_STAGE: Record<
   string,
-  { media?: keyof typeof CM_IMAGE; mediaDim: number; map: number }
+  { media?: keyof typeof CM_IMAGE; mediaDim: number }
 > = {
-  hero: { media: "hero", mediaDim: 0, map: 0.16 },
-  komplexitaet: { media: "hero", mediaDim: 0.82, map: 1 },
-  loesung: { media: "row", mediaDim: 0.72, map: 1 },
-  eigentuemer: { media: "hero", mediaDim: 0.62, map: 0.95 },
-  verwaltung: { media: "row", mediaDim: 0.66, map: 0.35 },
-  mieter: { media: "plug", mediaDim: 0.08, map: 0.12 },
-  lastmanagement: { media: "garage", mediaDim: 0.14, map: 0.2 },
-  abrechnung: { media: "garage", mediaDim: 0.7, map: 0.55 },
-  foerderung: { media: "hero", mediaDim: 0.68, map: 0.95 },
-  ablauf: { media: "hero", mediaDim: 0.76, map: 1 },
-  plattform: { media: "cta", mediaDim: 0.55, map: 0.3 },
-  cta: { media: "cta", mediaDim: 0.06, map: 0.18 },
+  hero: { media: "hero", mediaDim: 0 },
+  komplexitaet: { media: "hero", mediaDim: 0.42 },
+  loesung: { media: "row", mediaDim: 0.46 },
+  eigentuemer: { media: "cta", mediaDim: 0.44 },
+  verwaltung: { media: "row", mediaDim: 0.48 },
+  mieter: { media: "plug", mediaDim: 0.06 },
+  lastmanagement: { media: "garage", mediaDim: 0.12 },
+  abrechnung: { media: "garage", mediaDim: 0.46 },
+  foerderung: { media: "hero", mediaDim: 0.44 },
+  ablauf: { media: "cta", mediaDim: 0.46 },
+  plattform: { media: "cta", mediaDim: 0.42 },
+  cta: { media: "cta", mediaDim: 0.05 },
 };

@@ -6,16 +6,16 @@ import { CM_SCENES } from "@/content/chargemieter";
 import ChargePanel from "./ChargePanel";
 import ChargeScrollBridge from "./ChargeScrollBridge";
 import ChargeRail from "./ChargeRail";
-import ChargeMap from "./ChargeMap";
 import ChargeLoader from "./ChargeLoader";
 import { OverlayStyles } from "./ChargeOverlays";
 
 const ChargeStage = dynamic(() => import("./ChargeStage"), { ssr: false });
 
 /**
- * Desktop-Erlebnis /chargemieter: EINE fixierte Bühne (Medien + ChargeMap +
- * Grade) füllt den Viewport; darüber scrollen die 12 Szenen-Panels. Die
- * letzte Szene (CTA) ist sticky, damit der Footer sie natürlich hinausschiebt.
+ * Desktop-Erlebnis /chargemieter: EINE fixierte Bühne (kinematische Medien +
+ * Grade) füllt den Viewport; darüber scrollen die 12 Szenen-Panels mit ihren
+ * schwebenden UI-Karten. Die letzte Szene (CTA) ist sticky, damit der Footer
+ * sie natürlich hinausschiebt.
  */
 export default function ChargeDesktop() {
   const [ready, setReady] = useState(false);
@@ -36,8 +36,6 @@ export default function ChargeDesktop() {
       {/* fixierte Bühne */}
       <div className="fixed inset-0 z-0 h-dvh w-full overflow-hidden">
         <ChargeStage onReady={() => setReady(true)} />
-        {/* Higgsfield Map — der digitale Lageplan über den Medien */}
-        <ChargeMap />
         <div
           className="pointer-events-none absolute inset-0"
           style={{
