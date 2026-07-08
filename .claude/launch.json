@@ -4,8 +4,16 @@
     {
       "name": "ph360-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "-p", "3005"],
-      "port": 3005
+      "runtimeArgs": ["run", "dev"],
+      "port": 3005,
+      "autoPort": true
+    },
+    {
+      "name": "ph360-prod",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".next/standalone/server.js"],
+      "port": 3200,
+      "autoPort": true
     }
   ]
 }
