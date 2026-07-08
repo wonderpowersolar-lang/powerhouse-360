@@ -139,6 +139,8 @@ export const SM_IMAGE = {
   family: "/media/smokemieter/family.jpg",
   dawn: "/media/smokemieter/dawn.jpg",
   night: "/media/smokemieter/night.jpg",
+  /** Hero-Poster (Nacht, Melder im Standby) */
+  heroNight: "/media/smokemieter/hero-night.jpg",
   /** Sektions-Motive (Akt 3) */
   flur: "/media/smokemieter/flur.jpg",
   objekt: "/media/smokemieter/objekt.jpg",
@@ -165,6 +167,21 @@ export function smStoryFramePath(i: number): string {
   return SM_STORY_FRAMES.pattern.replace(
     "%03d",
     String(Math.max(1, Math.min(SM_STORY_FRAMES.count, i))).padStart(3, "0")
+  );
+}
+
+/** Hero-Scrub (Kamera steigt zum wachenden Melder — Stil ChargeMieter-Hero). */
+export const SM_HERO_FRAMES = {
+  pattern: "/media/smokemieter/hero-frames/frame_%03d.jpg",
+  count: 97,
+  width: 1600,
+  height: 900,
+};
+
+export function smHeroFramePath(i: number): string {
+  return SM_HERO_FRAMES.pattern.replace(
+    "%03d",
+    String(Math.max(1, Math.min(SM_HERO_FRAMES.count, i))).padStart(3, "0")
   );
 }
 
