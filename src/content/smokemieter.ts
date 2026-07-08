@@ -59,7 +59,7 @@ export const SM_PHASES = {
 
 export const SM_STORY = {
   burn: {
-    kicker: "03:12 · Wohnung 3.2",
+    kicker: "Wohnung 3.2 · Ohne Melder",
     headline: "Es beginnt lautlos.",
     lines: [
       "Ein Schwelbrand. Kein Feuerschein, noch nicht — nur Rauch.",
@@ -74,7 +74,7 @@ export const SM_STORY = {
       "Zurück zu dem Moment, in dem noch nichts passiert ist. Und geben dem Haus, was gefehlt hat: einen Melder, der wacht.",
   },
   rescue: {
-    kicker: "03:12 · Dieselbe Minute",
+    kicker: "Dieselbe Nacht · Mit Melder",
     headline: "Diesmal wacht jemand.",
     resolveHeadline:
       "Der Unterschied zwischen diesen zwei Nächten hängt an der Decke.",

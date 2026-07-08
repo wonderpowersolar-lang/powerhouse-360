@@ -26,7 +26,7 @@ export default function SmokeHero() {
       <div className="absolute inset-0 bg-gradient-to-r from-navy-900/85 via-navy-900/40 to-navy-900/20" />
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-navy-900 to-transparent" />
 
-      <div className="relative mx-auto w-full max-w-7xl px-5 pb-24 pt-28 sm:px-8">
+      <div className="relative mx-auto w-full max-w-7xl px-5 pb-40 pt-28 sm:px-8 sm:pb-24">
         <div className="max-w-2xl">
           <p
             className="mb-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em]"
@@ -39,7 +39,7 @@ export default function SmokeHero() {
           <h1
             id="smoke-hero-h"
             className="text-legible font-bold leading-[0.98] tracking-tight text-ink"
-            style={{ fontSize: "clamp(3.4rem, 8vw, 7rem)" }}
+            style={{ fontSize: "clamp(2.75rem, 8vw, 7rem)" }}
           >
             Smoke
             <span className="text-[color:var(--color-mod-smoke)]">Mieter</span>
@@ -71,7 +71,7 @@ export default function SmokeHero() {
         aria-hidden
         className="pointer-events-none absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-dim">
+        <span className="max-w-[280px] text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-dim sm:max-w-none">
           {SM_HERO.scrollHint}
         </span>
         <span className="relative block h-9 w-px overflow-hidden bg-white/15">

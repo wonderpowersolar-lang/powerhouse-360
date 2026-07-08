@@ -325,7 +325,7 @@ export default function SmokeStory() {
         <div
           ref={clockRef}
           aria-hidden
-          className="absolute left-1/2 top-[5.5rem] -translate-x-1/2 font-mono text-3xl font-semibold tabular-nums tracking-[0.18em] sm:top-24 sm:text-5xl"
+          className="absolute left-1/2 top-[4.25rem] -translate-x-1/2 font-mono text-2xl font-semibold tabular-nums tracking-[0.18em] md:top-24 md:text-5xl"
           style={{ color: "#ff8a63", textShadow: "0 2px 24px rgba(0,0,0,0.6)" }}
         >
           03:12
@@ -334,7 +334,7 @@ export default function SmokeStory() {
         {/* 8 · Copy: burn (links) */}
         <div
           ref={burnCopyRef}
-          className="absolute inset-x-5 top-1/2 -translate-y-1/2 sm:inset-x-8 lg:left-[8%] lg:right-auto lg:max-w-xl"
+          className="absolute inset-x-5 top-[55%] -translate-y-1/2 sm:inset-x-8 lg:left-[8%] lg:right-auto lg:max-w-xl"
           style={{ opacity: 0, visibility: "hidden" }}
         >
           <p
@@ -389,7 +389,7 @@ export default function SmokeStory() {
         {/* 10 · Copy: rescue (links) + Beat-Karten */}
         <div
           ref={rescueCopyRef}
-          className="absolute inset-x-5 top-[22%] sm:inset-x-8 lg:left-[8%] lg:right-auto lg:top-1/2 lg:max-w-md lg:-translate-y-1/2"
+          className="absolute inset-x-5 top-[7rem] sm:inset-x-8 md:top-1/2 md:-translate-y-1/2 lg:left-[8%] lg:right-auto lg:max-w-md"
           style={{ opacity: 0, visibility: "hidden" }}
         >
           <p
@@ -399,19 +399,19 @@ export default function SmokeStory() {
             <span className="h-px w-8 bg-current opacity-60" />
             {SM_STORY.rescue.kicker}
           </p>
-          <h2 className="text-legible text-3xl font-bold leading-[1.08] text-ink sm:text-4xl lg:text-[2.9rem]">
+          <h2 className="text-legible text-2xl font-bold leading-[1.08] text-ink sm:text-4xl lg:text-[2.9rem]">
             {SM_STORY.rescue.headline}
           </h2>
         </div>
 
-        <div className="absolute inset-x-5 bottom-16 flex flex-col gap-3 sm:inset-x-8 md:inset-x-auto md:bottom-auto md:right-[7%] md:top-1/2 md:w-[360px] md:-translate-y-1/2">
+        <div className="absolute inset-x-5 bottom-10 flex flex-col gap-2.5 sm:inset-x-8 md:inset-x-auto md:bottom-auto md:right-[7%] md:top-1/2 md:w-[360px] md:-translate-y-1/2 md:gap-3">
           {SM_BEATS.map((b, i) => (
             <div
               key={b.clock + b.at}
               ref={(el) => {
                 beatRefs.current[i] = el;
               }}
-              className="rounded-xl border border-white/12 bg-black/45 px-4 py-3 backdrop-blur-md"
+              className="rounded-xl border border-white/12 bg-black/45 px-3.5 py-2.5 backdrop-blur-md md:px-4 md:py-3"
               style={{ opacity: 0, visibility: "hidden" }}
             >
               <div className="flex items-baseline gap-3">
@@ -421,7 +421,7 @@ export default function SmokeStory() {
                 >
                   {b.clock}
                 </span>
-                <p className="text-legible text-sm leading-snug text-ink sm:text-base">
+                <p className="text-legible text-sm leading-snug text-ink md:text-base">
                   {b.text}
                 </p>
               </div>
