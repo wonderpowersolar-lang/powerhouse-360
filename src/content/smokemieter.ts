@@ -80,7 +80,16 @@ export const SM_STORY = {
       "Der Unterschied zwischen diesen zwei Nächten hängt an der Decke.",
     resolveSubline:
       "Ein Melder rettet nur, wenn er hängt, funktioniert und geprüft ist. Genau dafür gibt es SmokeMieter.",
+    resolveClaim: "SmokeMieter — für Sicherheit in Ihrer Immobilie.",
   },
+} as const;
+
+/** Push-Benachrichtigung (Phase C, über dem Telefon-Bild — echte DOM-Karte). */
+export const SM_PUSH = {
+  app: "SmokeMieter",
+  time: "jetzt",
+  title: "Alarm — Wohnung 3.2",
+  body: "Rauchwarnmelder ausgelöst. Ereignis wird dokumentiert.",
 } as const;
 
 /** Rettungs-Beats (Phase C) — Zeitfenster in Phase-C-Fortschritt [0..1]. */
@@ -95,14 +104,20 @@ export const SM_BEATS: SmBeat[] = [
   {
     clock: "03:12",
     text: "Der erste Rauch erreicht den Melder. Alarm: 85 dB.",
-    at: 0.08,
+    at: 0.05,
   },
-  { clock: "03:13", text: "Alle sind wach.", at: 0.28 },
-  { clock: "03:15", text: "Alle im Treppenhaus.", at: 0.44 },
   {
-    clock: "03:19",
-    text: "Die Feuerwehr ist da. Der Brand bleibt eine Randnotiz.",
-    at: 0.6,
+    clock: "03:12",
+    text: "Das Telefon meldet den Alarm — Wohnung 3.2.",
+    at: 0.32,
+  },
+  { clock: "03:13", text: "Alle sind wach. Ein Anruf: 112.", at: 0.4 },
+  { clock: "03:15", text: "Alle im Treppenhaus.", at: 0.48 },
+  { clock: "03:19", text: "Die Feuerwehr ist da.", at: 0.56 },
+  {
+    clock: "03:26",
+    text: "Gelöscht. Der Brand bleibt eine Randnotiz.",
+    at: 0.68,
   },
 ];
 
@@ -114,6 +129,9 @@ export const SM_RESOLVE_AT = 0.78;
 export const SM_IMAGE = {
   burn: "/media/smokemieter/burn.jpg",
   alarm: "/media/smokemieter/alarm.jpg",
+  phone: "/media/smokemieter/phone.jpg",
+  firetruck: "/media/smokemieter/firetruck.jpg",
+  family: "/media/smokemieter/family.jpg",
   dawn: "/media/smokemieter/dawn.jpg",
   night: "/media/smokemieter/night.jpg",
   /** Sektions-Motive (Akt 3) */

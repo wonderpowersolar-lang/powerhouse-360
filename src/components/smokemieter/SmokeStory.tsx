@@ -6,6 +6,7 @@ import {
   SM_IMAGE,
   SM_STORY,
   SM_BEATS,
+  SM_PUSH,
   SM_STORY_FRAMES,
   smStoryFramePath,
 } from "@/content/smokemieter";
@@ -21,6 +22,8 @@ import {
   smBeatWeight,
   smResolveWeight,
   smAlarmWeight,
+  smPhoneWeight,
+  smFireWeight,
   smDangerWeight,
 } from "@/lib/smokeProgress";
 
@@ -35,14 +38,17 @@ import {
  * Farb-Washes → Grade → Uhr/Copy/Beats.
  */
 
-const RUNWAY_VH = 800;
+const RUNWAY_VH = 950;
 const ACCENT = "var(--color-mod-smoke)";
 const DANGER = "#c22a18";
 
 export default function SmokeStory() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const alarmRef = useRef<HTMLDivElement>(null);
-  const dawnRef = useRef<HTMLDivElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
+  const pushRef = useRef<HTMLDivElement>(null);
+  const fireRef = useRef<HTMLDivElement>(null);
+  const familyRef = useRef<HTMLDivElement>(null);
   const dangerRef = useRef<HTMLDivElement>(null);
   const amberRef = useRef<HTMLDivElement>(null);
   const clockRef = useRef<HTMLDivElement>(null);
@@ -165,23 +171,33 @@ export default function SmokeStory() {
 
       /* Stills + Washes */
       const alarmW = smAlarmWeight(p);
+      const phoneW = smPhoneWeight(p);
+      const fireW = smFireWeight(p);
       const resolveW = smResolveWeight(p);
-      if (alarmRef.current) {
-        alarmRef.current.style.opacity = alarmW.toFixed(3);
-        alarmRef.current.style.visibility =
-          alarmW < 0.012 ? "hidden" : "visible";
-      }
-      if (dawnRef.current) {
-        dawnRef.current.style.opacity = resolveW.toFixed(3);
-        dawnRef.current.style.visibility =
-          resolveW < 0.012 ? "hidden" : "visible";
+      const setLayer = (el: HTMLDivElement | null, w: number) => {
+        if (!el) return;
+        el.style.opacity = w.toFixed(3);
+        el.style.visibility = w < 0.012 ? "hidden" : "visible";
+      };
+      setLayer(alarmRef.current, alarmW);
+      setLayer(phoneRef.current, phoneW);
+      setLayer(fireRef.current, fireW);
+      setLayer(familyRef.current, resolveW);
+      if (pushRef.current) {
+        pushRef.current.style.opacity = phoneW.toFixed(3);
+        pushRef.current.style.visibility =
+          phoneW < 0.012 ? "hidden" : "visible";
+        pushRef.current.style.transform = `translateY(${(
+          (1 - phoneW) *
+          -18
+        ).toFixed(2)}px)`;
       }
       if (dangerRef.current)
         dangerRef.current.style.opacity = (0.36 * smDangerWeight(p)).toFixed(3);
       if (amberRef.current)
         amberRef.current.style.opacity = (0.22 * resolveW).toFixed(3);
 
-      /* Uhr */
+      /* Uhr (blendet zur Morgen-Auflösung aus — der Morgen ist zeitlos) */
       if (clockRef.current) {
         const { text, rewinding } = smClock(p);
         const label = rewinding ? `◀◀ ${text}` : text;
@@ -193,6 +209,7 @@ export default function SmokeStory() {
             : phase === "rewind"
             ? "rgba(240,244,252,0.72)"
             : ACCENT;
+        clockRef.current.style.opacity = (1 - resolveW).toFixed(3);
       }
 
       /* Copy-Blöcke */
@@ -265,15 +282,53 @@ export default function SmokeStory() {
           />
         </div>
 
-        {/* 4 · Morgen-Still (Auflösung) */}
+        {/* 4 · Telefon-Still (Push aufs Telefon) */}
         <div
-          ref={dawnRef}
+          ref={phoneRef}
           aria-hidden
           className="absolute inset-0 will-change-[opacity]"
           style={{ opacity: 0, visibility: "hidden" }}
         >
           <Image
-            src={SM_IMAGE.dawn}
+            src={SM_IMAGE.phone}
+            alt=""
+            fill
+            loading="lazy"
+            sizes="100vw"
+            unoptimized
+            className="object-cover"
+            draggable={false}
+          />
+        </div>
+
+        {/* 5 · Feuerwehr-Still (gelöscht) */}
+        <div
+          ref={fireRef}
+          aria-hidden
+          className="absolute inset-0 will-change-[opacity]"
+          style={{ opacity: 0, visibility: "hidden" }}
+        >
+          <Image
+            src={SM_IMAGE.firetruck}
+            alt=""
+            fill
+            loading="lazy"
+            sizes="100vw"
+            unoptimized
+            className="object-cover"
+            draggable={false}
+          />
+        </div>
+
+        {/* 6 · Familien-Still (Auflösung im Morgenlicht) */}
+        <div
+          ref={familyRef}
+          aria-hidden
+          className="absolute inset-0 will-change-[opacity]"
+          style={{ opacity: 0, visibility: "hidden" }}
+        >
+          <Image
+            src={SM_IMAGE.family}
             alt=""
             fill
             loading="lazy"
@@ -329,6 +384,33 @@ export default function SmokeStory() {
           style={{ color: "#ff8a63", textShadow: "0 2px 24px rgba(0,0,0,0.6)" }}
         >
           03:12
+        </div>
+
+        {/* Push-Benachrichtigung (über dem Telefon-Bild) */}
+        <div
+          ref={pushRef}
+          className="absolute left-1/2 top-[26%] w-[min(92vw,380px)] -translate-x-1/2 rounded-2xl border border-white/15 bg-black/60 p-4 backdrop-blur-xl will-change-[transform,opacity] md:top-[30%]"
+          style={{ opacity: 0, visibility: "hidden" }}
+        >
+          <div className="flex items-center gap-2">
+            <span
+              aria-hidden
+              className="h-2 w-2 rounded-full"
+              style={{ background: ACCENT }}
+            />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-dim">
+              {SM_PUSH.app}
+            </span>
+            <span className="ml-auto text-[11px] text-ink-faint">
+              {SM_PUSH.time}
+            </span>
+          </div>
+          <p className="mt-2 text-base font-bold leading-snug text-ink">
+            {SM_PUSH.title}
+          </p>
+          <p className="mt-1 text-sm leading-snug text-ink-dim">
+            {SM_PUSH.body}
+          </p>
         </div>
 
         {/* 8 · Copy: burn (links) */}
@@ -444,6 +526,9 @@ export default function SmokeStory() {
               style={{ color: ACCENT }}
             >
               {SM_STORY.rescue.resolveSubline}
+            </p>
+            <p className="text-legible mt-8 text-xl font-bold text-ink sm:text-2xl">
+              {SM_STORY.rescue.resolveClaim}
             </p>
           </div>
         </div>

@@ -123,11 +123,29 @@ export function smResolveWeight(p: number): number {
   return smoothstep((t - SM_RESOLVE_AT) / 0.1);
 }
 
-/** Alarm-Still-Deckkraft: trägt rescue bis zur Auflösung. */
+/**
+ * Bild-Stufen in rescue: alarm → phone → firetruck → family (resolve).
+ * Grenzen in Phase-C-t: 0.30 / 0.50 / SM_RESOLVE_AT.
+ */
 export function smAlarmWeight(p: number): number {
   const { phase, t } = smPhaseT(p);
   if (phase !== "rescue") return 0;
-  return Math.min(smoothstep(t / 0.08), 1 - smResolveWeight(p));
+  return Math.min(smoothstep(t / 0.08), 1 - smoothstep((t - 0.26) / 0.08));
+}
+
+export function smPhoneWeight(p: number): number {
+  const { phase, t } = smPhaseT(p);
+  if (phase !== "rescue") return 0;
+  return Math.min(
+    smoothstep((t - 0.26) / 0.08),
+    1 - smoothstep((t - 0.46) / 0.08)
+  );
+}
+
+export function smFireWeight(p: number): number {
+  const { phase, t } = smPhaseT(p);
+  if (phase !== "rescue") return 0;
+  return Math.min(smoothstep((t - 0.46) / 0.08), 1 - smResolveWeight(p));
 }
 
 /** Roter Gefahren-Wash: wächst in burn, weicht in rewind, weg in rescue. */
