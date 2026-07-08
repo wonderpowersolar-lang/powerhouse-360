@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LogoMark } from "@/components/ui/Logo";
 import { ButtonLink } from "@/components/ui/Button";
+import SmokeMark from "./SmokeMark";
 import { SM_CTA } from "@/content/smokemieter";
 
 const LINKS = [
@@ -45,25 +45,22 @@ export default function SmokeNav() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-3.5 sm:px-8">
         <div className="flex min-w-0 items-center gap-3">
-          {/* Absolute URL: funktioniert auf powerhouse360.de/smokemieter UND
-              auf der eigenen Domain smokemieter.de gleichermaßen. */}
-          <a
-            href="https://powerhouse360.de"
-            aria-label="Zur Powerhouse 360 Startseite"
-            className="shrink-0"
-          >
-            <LogoMark size={36} className="h-9 w-9" />
-          </a>
-          <span className="hidden h-5 w-px bg-white/12 sm:block" aria-hidden />
-          <a href="#start" className="min-w-0">
-            <span className="block truncate text-lg font-bold leading-none tracking-tight text-ink">
-              Smoke
-              <span className="text-[color:var(--color-mod-smoke)]">
-                Mieter
-              </span>
+          {/* SmokeMieter-Logo (Bildmarke + Wortmarke) — Rückweg zu
+              Powerhouse 360 liegt im Mobilmenü und im Footer. */}
+          <a href="#start" className="flex min-w-0 items-center gap-3">
+            <span className="shrink-0">
+              <SmokeMark size={38} />
             </span>
-            <span className="mt-0.5 hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-faint sm:block">
-              Rauchwarnmelder im Mehrfamilienhaus
+            <span className="min-w-0">
+              <span className="block truncate text-lg font-bold leading-none tracking-tight text-ink">
+                Smoke
+                <span className="text-[color:var(--color-mod-smoke)]">
+                  Mieter
+                </span>
+              </span>
+              <span className="mt-0.5 hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-faint sm:block">
+                Rauchwarnmelder im Mehrfamilienhaus
+              </span>
             </span>
           </a>
         </div>
