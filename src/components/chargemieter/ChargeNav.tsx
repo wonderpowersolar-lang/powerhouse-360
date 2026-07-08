@@ -7,7 +7,8 @@ import { CM_CTA } from "@/content/chargemieter";
 
 const LINKS = [
   { label: "Lösung", href: "#loesung" },
-  { label: "Lastmanagement", href: "#lastmanagement" },
+  /* längster Eintrag — erst ab xl, damit die Leiste bei 1024–1280 px ruhig bleibt */
+  { label: "Lastmanagement", href: "#lastmanagement", wide: true },
   { label: "Abrechnung", href: "#abrechnung" },
   { label: "Förderung", href: "#foerderung" },
   { label: "Ablauf", href: "#ablauf" },
@@ -43,12 +44,12 @@ export default function ChargeNav() {
           : "bg-transparent"
       }`}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-3.5 sm:px-8">
-        <div className="flex min-w-0 items-center gap-3">
-          {/* ChargeMieter-Marke (Icon + Wortzug); der Wortzug bleibt Live-Text —
-              »Charge« weiß statt schwarz, damit er auf dem Noir-Grund lesbar
-              ist, »Mieter« im Logo-Verlauf Cyan→Grün. */}
-          <a href="#hero" className="flex min-w-0 items-center gap-2.5">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 lg:gap-6">
+        {/* ── Marke: Icon + einzeiliger Wortzug (nie abgeschnitten) ── */}
+        <div className="flex shrink-0 items-center gap-3">
+          {/* »Charge« weiß statt schwarz (Noir-Grund), »Mieter« im
+              Logo-Verlauf Cyan→Grün — wie im Logo-Lockup. */}
+          <a href="#hero" className="flex items-center gap-2.5">
             <Image
               src="/brand/chargemieter-mark.png"
               alt=""
@@ -56,41 +57,47 @@ export default function ChargeNav() {
               height={72}
               priority
               unoptimized
-              className="h-10 w-10 shrink-0 drop-shadow-[0_2px_10px_rgba(60,190,180,0.3)]"
+              className="h-9 w-9 shrink-0 drop-shadow-[0_2px_10px_rgba(60,190,180,0.3)]"
               aria-hidden
             />
-            <span className="min-w-0">
-              <span className="block truncate text-lg font-bold leading-none tracking-tight text-ink">
+            <span className="flex flex-col justify-center">
+              <span className="whitespace-nowrap text-lg font-bold leading-none tracking-tight text-ink">
                 Charge
                 <span className="cm-brand-gradient">Mieter</span>
               </span>
-              <span className="mt-0.5 hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-faint sm:block">
+              <span className="mt-1 hidden whitespace-nowrap text-[9px] font-semibold uppercase leading-none tracking-[0.18em] text-ink-faint xl:block">
                 Laden im Mehrfamilienhaus
               </span>
             </span>
           </a>
-          <span className="hidden h-5 w-px bg-white/12 sm:block" aria-hidden />
+          {/* Trenner + Powerhouse-Backlink gemeinsam erst ab xl (kein
+              verwaister Strich auf mittleren Breiten). */}
+          <span className="hidden h-5 w-px bg-white/12 xl:block" aria-hidden />
           <a
             href="https://powerhouse360.de"
-            className="hidden shrink-0 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink lg:block"
+            className="hidden whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink xl:block"
           >
             Powerhouse 360
           </a>
         </div>
 
-        <div className="hidden items-center gap-7 lg:flex">
+        {/* ── Kapitel-Anker ── */}
+        <div className="hidden items-center gap-6 lg:flex">
           {LINKS.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="text-sm font-medium text-ink-dim transition-colors hover:text-ink"
+              className={`whitespace-nowrap text-sm font-medium text-ink-dim transition-colors hover:text-ink ${
+                l.wide ? "hidden xl:inline-block" : ""
+              }`}
             >
               {l.label}
             </a>
           ))}
         </div>
 
-        <div className="hidden lg:block">
+        {/* ── CTA ── */}
+        <div className="hidden shrink-0 lg:block">
           <ButtonLink href={CM_CTA.foerderung.href} variant="primary">
             {CM_CTA.foerderung.label}
           </ButtonLink>
