@@ -41,6 +41,9 @@ yarn-error.log*
 next-env.d.ts
 .gstack/
 
+# generated knowledge graph output (graphify)
+/graphify-out/
+
 # Original brand source files & business PDFs (kept on disk, not part of the app source).
 # The assets the site actually uses are copied into /public/brand.
 *.pdf
