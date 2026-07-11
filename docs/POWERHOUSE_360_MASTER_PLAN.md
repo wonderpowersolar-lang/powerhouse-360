@@ -72,14 +72,14 @@ Reihenfolge gegenüber dem Auftrag unverändert (Phasen 0–10); eine Anpassung:
 
 ### Phase 0 — Bestandsaufnahme & Masterplan 🟢 (dieses Dokument, 2026-07-11)
 
-### Phase 1 — Core & Fundament ⚪
-| WP | Inhalt | Akzeptanz (Auszug) |
-|---|---|---|
-| **WP-1.0** Repo-Fundament | Git-Remote + Branch-Konsolidierung (`main` aktualisieren, Tag `website-v1`), pnpm/Turborepo, Website → `apps/website`, CI-Grundgerüst, docker-compose (postgres/minio/mailpit), Staging | F-21 🟢; CI läuft auf PR |
-| **WP-1.1** Lead-Persistenz (**erste Implementierungseinheit**, behebt R-01) | `packages/database` (Erstmigration: identity + crm-Kern + platform), `apps/platform` mit `POST /api/v1/leads`, Website-Proxy, E-Mail-Notify (SMTP Hostinger), Admin-Lead-Liste mit Login | F-01 🟢; kein console.log-Pfad mehr |
-| WP-1.2 Mandanten/Rollen/Audit | better-auth + Organizations, Rollen/Permissions/Scopes (`packages/permissions`), AuditEvent, Einladungen | F-02, F-19, F-20 🟢 |
-| WP-1.3 Immobilienstruktur + CRM | Property→Unit-Baum, CSV-Import, Lead-Qualifizierung → Customer/Property, Notizen/Aufgaben | F-03 🟢 |
-| WP-1.4 Events/Worker | Outbox, pg-boss, Handler-Registry, Notification-Grundgerüst | Idempotenz-Tests grün |
+### Phase 1 — Core & Fundament 🟡 (in Arbeit seit 2026-07-11, Branch `feat/platform-foundation`)
+| WP | Inhalt | Akzeptanz (Auszug) | Status |
+|---|---|---|---|
+| **WP-1.0** Repo-Fundament | pnpm/Turborepo, Website → `apps/website`, docker-compose (postgres:5433/mailpit/minio), `.env.example`; **offen:** Git-Remote (R-02), CI, Website-Dockerfile fürs Monorepo, Staging | F-21 🟣 (Startseite+Funnel-Proxy verifiziert; Route-Sweep offen) | 🟣 |
+| **WP-1.1** Lead-Persistenz (**erste Implementierungseinheit**, behebt R-01) | `packages/database` (Migration `init`: Organization/Lead/LeadActivity/AuditEvent/DomainEvent), `apps/platform` `POST /api/v1/leads` + Admin-Liste (interim Basic-Auth), `apps/worker` Outbox→E-Mail, Website-Proxy | F-01 🟢 (DB+Audit+Outbox+E-Mail+Admin+Proxy verifiziert) | 🟢 dev / Prod nach Deploy |
+| WP-1.2 Mandanten/Rollen/Audit | better-auth + Organizations, Rollen/Permissions/Scopes (`packages/permissions`), AuditEvent-UI, Einladungen; ersetzt interim Basic-Auth | F-02, F-19, F-20 🟢 | ⚪ nächstes |
+| WP-1.3 Immobilienstruktur + CRM | Property→Unit-Baum, CSV-Import, Lead-Qualifizierung → Customer/Property, Notizen/Aufgaben | F-03 🟢 | ⚪ |
+| WP-1.4 Events/Worker | Outbox (steht), pg-boss/Dauerdienst, Handler-Registry, Notification-Grundgerüst | Idempotenz-Tests grün | 🟡 (Outbox+Dispatcher stehen, Tests+Dauerbetrieb offen) |
 
 ### Phase 2 — Onboarding-Engine ⚪ → [ONBOARDING_ENGINE.md](ONBOARDING_ENGINE.md) · Gate F-04
 ### Phase 3 — Documenso ⚪ → [DOCUMENSO_INTEGRATION.md](DOCUMENSO_INTEGRATION.md) · Gates F-05, F-06 (inkl. Staging-Server-Betrieb)
@@ -95,11 +95,13 @@ Release-Zuschnitt: [RELEASE_PLAN.md](RELEASE_PLAN.md).
 
 ## 11. Priorisierte nächste Aufgaben (verbindlich)
 
-1. **Masterplan-Freigabe durch Leon** (insb. ADR-001/002-Bestätigung, §13-Entscheidungen O-01/O-02)
-2. WP-1.0 Repo-Fundament (Voraussetzung für alles; enthält R-02-Fix)
-3. WP-1.1 Lead-Persistenz (stoppt aktiven Lead-Verlust R-01)
-4. WP-1.2 → WP-1.4 in Reihenfolge
-5. Parallel (nicht blockierend): fachliche Klärungen O-P1…P4 anstoßen (R-04)
+Stand 2026-07-11 nach WP-1.0/WP-1.1 (Fundament steht, Lead-Kette in Dev verifiziert):
+
+1. **Git-Remote einrichten + pushen** (R-02) — Voraussetzung für Backup & CI. *(Publishing-Aktion: Anlegen/Push des Remotes durch Leon bzw. mit ausdrücklicher Freigabe.)*
+2. **Website-Dockerfile auf Monorepo umstellen + Coolify-Deploy** — sonst zeigt die produktive Website-Route weiter ins Leere und Leads gehen in Prod verloren (R-01 erst nach Deploy geschlossen). `sharp`-Build freigeben, `next build` verifizieren.
+3. WP-1.2 (better-auth + Organizations + Rollen/Scopes + Audit-UI) — ersetzt interim Basic-Auth.
+4. WP-1.3 (Immobilienstruktur + CRM-Qualifizierung), WP-1.4 (Worker als Dauerdienst + Vitest-Idempotenz-/Berechtigungstests F-19/F-20).
+5. Parallel: fachliche Klärungen O-P1…P4 (R-04); Documenso-Fund auf der Maschine für Phase 3 sichten.
 
 ## 12. Definition of Done
 
@@ -126,9 +128,13 @@ Vollständig in [RISK_REGISTER.md](RISK_REGISTER.md). Top-3 aktuell: R-01 Lead-V
 
 | Bereich (Auftrag §1) | Status |
 |---|---|
-| Masterplan & Doku-Fundament | 🟢 (dieses Paket, 2026-07-11) |
-| 1 CRM · 2 Angebotskonfigurator · 3 Portal · 4 Onboarding · 5 Hubs · 6 Registry · 7 PWA · 8 Documenso · 9 Lexoffice · 10–13 Module · 14 Service · 15 DMS · 16 Notifications · 17 Audit · 18 Identity | ⚪ (Konzepte 🔵 in den verlinkten Dokumenten) |
-| Marketing-Site + Funnels (Bestand) | 🟢 produktiv (Lead-Zustellung 🔴 → WP-1.1) |
+| Masterplan & Doku-Fundament | 🟢 (2026-07-11) |
+| Monorepo-Fundament (WP-1.0) | 🟣 (pnpm/Turbo, Website umgezogen, docker-compose; Remote/CI/Deploy offen) |
+| **1 CRM (Lead-Kern)** | 🟢 dev — Lead-Erfassung/Persistenz/Benachrichtigung/Admin-Liste (WP-1.1); Qualifizierung/Property in WP-1.3 |
+| 17 Audit · 16 Notifications (E-Mail) · Events/Outbox | 🟣 Grundgerüst live (Lead-Pfad); Ausbau je Modul |
+| 18 Identity (Mandant/Rollen) | 🟡 Organization steht; better-auth/Rollen/Scopes = WP-1.2 |
+| 2 Konfigurator · 3 Portal · 4 Onboarding · 5 Hubs · 6 Registry · 7 PWA · 8 Documenso · 9 Lexoffice · 10–13 Module · 14 Service · 15 DMS | ⚪ (Konzepte 🔵 in den verlinkten Dokumenten) |
+| Marketing-Site + Funnels (Bestand) | 🟢 produktiv; Lead-Zustellung 🟢 dev (Proxy→Plattform), Prod nach Deploy |
 
 ## 16. Pflegeprozess dieses Plans (verbindlich)
 

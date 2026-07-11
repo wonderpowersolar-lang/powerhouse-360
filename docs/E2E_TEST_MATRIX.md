@@ -7,7 +7,7 @@
 
 | # | Fluss | Schritte (Kurzform) | Phase | Status | Zuletzt getestet |
 |---|---|---|---|---|---|
-| F-01 | Lead-Eingang | Funnel (/demo, /projekt-besprechen) → POST /api/v1/leads → Lead in DB → im CRM sichtbar → Benachrichtigung Vertrieb | 1 | ⚪ | — |
+| F-01 | Lead-Eingang | Funnel (/demo, /projekt-besprechen) → POST /api/v1/leads → Lead in DB → im CRM sichtbar → Benachrichtigung Vertrieb | 1 | 🟢 | 2026-07-11 (lokal/Docker: 201→DB→Audit→Outbox→Worker→Mailpit→Admin; Website-Proxy) |
 | F-02 | Mandant & Rollen | Org anlegen → User einladen → Rolle+Scope → Zugriff nur im Scope (Negativtest Cross-Tenant) | 1 | ⚪ | — |
 | F-03 | Lead → Kunde/Objekt | Lead qualifizieren → Customer+Property ohne Doppelerfassung → Audit-Trail | 1 | ⚪ | — |
 | F-04 | Onboarding generisch | Template versionieren → Workflow instanziieren → Schritte (form/document/approval) → Blocked/Exception → Ready for Activation | 2 | ⚪ | — |
@@ -37,4 +37,4 @@
 |---|---|---|---|
 | F-19 | Audit-Vollständigkeit: Vertragsstatuswechsel, Downloads, Rollenänderungen, Retries erscheinen im Audit-Log | 1+ | ⚪ |
 | F-20 | Berechtigungs-Negativmatrix: je Rolle 3 verbotene Aktionen → 403 | 1+ | ⚪ |
-| F-21 | Bestandsschutz Marketing-Site: powerhouse360.de/chargemieter.de/smokemieter.de unverändert erreichbar nach Monorepo-Umbau (Smoke-Test aller Routen + Funnel-Submit) | 1 | ⚪ |
+| F-21 | Bestandsschutz Marketing-Site: powerhouse360.de/chargemieter.de/smokemieter.de unverändert erreichbar nach Monorepo-Umbau (Smoke-Test aller Routen + Funnel-Submit) | 1 | 🟣 (2026-07-11: Startseite bootet `GET / 200`, Funnel-Proxy verifiziert; vollständiger Route-Sweep + Prod-`next build` offen) |

@@ -4,7 +4,7 @@
 
 | ID | Risiko | W'keit | Auswirkung | Gegenmaßnahme | Status |
 |---|---|---|---|---|---|
-| R-01 | **Leads gehen aktuell verloren** (`deliverLead()` = console.log; Container-Neustart löscht selbst Logs) | sicher (Ist-Zustand) | H — Umsatz | Erste Implementierungseinheit: Lead-Persistenz + Benachrichtigung (Phase 1, WP-1.1) | 🔴 offen |
+| R-01 | **Leads gehen aktuell verloren** (`deliverLead()` = console.log; Container-Neustart löscht selbst Logs) | sicher (Ist-Zustand) | H — Umsatz | WP-1.1 umgesetzt: Persistenz + Audit + Outbox-Benachrichtigung + Website-Proxy, **in Dev verifiziert (F-01)**. In Prod erst nach Deploy der Plattform + Website-Proxy wirksam. | 🟡 in Dev behoben, Prod-Deploy offen |
 | R-02 | **Kein Git-Remote / kein Repo-Backup**; Verlust der Workstation = Verlust des Codes | M | H | Privates Remote (GitHub o. ä.) einrichten, Push-Routine; Voraussetzung für CI | 🔴 offen |
 | R-03 | Greenfield-Umfang wird unterschätzt (18 Zielbereiche, 0 vorhanden) — Verzettelung über Module | H | H | Strikte Phasenreihenfolge, ein Modul zuerst komplett (Powermieter), Definition of Done je Phase, kein Modul-Hopping | offen |
 | R-04 | Regulatorik Mieterstrom/Messstellenbetrieb (EnWG/MsbG, Eichrecht, SMGW/TRuDi) erzwingt Architekturänderungen im Powermieter-Billing | M | H | Fachliche Klärung vor Phase 6 (externe Beratung); Messkonzept-Modell flexibel halten; TRuDi-Handbuch liegt vor | offen |

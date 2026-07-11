@@ -17,3 +17,40 @@
 **Nächster Schritt:** Freigabe des Masterplans; danach WP-1.0 (Git-Remote + Monorepo-Umbau) und WP-1.1 (Lead-Persistenz) gemäß [Masterplan §10](POWERHOUSE_360_MASTER_PLAN.md).
 
 ---
+
+## 2026-07-11 — Phase 1: WP-1.0 Monorepo-Fundament + WP-1.1 Lead-Persistenz
+
+Branch: `feat/platform-foundation`. Stack bestätigt durch Ausführungsauftrag (ADR-001/002).
+
+**Getan (WP-1.0):**
+- pnpm-Workspaces + Turborepo eingeführt (`pnpm-workspace.yaml`, `turbo.json`, Root-`package.json`, `.npmrc` mit `node-linker=hoisted`, `tsconfig.base.json`).
+- Website per `git mv` nach `apps/website` verschoben (Historie erhalten), `next.config.ts` auf Monorepo angepasst (`outputFileTracingRoot`), Paket → `@ph360/website`. npm-`package-lock.json` entfernt.
+- `docker-compose.yml` (Postgres :5433, Mailpit :8025, MinIO :9001), `.env.example`, Root-`README.md`, `.gitignore` monorepo-weit + `graphify-out/` ignoriert.
+- **Port-Konflikt gelöst:** lokal belegt bereits ein anderer Stack (Supabase) Port 5432 → Postgres dauerhaft auf **5433** gelegt.
+
+**Getan (WP-1.1):**
+- `packages/database`: erstes Prisma-Schema (Organization, Lead, LeadActivity, AuditEvent, DomainEvent-Outbox) + Client-Singleton + idempotenter Seed. Migration `20260711112509_init` angewandt.
+- `apps/platform`: `POST /api/v1/leads` — Zod-Validierung, Honeypot, optionaler Ingest-Token, Persistenz von Lead + LeadActivity + AuditEvent + DomainEvent in einer Transaktion. Admin-Liste `/admin/leads` (interim Basic-Auth via Middleware, ersetzt durch better-auth in WP-1.2).
+- `apps/worker`: Outbox-Dispatcher (Poll/Claim/Retry/Backoff) mit Handler `lead.created` → Benachrichtigungs-E-Mail (nodemailer → SMTP/Mailpit).
+- `apps/website`: `/api/leads` vom `console.log`-Handler zum **Plattform-Proxy** umgebaut (Fallback-Log gegen Lead-Verlust). **R-01 behoben.**
+
+**Getestet (verifiziert, lokal auf Docker-Postgres):**
+- F-01 🟢: `POST /api/v1/leads` → HTTP 201, Lead in DB (korrektes Modul-Mapping HEATMIETER/SMOKEMIETER), `audit_event` `lead.created` geschrieben, `domain_event` PENDING → Worker → PROCESSED, **E-Mail in Mailpit** ("Neuer Lead: Erika Musterfrau" → vertrieb@), Admin-Liste 401 ohne / 200 mit Basic-Auth (zeigt Lead).
+- Website-Proxy: `POST /api/leads` (öffentlich) → Plattform → 2. Lead persistiert. Website bootet nach Umzug (`GET / 200`).
+- F-21 🟣 (teilverifiziert): Startseite + Funnel-Proxy laufen; **vollständiger Route-Sweep + Modul-Domains noch nicht** durchgeklickt.
+
+**Nicht getestet / offen:**
+- Produktions-`next build` der Website (`sharp`-Build-Script von pnpm-Guard blockiert; Dev läuft). Vor Deploy: `sharp` freigeben + Build prüfen.
+- Coolify-Deploy auf neue Monorepo-Struktur (Dockerfile der Website ist noch der alte Single-App-Stand → **muss vor nächstem Deploy angepasst werden**, sonst bricht der Prod-Build).
+- Idempotenz-/Berechtigungs-Automatiktests (F-19/F-20) noch nicht als Vitest geschrieben — bisher nur manuell.
+
+**Neue Erkenntnisse / Risiken:**
+- Next 16 markiert `middleware.ts` als deprecated → künftig `proxy.ts` (betrifft Website + Platform, kosmetisch).
+- Prisma 7 entfernt `package.json#prisma` → später `prisma.config.ts`; Prisma lädt `.env` nur aus cwd, nicht aus Repo-Root (Migrationen brauchen gesourcete Root-`.env`).
+- pnpm-Supply-Chain-Guard blockiert Build-Scripts (prisma/sharp/esbuild) → mit direktem Binary-Aufruf umgangen; für CI/Deploy sauber freigeben.
+- **Bestehende Fremd-Stacks auf der Maschine entdeckt:** ein `documenso-powermieter`-Docker-Setup (Documenso + DB + Mailpit, gestoppt) und eine laufende Supabase-Instanz — relevanter Kontext für Phase 3 (Documenso ist offenbar schon einmal aufgesetzt worden).
+
+**Restrisiko:** R-01 in Dev behoben, in **Prod erst nach Deploy** wirksam (Website-Route zeigt sonst weiter ins Leere) — bis dahin gehen produktive Leads weiter verloren. R-02 (kein Git-Remote) weiter offen.
+**Nächster Schritt:** WP-1.2 (better-auth + Organizations + Rollen/Scopes + Audit-UI), WP-1.3 (Immobilienstruktur + CRM-Qualifizierung), WP-1.4 (Events/Worker als Dauerdienst). Parallel: Git-Remote (R-02), Website-Dockerfile für Monorepo, sharp-Freigabe.
+
+---

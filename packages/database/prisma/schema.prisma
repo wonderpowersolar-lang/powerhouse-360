@@ -1,0 +1,197 @@
+// Powerhouse 360 — first migration (WP-1.1).
+// Scope: identity core + CRM lead + platform (audit + domain-event outbox).
+// Aligned with docs/DATA_MODEL.md. Auth tables (User/Session/…) arrive in WP-1.2
+// via better-auth; roles/permissions/property tree in WP-1.2/1.3.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// identity
+// ---------------------------------------------------------------------------
+
+enum OrganizationType {
+  POWERHOUSE
+  PROPERTY_MANAGER
+  WEG
+  OWNER
+  ASSET_HOLDER
+  COOPERATIVE
+  UTILITY
+  INSTALLER_PARTNER
+  OTHER
+}
+
+model Organization {
+  id        String           @id @default(uuid()) @db.Uuid
+  type      OrganizationType
+  name      String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  leads       Lead[]
+  auditEvents AuditEvent[]
+
+  @@map("organization")
+}
+
+// ---------------------------------------------------------------------------
+// crm
+// ---------------------------------------------------------------------------
+
+enum LeadType {
+  DEMO_REQUEST
+  PROJECT_REQUEST
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  DISQUALIFIED
+  CONVERTED
+}
+
+enum ModuleKey {
+  POWERMIETER
+  HEATMIETER
+  CHARGEMIETER
+  SMOKEMIETER
+}
+
+enum LeadActivityType {
+  CREATED
+  STATUS_CHANGED
+  NOTE
+  CONTACTED
+  NOTIFICATION_SENT
+}
+
+model Lead {
+  id             String     @id @default(uuid()) @db.Uuid
+  organizationId String     @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  leadType LeadType
+  status   LeadStatus @default(NEW)
+
+  // Contact
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  company   String?
+  role      String? // roleOrOrganizationType from the funnel
+
+  // Qualification snapshot
+  modules             ModuleKey[]
+  dwellingUnits       String? // band, e.g. "20-49"
+  buildings           Int?
+  portfolioSize       Int?
+  currentSituation    String?
+  recommendedNextStep String?
+
+  // Origin
+  source       String? // "demo" | "projekt-besprechen"
+  sourceModule ModuleKey? // from ?modul= (future funnel wiring)
+  sourceTheme  String? // from ?thema=
+
+  consentPrivacy Boolean
+  consentContact Boolean
+
+  // Lossless original payload for audit/replay.
+  payload Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  activities LeadActivity[]
+
+  @@index([status, createdAt])
+  @@index([email])
+  @@map("lead")
+}
+
+model LeadActivity {
+  id     String @id @default(uuid()) @db.Uuid
+  leadId String @db.Uuid
+  lead   Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  type      LeadActivityType
+  message   String?
+  actorType AuditActorType   @default(SYSTEM)
+  actorId   String?          @db.Uuid
+  payload   Json?
+  createdAt DateTime         @default(now())
+
+  @@index([leadId, createdAt])
+  @@map("lead_activity")
+}
+
+// ---------------------------------------------------------------------------
+// platform: audit + domain-event outbox
+// ---------------------------------------------------------------------------
+
+enum AuditActorType {
+  USER
+  SYSTEM
+  WEBHOOK
+}
+
+model AuditEvent {
+  id             String        @id @default(uuid()) @db.Uuid
+  organizationId String?       @db.Uuid
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  actorType   AuditActorType @default(SYSTEM)
+  actorId     String?        @db.Uuid
+  action      String // e.g. "lead.created"
+  subjectType String // e.g. "Lead"
+  subjectId   String
+  before      Json?
+  after       Json?
+  requestId   String?
+  createdAt   DateTime       @default(now())
+
+  @@index([subjectType, subjectId])
+  @@index([createdAt])
+  @@map("audit_event")
+}
+
+enum DomainEventStatus {
+  PENDING
+  PROCESSING
+  PROCESSED
+  FAILED
+  DEAD
+}
+
+/// Transactional outbox. Written in the same transaction as the state change;
+/// drained by apps/worker. See docs/EVENT_MODEL.md.
+model DomainEvent {
+  id            String            @id @default(uuid()) @db.Uuid
+  eventType     String // e.g. "lead.created"
+  aggregateType String // e.g. "Lead"
+  aggregateId   String
+  organizationId String?          @db.Uuid
+  payload       Json
+  status        DomainEventStatus @default(PENDING)
+  attempts      Int               @default(0)
+  availableAt   DateTime          @default(now())
+  processedAt   DateTime?
+  lastError     String?
+  correlationId String?
+  causationId   String?
+  createdAt     DateTime          @default(now())
+
+  @@index([status, availableAt])
+  @@map("domain_event")
+}
