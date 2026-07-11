@@ -54,3 +54,24 @@ Branch: `feat/platform-foundation`. Stack bestätigt durch Ausführungsauftrag (
 **Nächster Schritt:** WP-1.2 (better-auth + Organizations + Rollen/Scopes + Audit-UI), WP-1.3 (Immobilienstruktur + CRM-Qualifizierung), WP-1.4 (Events/Worker als Dauerdienst). Parallel: Git-Remote (R-02), Website-Dockerfile für Monorepo, sharp-Freigabe.
 
 ---
+
+## 2026-07-11 — Deploy-Vorbereitung: Monorepo-Prod-Images (verifiziert)
+
+**Getan:**
+- Monorepo-Dockerfiles: `apps/website/Dockerfile` (alpine, Next standalone), `apps/platform/Dockerfile` + `apps/worker/Dockerfile` (debian-slim, Prisma). Build-Context = Repo-Root, `pnpm --filter … build`.
+- `docker-compose.prod.yml`: postgres + **migrate (One-shot `prisma migrate deploy`)** + platform + worker + website; Secrets serverseitig via `.env` (`.env.prod.example`).
+- `docs/DEPLOYMENT.md`: vollständiges VPS/Coolify-Runbook inkl. konkreter Serverdaten (`powerhouse.dvnii.de` / 152.239.118.208, Ubuntu 24.04+Docker, 2 vCPU/8 GB, VPS-ID 1792920) und sicherer Cutover-Reihenfolge (neuer Stack bauen → intern prüfen → Domains umhängen → alten Container stoppen; Rollback = zurückhängen).
+- `sharp`/Prisma-Build-Freigabe: pnpm 11 nutzt `allowBuilds` (nicht `onlyBuiltDependencies`) → in `pnpm-workspace.yaml` gesetzt. Basis-Images auf **Node 22** (pnpm 11.11 braucht `node:sqlite`). Prisma `binaryTargets` um `debian-openssl-3.0.x`, Engine via `outputFileTracingIncludes` ins Platform-Standalone.
+
+**Getestet (verifiziert):**
+- `docker compose -f docker-compose.prod.yml build` → **alle 3 Images bauen** (website 731 MB, platform 509 MB, worker/migrate 2.5 GB) nach Fix von zwei echten Blockern (Node-20→22, allowBuilds).
+- Isolierter Prod-Stack-Lauf (eigenes Projekt `ph360v`, frisches Postgres): migrate legt Schema an → platform ready → Website-`POST /api/leads` → **echte Persistenz (1 Lead in DB)** → Admin-Liste (Basic-Auth) zeigt den Lead. Danach sauber `down -v`. **Prod-Images end-to-end verifiziert.**
+
+**Nicht getestet / offen (bewusst beim Nutzer):**
+- Tatsächlicher VPS-Rollout: `.env`-Secrets auf dem Server setzen + `git archive|scp` + `docker compose … up -d` + Coolify-Domains umhängen. Ich habe **keine SSH-Zugangsdaten** und darf **keine Secrets eingeben** → Runbook in `docs/DEPLOYMENT.md`.
+- DNS: Cutover Cloudflare→Hostinger-NS prüfen, bevor Domains umgehängt werden.
+
+**Restrisiko:** R-01 (Lead-Verlust) ist erst nach diesem VPS-Rollout in **Prod** geschlossen; Artefakte sind verifiziert und bereit.
+**Nächster Schritt:** VPS-Rollout (Nutzer) + WP-1.2. Empfehlung: WP-1.2 in einer frischen Session (diese ist sehr lang/teuer geworden) — Masterplan & Memory tragen den Kontext.
+
+---

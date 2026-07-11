@@ -1,6 +1,6 @@
 # Website (Next.js standalone) — monorepo build. BUILD CONTEXT = repo root:
 #   docker build -f apps/website/Dockerfile -t ph360-website .
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat
 RUN npm install -g pnpm@11.11.0
 WORKDIR /repo
@@ -11,7 +11,7 @@ RUN pnpm install --frozen-lockfile --filter @ph360/website...
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @ph360/website build
 
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 RUN apk add --no-cache libc6-compat
 WORKDIR /repo
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0

@@ -3,6 +3,15 @@ packages:
   - "packages/*"
 
 # Trusted dependencies allowed to run install/build scripts.
+# pnpm 11 uses the allowBuilds map (`pnpm approve-builds` writes it); the
+# legacy onlyBuiltDependencies list is kept for older pnpm.
+allowBuilds:
+  "@prisma/client": true
+  "@prisma/engines": true
+  prisma: true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
 onlyBuiltDependencies:
   - "@prisma/client"
   - "@prisma/engines"

@@ -75,7 +75,7 @@ Reihenfolge gegenüber dem Auftrag unverändert (Phasen 0–10); eine Anpassung:
 ### Phase 1 — Core & Fundament 🟡 (in Arbeit seit 2026-07-11, Branch `feat/platform-foundation`)
 | WP | Inhalt | Akzeptanz (Auszug) | Status |
 |---|---|---|---|
-| **WP-1.0** Repo-Fundament | pnpm/Turborepo, Website → `apps/website`, docker-compose (postgres:5433/mailpit/minio), `.env.example`; **offen:** Git-Remote (R-02), CI, Website-Dockerfile fürs Monorepo, Staging | F-21 🟣 (Startseite+Funnel-Proxy verifiziert; Route-Sweep offen) | 🟣 |
+| **WP-1.0** Repo-Fundament | pnpm/Turborepo, Website → `apps/website`, docker-compose; **Prod-Deploy: 3 Monorepo-Dockerfiles + `docker-compose.prod.yml` + Runbook, Images end-to-end verifiziert** (F-01 im Prod-Stack); **offen:** Git-Remote (R-02), CI, VPS-Rollout (Secrets+SSH beim Nutzer) | F-21 🟣; Prod-Build 🟢 | 🟣 |
 | **WP-1.1** Lead-Persistenz (**erste Implementierungseinheit**, behebt R-01) | `packages/database` (Migration `init`: Organization/Lead/LeadActivity/AuditEvent/DomainEvent), `apps/platform` `POST /api/v1/leads` + Admin-Liste (interim Basic-Auth), `apps/worker` Outbox→E-Mail, Website-Proxy | F-01 🟢 (DB+Audit+Outbox+E-Mail+Admin+Proxy verifiziert) | 🟢 dev / Prod nach Deploy |
 | WP-1.2 Mandanten/Rollen/Audit | better-auth + Organizations, Rollen/Permissions/Scopes (`packages/permissions`), AuditEvent-UI, Einladungen; ersetzt interim Basic-Auth | F-02, F-19, F-20 🟢 | ⚪ nächstes |
 | WP-1.3 Immobilienstruktur + CRM | Property→Unit-Baum, CSV-Import, Lead-Qualifizierung → Customer/Property, Notizen/Aufgaben | F-03 🟢 | ⚪ |

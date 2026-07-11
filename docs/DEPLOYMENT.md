@@ -18,14 +18,23 @@ Alle drei Images bauen mit **Build-Context = Repo-Root**:
 docker compose -f docker-compose.prod.yml build
 ```
 
+## Zielserver (Hostinger VPS)
+
+| | |
+|---|---|
+| Hostname | `powerhouse.dvnii.de` (PTR `srv1792920.hstgr.cloud`) |
+| IPv4 | `152.239.118.208` · IPv6 `2a02:4780:79:b5fa::1` |
+| OS | Ubuntu 24.04 „with Docker" · KVM 2 (2 vCPU, 8 GB RAM, 100 GB) |
+| VPS-ID | 1792920 (Hostinger) |
+
 ## Deploy-Schritte auf dem VPS
 
 Voraussetzung: Code liegt auf dem VPS. Da (noch) **kein Git-Remote** existiert, per Archiv:
 ```bash
 # lokal:
 git archive --format=tar.gz -o ph360.tar.gz HEAD
-scp ph360.tar.gz USER@VPS:/opt/ph360/
-# auf dem VPS:
+scp ph360.tar.gz root@152.239.118.208:/opt/ph360/
+# auf dem VPS (ssh root@152.239.118.208):
 mkdir -p /opt/ph360/app && tar -xzf /opt/ph360/ph360.tar.gz -C /opt/ph360/app
 cd /opt/ph360/app
 cp .env.prod.example .env      # dann Secrets eintragen (siehe unten)

@@ -1,7 +1,7 @@
 # Platform (Next.js standalone + Prisma). BUILD CONTEXT = repo root:
 #   docker build -f apps/platform/Dockerfile -t ph360-platform .
 # node:20-slim (debian) for reliable Prisma engine support.
-FROM node:20-slim AS base
+FROM node:22-slim AS base
 RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 RUN npm install -g pnpm@11.11.0
