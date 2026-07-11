@@ -1,0 +1,83 @@
+# Production stack for the Hostinger VPS (Coolify or plain `docker compose`).
+# Secrets come from an .env file on the server (NEVER committed). See docs/DEPLOYMENT.md.
+#   docker compose -f docker-compose.prod.yml build
+#   docker compose -f docker-compose.prod.yml up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ph360_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-shot: applies pending Prisma migrations, then exits.
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    command: ["pnpm", "--filter", "@ph360/database", "migrate:deploy"]
+    working_dir: /repo
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_DATABASE_URL: ${DIRECT_DATABASE_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  platform:
+    build:
+      context: .
+      dockerfile: apps/platform/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_DATABASE_URL: ${DIRECT_DATABASE_URL}
+      PLATFORM_INGEST_TOKEN: ${PLATFORM_INGEST_TOKEN}
+      ADMIN_BASIC_USER: ${ADMIN_BASIC_USER}
+      ADMIN_BASIC_PASSWORD: ${ADMIN_BASIC_PASSWORD}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    expose:
+      - "3100"
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_DATABASE_URL: ${DIRECT_DATABASE_URL}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+      LEAD_NOTIFY_TO: ${LEAD_NOTIFY_TO}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  website:
+    build:
+      context: .
+      dockerfile: apps/website/Dockerfile
+    restart: unless-stopped
+    environment:
+      PLATFORM_API_URL: ${PLATFORM_API_URL}
+      PLATFORM_INGEST_TOKEN: ${PLATFORM_INGEST_TOKEN}
+    expose:
+      - "3000"
+
+volumes:
+  ph360_pgdata:

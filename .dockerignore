@@ -1,0 +1,13 @@
+**/node_modules
+**/.next
+**/.turbo
+**/dist
+**/generated
+.git
+.env
+.env.*
+docs
+graphify-out
+*.md
+**/*.tsbuildinfo
+.DS_Store

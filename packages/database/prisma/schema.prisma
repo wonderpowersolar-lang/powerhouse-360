@@ -6,6 +6,8 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/client"
+  // native = local dev (macOS); debian-openssl-3.0.x = node:20-slim runtime image.
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
