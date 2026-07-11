@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="smcloud" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#333944"/>
+      <stop offset="0.5" stop-color="#8a5c33"/>
+      <stop offset="1" stop-color="#e8973c"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#smcloud)">
+    <circle cx="21" cy="22" r="12"/>
+    <circle cx="38" cy="17" r="13"/>
+    <circle cx="49" cy="27" r="10"/>
+    <rect x="9" y="22" width="50" height="18" rx="9"/>
+  </g>
+  <g fill="#fff">
+    <rect x="24" y="11" width="16" height="4.4" rx="1.2"/>
+    <rect x="24" y="17.2" width="16" height="4.4" rx="1.2"/>
+    <rect x="24" y="23.4" width="16" height="4.4" rx="1.2"/>
+    <rect x="24" y="29.6" width="16" height="4.4" rx="1.2"/>
+  </g>
+  <g fill="none" stroke="#e8973c" stroke-width="4.4" stroke-linecap="round">
+    <path d="M21.5 49.5a15 15 0 0 1 21 0"/>
+    <path d="M27.5 56.5a8 8 0 0 1 9 0"/>
+  </g>
+</svg>
