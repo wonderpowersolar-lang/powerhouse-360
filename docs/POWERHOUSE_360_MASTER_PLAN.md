@@ -204,6 +204,8 @@ Regeln: jeder Import idempotent (natürliche Schlüssel) · Probelauf mit Abweic
 
 Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert: **minimaler Angebots-/Annahmefluss wird aus Phase 7 in Phase 6 vorgezogen** (Powermieter-DoD „Lead → Angebot → Annahme" braucht ihn vor dem Commercial-Vollausbau).
 
+> **Step-by-Step-Abarbeitung:** Die operative Zerlegung jeder Phase in abhakbare Schritte (mit Voraussetzungen, WP-Grenzen und Gates) steht in der ausgelagerten [EXECUTION_ROADMAP.md](EXECUTION_ROADMAP.md). Diese Tabelle bleibt die strategische Sicht; die Roadmap ist das Arbeitsblatt.
+
 | Phase | Inhalt (Kurz) | Gates (§12) | Status |
 |---|---|---|---|
 | **0 — Bestandsaufnahme & Masterplan** | Audit + Plan V1 (2026-07-11); **WP-0.2 V2-Rebaseline** (2026-07-12: dieses Dokument, ADR-001…008, Doku-Konsolidierung) | — | 🟢 |
