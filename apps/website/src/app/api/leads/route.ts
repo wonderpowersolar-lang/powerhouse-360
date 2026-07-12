@@ -11,7 +11,7 @@ export const runtime = "nodejs";
  * fields) and forwards server-to-server to the platform, which persists the
  * lead (DB + audit + outbox notification). If the platform is unreachable the
  * lead is logged as a last-resort safety net so it is never silently lost.
- * See docs/MIGRATION_PLAN.md (WP-1.1).
+ * See docs/POWERHOUSE_360_MASTER_PLAN.md §9 (WP-1.1).
  */
 const PLATFORM_URL = process.env.PLATFORM_API_URL ?? "http://localhost:3100";
 const INGEST_TOKEN = process.env.PLATFORM_INGEST_TOKEN ?? "";

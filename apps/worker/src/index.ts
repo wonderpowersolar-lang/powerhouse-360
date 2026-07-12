@@ -5,7 +5,7 @@ import { sendMail, leadNotifyTo } from "./mailer.js";
  * Outbox dispatcher (WP-1.1 / WP-1.4 seed). Polls the domain_event table,
  * claims PENDING events optimistically, dispatches to handlers, and applies
  * retry/backoff. Idempotent: a claimed event is only processed once.
- * See docs/EVENT_MODEL.md.
+ * See docs/POWERHOUSE_360_MASTER_PLAN.md §3 + ADR-001.
  */
 
 const POLL_INTERVAL_MS = 3000;

@@ -7,7 +7,7 @@
 ## 2026-07-11 — Phase 0: Bestandsaufnahme & Masterplan (WP-0)
 
 **Getan:**
-- Vollständiges Codebase-Audit (Routen, Komponenten, Lead-Fluss, Deployment, Tests, Doku, Medien, Git-Zustand) → [CURRENT_STATE_AUDIT.md](CURRENT_STATE_AUDIT.md)
+- Vollständiges Codebase-Audit (Routen, Komponenten, Lead-Fluss, Deployment, Tests, Doku, Medien, Git-Zustand) → `CURRENT_STATE_AUDIT.md` *(2026-07-12 in Masterplan §2 konsolidiert)*
 - Zentrale Plandokumentation angelegt: Masterplan, Zielarchitektur, Datenmodell, API-, Event-, Security-Konzept, Onboarding-Engine, Hub/Device-Plattform, Documenso- & Lexoffice-Integration, Migrationsplan, Teststrategie, E2E-Matrix, Risikoregister, Release-Plan, ADR-001…005, vier Modul-Dokumente
 - Kernbefunde: reines Marketing-Frontend ohne Backend; Leads gehen verloren (R-01); kein Git-Remote (R-02); keine Tests/CI
 
@@ -73,5 +73,19 @@ Branch: `feat/platform-foundation`. Stack bestätigt durch Ausführungsauftrag (
 
 **Restrisiko:** R-01 (Lead-Verlust) ist erst nach diesem VPS-Rollout in **Prod** geschlossen; Artefakte sind verifiziert und bereit.
 **Nächster Schritt:** VPS-Rollout (Nutzer) + WP-1.2. Empfehlung: WP-1.2 in einer frischen Session (diese ist sehr lang/teuer geworden) — Masterplan & Memory tragen den Kontext.
+
+---
+## 2026-07-12 — WP-0.2: V2-Rebaseline (Masterprompt V2)
+
+**Getan:**
+- Doku-Konsolidierung auf die 3 Pflichtdokumente (V2 §3): Masterplan v2.0 komplett neu (15 Pflichtkapitel, alle Statusstände F-01…F-21 / R-01…R-17 / WP-Stände verlustfrei übernommen); 15 Konzeptdokumente + 4 Moduldokumente als Kapitel absorbiert und gelöscht; `DEPLOYMENT.md` bleibt als verlinktes Betriebs-Runbook.
+- ADR-Satz nach V2-Nummerierung neu aufgebaut: ADR-001 (Outbox), ADR-002 (Timescale), ADR-003 (PDF-Pipeline extern + Documenso als Signatur-Layer), ADR-004 (Mandantenisolation), ADR-005 (Billing-Engine), ADR-006 (Testmandant) — angenommen per V2-Vorgabe; ADR-007 (Stack & Hosting) + ADR-008 (Bewohner-Belegweg) als **Entwürfe zur PO-Freigabe**. Alte ADR-001…005 gelöscht (Mapping im Masterplan §15).
+- Neue Verbindlichkeiten eingearbeitet: kommerzielle P1-Priorisierung + Pilot Christinenstraße 36/Lottumstraße 22 (HV Hennings, 21 Messstellen), Mandanten-/Gesellschaftsmodell mit `IssuingEntity` (Wonderpower/AKL, Zwei-Konten-Lexoffice-Routing — beide Konten existieren lt. PO), Regulatorik-Kapitel (§6 inkl. MaKo-Split-Matrix Comgy), NFR-Kapitel (§8), Quellsysteme Zoho/Reonic/Excel (§9), Signaturniveaus je ContractType, Phasen-Neuschnitt (Commercial+Lexoffice = Ph. 7 vor Smokemieter = Ph. 8; Heat/Charge P3-gated).
+- Repo-Housekeeping: invalider Schema-Zwischenstand zurückgesetzt (`prisma validate` grün), WP-1.2-Plan+Spec (`docs/superpowers/…wp-1.2…`) ins Git aufgenommen, verwaiste Doku-Verweise in Code-Kommentaren auf Masterplan-Kapitel umgestellt.
+
+**Getestet:** `prisma validate` grün nach Revert; Doku-Linkcheck + Strukturprüfung (siehe Commit); keine Laufzeit-Codeänderungen (nur Kommentare).
+**Nicht getestet:** keine — reine Dokumentations-/Housekeeping-Einheit ohne Feature-Codepfad.
+**Restrisiko:** R-01 (prod) und R-02 unverändert offen — VPS-Rollout + Git-Remote weiterhin beim PO. Neu: R-17 (Übergabe externe PDF-Pipeline).
+**Nächster Schritt:** WP-1.2 fortsetzen (Task 2: better-auth-Tabellen + RBAC + Migration `auth_and_rbac`; plus V2-Delta Testmandant-Seed + IssuingEntity-Stammdaten) — siehe Masterplan §14.
 
 ---

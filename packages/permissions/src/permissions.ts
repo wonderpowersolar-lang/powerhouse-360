@@ -1,4 +1,4 @@
-/** The ONLY place permissions are defined (SECURITY_AND_PERMISSIONS §3). */
+/** The ONLY place permissions are defined (Masterplan §8 — einzige Quelle des Permission-Katalogs). */
 export const PERMISSIONS = [
   "lead.read",
   "lead.update",
