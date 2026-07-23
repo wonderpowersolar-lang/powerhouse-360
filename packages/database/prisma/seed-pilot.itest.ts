@@ -13,9 +13,10 @@ describe("Pilotstruktur-Seed (ADR-006, WP-1.3-Kern)", () => {
     expect(await prisma.building.count()).toBe(2);
     expect(await prisma.entrance.count()).toBe(2);
     expect(await prisma.unit.count()).toBe(21);
+    expect(await prisma.address.count()).toBe(2);
 
     const buildings = await prisma.building.findMany({
-      include: { address: true, units: true },
+      include: { address: true, units: true, entrances: true },
       orderBy: { name: "asc" },
     });
     expect(buildings.map((b) => b.name)).toEqual(["Christinenstraße 36", "Lottumstraße 22"]);
@@ -24,8 +25,15 @@ describe("Pilotstruktur-Seed (ADR-006, WP-1.3-Kern)", () => {
     expect(buildings[0]!.address.street).toBe("Christinenstraße");
     expect(buildings[0]!.address.postalCode).toBe("10119");
     expect(buildings[1]!.address.street).toBe("Lottumstraße");
-    // Jede Unit hängt am Haupteingang ihres Gebäudes
-    for (const b of buildings) for (const u of b.units) expect(u.entranceId).not.toBeNull();
+    // Floor-Formel gepinnt (0 = EG, 2 WE je Etage): WE 01 → EG, WE 11 → 5. Etage.
+    const chstr = buildings[0]!;
+    expect(chstr.units.find((u) => u.label === "WE 01")!.floor).toBe(0);
+    expect(chstr.units.find((u) => u.label === "WE 11")!.floor).toBe(5);
+    // Jede Unit hängt am Haupteingang IHRES EIGENEN Gebäudes
+    for (const b of buildings) {
+      const haupteingangId = b.entrances[0]!.id;
+      for (const u of b.units) expect(u.entranceId).toBe(haupteingangId);
+    }
   });
 
   it("verwendet einen als TEST gekennzeichneten Mandanten und legt keinen zweiten an", async () => {

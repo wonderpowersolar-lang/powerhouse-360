@@ -26,8 +26,10 @@ export async function seedPilotStructure(
   prisma: PrismaClient,
 ): Promise<{ organizationId: string; propertyId: string }> {
   const org =
-    (await prisma.organization.findFirst({ where: { name: { startsWith: "TEST — " } } })) ??
-    (await prisma.organization.create({ data: { type: "WEG", name: TEST_TENANT_NAME } }));
+    (await prisma.organization.findFirst({
+      where: { name: { startsWith: "TEST — " } },
+      orderBy: { createdAt: "asc" },
+    })) ?? (await prisma.organization.create({ data: { type: "WEG", name: TEST_TENANT_NAME } }));
 
   const property = await prisma.property.upsert({
     where: { organizationId_name: { organizationId: org.id, name: PILOT.propertyName } },
@@ -40,11 +42,14 @@ export async function seedPilotStructure(
       where: { propertyId_name: { propertyId: property.id, name: spec.name } },
     });
     if (!building) {
-      const address = await prisma.address.create({
-        data: { street: spec.street, houseNumber: spec.houseNumber, postalCode: spec.postalCode, city: spec.city },
-      });
       building = await prisma.building.create({
-        data: { propertyId: property.id, name: spec.name, addressId: address.id },
+        data: {
+          property: { connect: { id: property.id } },
+          name: spec.name,
+          address: {
+            create: { street: spec.street, houseNumber: spec.houseNumber, postalCode: spec.postalCode, city: spec.city },
+          },
+        },
       });
     }
 
