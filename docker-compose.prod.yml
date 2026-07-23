@@ -42,8 +42,8 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_DATABASE_URL: ${DIRECT_DATABASE_URL}
       PLATFORM_INGEST_TOKEN: ${PLATFORM_INGEST_TOKEN}
-      ADMIN_BASIC_USER: ${ADMIN_BASIC_USER}
-      ADMIN_BASIC_PASSWORD: ${ADMIN_BASIC_PASSWORD}
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_URL: ${AUTH_URL}
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -58,6 +58,7 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_DATABASE_URL: ${DIRECT_DATABASE_URL}
+      AUTH_URL: ${AUTH_URL}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}

@@ -45,9 +45,15 @@ docker compose -f docker-compose.prod.yml up -d
 ```bash
 docker compose -f docker-compose.prod.yml run --rm worker pnpm --filter @ph360/database seed
 ```
+Danach den Plattform-Admin bootstrappen (ersetzt die interimistische Basic-Auth):
+```bash
+docker compose -f docker-compose.prod.yml run --rm \
+  -e ADMIN_EMAIL=admin@powerhouse360.de -e ADMIN_PASSWORD='…' \
+  worker pnpm ph360:create-admin
+```
 
 ### Secrets (DU setzt sie — ich darf das nicht)
-In `/opt/ph360/app/.env` gemäß `.env.prod.example`: `POSTGRES_PASSWORD`, identisches Passwort in `DATABASE_URL`/`DIRECT_DATABASE_URL`, `PLATFORM_INGEST_TOKEN` (`openssl rand -hex 32`), `ADMIN_BASIC_PASSWORD`, `SMTP_*` (Hostinger-Postfach).
+In `/opt/ph360/app/.env` gemäß `.env.prod.example`: `POSTGRES_PASSWORD`, identisches Passwort in `DATABASE_URL`/`DIRECT_DATABASE_URL`, `PLATFORM_INGEST_TOKEN` (`openssl rand -hex 32`), `AUTH_SECRET` (`openssl rand -hex 32`), `AUTH_URL` (`https://app.powerhouse360.de`), `SMTP_*` (Hostinger-Postfach). Bootstrap-Admin separat via `ADMIN_EMAIL`/`ADMIN_PASSWORD` (siehe oben).
 
 ### Domains / Reverse-Proxy (Coolify)
 - `powerhouse360.de` (+ chargemieter.de, smokemieter.de) → Service **website** :3000
@@ -65,4 +71,4 @@ In `/opt/ph360/app/.env` gemäß `.env.prod.example`: `POSTGRES_PASSWORD`, ident
 - **DNS:** Cutover Cloudflare→Hostinger-NS war offen (siehe VPS-Deploy-Notiz). Prüfen, dass die Domains tatsächlich auf den VPS zeigen, bevor umgehängt wird.
 - **R-01 in Prod** ist erst geschlossen, wenn `platform`+`postgres`+`worker` laufen UND die neue `website` (mit Proxy-Route) live ist.
 - **Kein Git-Remote (R-02):** Archiv-Deploy oben; für Coolify-Git-Deploy zuerst Remote einrichten.
-- `apps/platform/src/middleware.ts` (Basic-Auth) ist interim → WP-1.2 better-auth.
+- Auth: WP-1.2 better-auth ist aktiv (Session-Middleware + `/admin`-Guards, Einladungs-/Audit-Flow); die interimistische Basic-Auth ist entfernt.
