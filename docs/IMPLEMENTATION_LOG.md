@@ -89,3 +89,24 @@ Branch: `feat/platform-foundation`. Stack bestätigt durch Ausführungsauftrag (
 **Nächster Schritt:** WP-1.2 fortsetzen (Task 2: better-auth-Tabellen + RBAC + Migration `auth_and_rbac`; plus V2-Delta Testmandant-Seed + IssuingEntity-Stammdaten) — siehe Masterplan §14.
 
 ---
+
+## 2026-07-23 — WP-1.2: Auth/Rollen/Mandanten (better-auth + eigene RBAC)
+
+**Getan (Branch `feat/platform-foundation`, nicht gepusht — R-02):**
+- `packages/permissions` (Task 1, `3588b7f`): 8-Permission-Katalog, 12-Rollen-Map, Resolver — F-20-Kern.
+- Migration `auth_and_rbac` (Task 2, `8a6fcaf`): better-auth-Tabellen (user/session/account/verification, String-IDs) + eigene RBAC (OrganizationMembership/Invitation + Enums SystemRole/MembershipStatus/InvitationStatus); Follow-up `audit_actor_id_text`.
+- `packages/testing` (Task 3, `5b0e942`): real-Postgres-Vitest-Harness + unit/integration-Projects.
+- `packages/auth` (Task 4, `5646f95`): better-auth-Instanz (invitation-only `user.create.before`, `session.create.after`→auth.login-Audit), deny-by-default-Guards (`requirePermission`+`assertOrgScope`, authz.denied-Audit), Audit-/Email-Helper (Outbox).
+- Worker-Auth-Mails (Task 5, `0e7a2e1`); apps/platform-Wiring (Task 6, `aa648cb`: `/api/auth/[...all]`, Session-Middleware statt Basic-Auth, next.config); Login-Page (Task 7, `7887541`).
+- Admin-Shell + Members-UI + Invitation-Service (Task 8, `5d48cbb`).
+- Invitation-Accept-Flow `/invite/[token]` (Task 9, `bee346a`) + **Turbopack-Fix** (Workspace-Source-Packages: `.js`→extensionslose Imports — sonst crasht jede Server-Seite mit @ph360/auth; betraf auch /api/auth+Login) + Accept-Hardening (already-registered→saubere Meldung, keine Doppel-Verification-Mail).
+- Audit-UI `/admin/audit` (Task 10, `1409499`); Bootstrap-Admin `scripts/create-admin.ts`+`ph360:create-admin` + prod-Env Auth statt Basic-Auth (Task 11, `b02308d`); Route-Level-Negativtest (Task 12, `c06f2aa`).
+- ADR-010 (better-auth-only + eigene RBAC).
+
+**Getestet:** unit 6/6, **integration 14/14** real-Postgres (Guard F-02/F-20, Invitation-Lifecycle F-19 inkl. Reuse-/already-registered-/no-verification-mail, Route-Contract F-20), typecheck 7/7. Browser-E2E (Dev-DB, inline-Creds): Invite→Accept→Login→`/admin/leads`+`/admin/audit` (live auth.login/member.joined/lead.created, Filter); Bootstrap-Script idempotent (PLATFORM_ADMIN/ACTIVE/emailVerified).
+
+**Nicht getestet:** SALES-denied-Render („Kein Zugriff") nur test-abgedeckt (route-guards.itest.ts + admin/error.tsx-Pattern), nicht live durchgeklickt; kein Prod-Deploy (VPS-Rollout offen); `.env.prod.example` nicht editiert (read-blocked+gitignored, PO-offen).
+**Restrisiko:** Lint repo-weit vorbestehend rot (apps/platform ohne ESLint-9-Config; apps/website-Funnel set-state-in-effect aus Phase 1) — separate Chips, NICHT Auth. Deferred (ADR-010): TOTP-2FA, Bewohner-Magic-Link, auto-org-scope-Prisma-Wrapper, AccessScope-Subtree (WP-1.3).
+**Nächster Schritt:** WP-1.3 (Kern-Immobilien) oder VPS-Rollout (PO); vor Merge/Push Git-Remote (R-02) klären.
+
+---
