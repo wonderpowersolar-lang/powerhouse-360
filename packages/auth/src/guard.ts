@@ -1,7 +1,7 @@
 import { prisma } from "@ph360/database";
 import { canAny, type Permission } from "@ph360/permissions";
-import { recordAudit } from "./audit.js";
-import type { AuthContext } from "./context.js";
+import { recordAudit } from "./audit";
+import type { AuthContext } from "./context";
 
 export class AuthnError extends Error {
   constructor() {

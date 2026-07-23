@@ -1,9 +1,10 @@
 import { randomBytes } from "node:crypto";
+import { APIError } from "better-auth/api";
 import { prisma } from "@ph360/database";
 import type { SystemRole } from "@ph360/permissions";
-import { auth } from "./auth.js";
-import { recordAudit } from "./audit.js";
-import { enqueueAuthEmail } from "./email.js";
+import { auth } from "./auth";
+import { recordAudit } from "./audit";
+import { enqueueAuthEmail } from "./email";
 
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -77,9 +78,27 @@ export async function acceptInvitation(input: {
     await prisma.invitation.update({ where: { id: invitation.id }, data: { status: "EXPIRED" } });
     throw new InvitationError("Einladung abgelaufen.");
   }
-  const { user } = await auth.api.signUpEmail({
-    body: { email: invitation.email, password: input.password, name: input.name },
-  });
+  // The accept flow only ever CREATES a user. If the invited address is already
+  // registered (re-invite, second-org invite, or a partial earlier accept), a
+  // clean message beats an opaque better-auth crash. The unique-email constraint
+  // is the real serialization point; the try/catch below covers the TOCTOU race.
+  const existing = await prisma.user.findUnique({ where: { email: invitation.email } });
+  if (existing) {
+    throw new InvitationError("Für diese E-Mail besteht bereits ein Zugang. Bitte melde dich an.");
+  }
+  let user;
+  try {
+    ({ user } = await auth.api.signUpEmail({
+      body: { email: invitation.email, password: input.password, name: input.name },
+    }));
+  } catch (e) {
+    // A concurrent accept won the unique-email race, or the address was registered
+    // between the pre-check and here → surface as a clean InvitationError.
+    if (e instanceof APIError) {
+      throw new InvitationError("Für diese E-Mail besteht bereits ein Zugang. Bitte melde dich an.");
+    }
+    throw e;
+  }
   await prisma.$transaction(async (tx) => {
     await tx.user.update({ where: { id: user.id }, data: { emailVerified: true } });
     await tx.organizationMembership.create({

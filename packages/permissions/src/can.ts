@@ -1,5 +1,5 @@
-import type { Permission } from "./permissions.js";
-import { ROLE_PERMISSIONS, type SystemRole } from "./roles.js";
+import type { Permission } from "./permissions";
+import { ROLE_PERMISSIONS, type SystemRole } from "./roles";
 
 export function roleHasPermission(role: SystemRole, permission: Permission): boolean {
   return ROLE_PERMISSIONS[role]?.includes(permission) ?? false;

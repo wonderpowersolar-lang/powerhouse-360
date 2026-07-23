@@ -1,3 +1,3 @@
-export * from "./permissions.js";
-export * from "./roles.js";
-export * from "./can.js";
+export * from "./permissions";
+export * from "./roles";
+export * from "./can";

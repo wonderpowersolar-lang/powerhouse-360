@@ -5,7 +5,7 @@ import {
   roleHasPermission,
   resolvePermissions,
   canAny,
-} from "./index.js";
+} from "./index";
 
 describe("roleHasPermission", () => {
   it("PLATFORM_ADMIN has every permission", () => {

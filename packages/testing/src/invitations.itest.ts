@@ -63,6 +63,37 @@ describe("invitation lifecycle + audit (F-19)", () => {
     ).rejects.toBeInstanceOf(InvitationError);
   });
 
+  it("rejects accepting for an email that already has an account", async () => {
+    const org = await createOrg("PROPERTY_MANAGER");
+    await createUserWithMembership(org.id, "SALES", { email: "dupe@example.test" });
+    const { user: admin } = await createUserWithMembership(org.id, "PLATFORM_ADMIN");
+    const { token } = await createInvitation({
+      email: "dupe@example.test",
+      organizationId: org.id,
+      role: "OPERATIONS",
+      invitedById: admin.id,
+    });
+    await expect(
+      acceptInvitation({ token, name: "Dupe", password: "dupe-pass-1!" }),
+    ).rejects.toBeInstanceOf(InvitationError);
+  });
+
+  it("does not enqueue a verification email for invitation-based signups", async () => {
+    const org = await createOrg("WEG");
+    const { user: admin } = await createUserWithMembership(org.id, "PLATFORM_ADMIN");
+    const { token } = await createInvitation({
+      email: "silent@example.test",
+      organizationId: org.id,
+      role: "SALES",
+      invitedById: admin.id,
+    });
+    await acceptInvitation({ token, name: "Silent", password: "silent-pass-1!" });
+    const verifyEvents = await prisma.domainEvent.findMany({
+      where: { eventType: "auth.email_verification" },
+    });
+    expect(verifyEvents).toHaveLength(0);
+  });
+
   it("changeMemberRole audits member.role_changed", async () => {
     const org = await createOrg("PROPERTY_MANAGER");
     const { membership, user } = await createUserWithMembership(org.id, "SALES");

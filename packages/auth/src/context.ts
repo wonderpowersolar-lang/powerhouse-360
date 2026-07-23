@@ -1,5 +1,5 @@
 import { prisma } from "@ph360/database";
-import { auth } from "./auth.js";
+import { auth } from "./auth";
 import type { SystemRole } from "@ph360/permissions";
 
 export interface Membership {

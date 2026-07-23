@@ -1,4 +1,4 @@
-import type { Permission } from "./permissions.js";
+import type { Permission } from "./permissions";
 
 /** System roles (mirror of the Prisma SystemRole enum — keep in sync). */
 export const SYSTEM_ROLES = [

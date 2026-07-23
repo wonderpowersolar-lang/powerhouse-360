@@ -3,8 +3,8 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { APIError } from "better-auth/api";
 import { prisma } from "@ph360/database";
-import { enqueueAuthEmail } from "./email.js";
-import { recordAudit } from "./audit.js";
+import { enqueueAuthEmail } from "./email";
+import { recordAudit } from "./audit";
 
 export const auth = betterAuth({
   secret: process.env.AUTH_SECRET,
@@ -26,6 +26,17 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     expiresIn: 3600,
     sendVerificationEmail: async ({ user, url, token }) => {
+      // Skip invitation-based signups: acceptInvitation() verifies the email in
+      // the same transaction, so a verification link would be pointless and
+      // confusing. At this point (during signUpEmail) the invite is still PENDING.
+      const pendingInvite = await prisma.invitation.findFirst({
+        where: {
+          email: { equals: user.email.toLowerCase(), mode: "insensitive" },
+          status: "PENDING",
+          expiresAt: { gt: new Date() },
+        },
+      });
+      if (pendingInvite) return;
       await enqueueAuthEmail({ kind: "email_verification", email: user.email, url, token });
     },
   },
