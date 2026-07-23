@@ -1,4 +1,7 @@
+import { headers } from "next/headers";
 import { prisma } from "@ph360/database";
+import { getAuthContext, requirePermission } from "@ph360/auth";
+import { getPowerhouseOrgId } from "../../../lib/org";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,9 +14,14 @@ function fmt(d: Date): string {
 }
 
 export default async function LeadsPage() {
+  const ctx = await getAuthContext(await headers());
+  const organizationId = await getPowerhouseOrgId();
+  await requirePermission(ctx, "lead.read", { organizationId });
+
+  const where = { organizationId };
   const [leads, total] = await Promise.all([
-    prisma.lead.findMany({ orderBy: { createdAt: "desc" }, take: 200 }),
-    prisma.lead.count(),
+    prisma.lead.findMany({ where, orderBy: { createdAt: "desc" }, take: 200 }),
+    prisma.lead.count({ where }),
   ]);
 
   return (

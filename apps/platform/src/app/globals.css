@@ -145,3 +145,84 @@ tr:hover td {
   color: #ff6b6b;
   font-size: 0.85rem;
 }
+
+/* ---- admin shell ---- */
+.admin-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.9rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 0.9rem;
+}
+
+.admin-nav strong {
+  color: var(--text);
+}
+
+.admin-nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.admin-nav a:hover {
+  color: var(--text);
+}
+
+.admin-nav .spacer {
+  flex: 1;
+}
+
+/* ---- inline forms (invite / role change) ---- */
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.inline-form input,
+.inline-form select,
+td select {
+  padding: 0.45rem 0.6rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.inline-form input:focus,
+.inline-form select:focus,
+td select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.inline-form button,
+td button {
+  padding: 0.45rem 0.8rem;
+  background: var(--accent);
+  color: #06231b;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.section-title {
+  margin: 2rem 0 0;
+  font-size: 1.05rem;
+}
+
+.linklike {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
