@@ -9,6 +9,7 @@ export const mailFrom =
   process.env.SMTP_FROM ?? "Powerhouse 360 <no-reply@powerhouse360.de>";
 export const leadNotifyTo =
   process.env.LEAD_NOTIFY_TO ?? "vertrieb@powerhouse360.de";
+export const appBaseUrl = process.env.AUTH_URL ?? "http://localhost:3100";
 
 export const transport = nodemailer.createTransport({
   host,

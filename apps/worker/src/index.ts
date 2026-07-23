@@ -40,6 +40,34 @@ const handlers: Record<string, Handler> = {
       ].join("\n"),
     });
   },
+  "auth.email_verification": async (payload) => {
+    const email = String(payload.email ?? "");
+    const url = String(payload.url ?? "");
+    await sendMail({
+      to: email,
+      subject: "Powerhouse 360 — E-Mail bestätigen",
+      text: `Bitte bestätige deine E-Mail-Adresse:\n\n${url}\n\nDer Link ist 1 Stunde gültig.`,
+    });
+  },
+  "auth.password_reset": async (payload) => {
+    const email = String(payload.email ?? "");
+    const url = String(payload.url ?? "");
+    await sendMail({
+      to: email,
+      subject: "Powerhouse 360 — Passwort zurücksetzen",
+      text: `Passwort zurücksetzen:\n\n${url}\n\nWenn du das nicht warst, ignoriere diese E-Mail.`,
+    });
+  },
+  "auth.member_invited": async (payload) => {
+    const email = String(payload.email ?? "");
+    const url = String(payload.url ?? "");
+    const org = String(payload.organizationName ?? "Powerhouse 360");
+    await sendMail({
+      to: email,
+      subject: `Einladung zu ${org} (Powerhouse 360)`,
+      text: `Du wurdest zu ${org} eingeladen. Zugang einrichten:\n\n${url}\n\nDer Link ist 7 Tage gültig.`,
+    });
+  },
 };
 
 function backoffSeconds(attempts: number): number {
