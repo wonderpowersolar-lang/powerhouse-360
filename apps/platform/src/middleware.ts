@@ -1,29 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
-/**
- * Interim admin protection (WP-1.1): HTTP Basic auth on /admin/*.
- * Replaced by better-auth sessions + RBAC in WP-1.2. If ADMIN_BASIC_PASSWORD
- * is unset, admin access is denied entirely (fail closed).
- */
+/** WP-1.2: optimistic session-cookie gate on /admin/*. Real permission checks
+ *  happen server-side in each page/action. Replaces the interim Basic-Auth. */
 export const config = { matcher: ["/admin/:path*"] };
 
 export function middleware(req: NextRequest) {
-  const user = process.env.ADMIN_BASIC_USER ?? "admin";
-  const password = process.env.ADMIN_BASIC_PASSWORD ?? "";
-  const header = req.headers.get("authorization");
-
-  if (password && header?.startsWith("Basic ")) {
-    const decoded = atob(header.slice(6));
-    const sep = decoded.indexOf(":");
-    const givenUser = decoded.slice(0, sep);
-    const givenPass = decoded.slice(sep + 1);
-    if (givenUser === user && givenPass === password) {
-      return NextResponse.next();
-    }
+  const cookie = getSessionCookie(req);
+  if (!cookie) {
+    const url = new URL("/login", req.url);
+    url.searchParams.set("next", req.nextUrl.pathname);
+    return NextResponse.redirect(url);
   }
-
-  return new NextResponse("Authentifizierung erforderlich.", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="Powerhouse 360 Admin"' },
-  });
+  return NextResponse.next();
 }

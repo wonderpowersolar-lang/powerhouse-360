@@ -14,6 +14,12 @@
       "runtimeArgs": [".next/standalone/server.js"],
       "port": 3200,
       "autoPort": true
+    },
+    {
+      "name": "platform-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@ph360/platform", "dev"],
+      "port": 3100
     }
   ]
 }

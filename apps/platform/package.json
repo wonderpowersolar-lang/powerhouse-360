@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ph360/auth": "workspace:*",
     "@ph360/database": "workspace:*",
+    "@ph360/permissions": "workspace:*",
+    "better-auth": "^1.6.23",
     "next": "16.2.7",
     "react": "19.2.4",
     "react-dom": "19.2.4",
