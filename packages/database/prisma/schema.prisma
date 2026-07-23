@@ -43,6 +43,8 @@ model Organization {
   auditEvents AuditEvent[]
   memberships OrganizationMembership[]
   invitations Invitation[]
+  properties   Property[]
+  accessScopes AccessScope[]
 
   @@map("organization")
 }
@@ -330,4 +332,113 @@ model Invitation {
   @@index([email])
   @@index([organizationId, status])
   @@map("invitation")
+}
+
+// ---------------------------------------------------------------------------
+// immobilien — Objektbaum-Kern (WP-1.3-Kern; Spec §3.1 Kunden-App-Architekturplan)
+// Floor/Room/TechnicalRoom/GridConnection folgen mit dem WP-1.3-Rest.
+// ---------------------------------------------------------------------------
+
+model Address {
+  id          String @id @default(uuid()) @db.Uuid
+  street      String
+  houseNumber String
+  postalCode  String
+  city        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  buildings Building[]
+
+  @@map("address")
+}
+
+model Property {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  buildings    Building[]
+  accessScopes AccessScope[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("property")
+}
+
+model Building {
+  id         String   @id @default(uuid()) @db.Uuid
+  propertyId String   @db.Uuid
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name       String
+  addressId  String   @db.Uuid
+  address    Address  @relation(fields: [addressId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  entrances    Entrance[]
+  units        Unit[]
+  accessScopes AccessScope[]
+
+  @@unique([propertyId, name])
+  @@map("building")
+}
+
+model Entrance {
+  id         String   @id @default(uuid()) @db.Uuid
+  buildingId String   @db.Uuid
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  label      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  units Unit[]
+
+  @@unique([buildingId, label])
+  @@map("entrance")
+}
+
+model Unit {
+  id         String    @id @default(uuid()) @db.Uuid
+  buildingId String    @db.Uuid
+  building   Building  @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  entranceId String?   @db.Uuid
+  entrance   Entrance? @relation(fields: [entranceId], references: [id], onDelete: SetNull)
+  label      String
+  floor      Int? // 0 = EG
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([buildingId, label])
+  @@index([buildingId])
+  @@map("unit")
+}
+
+enum AccessScopeType {
+  PROPERTY
+  BUILDING
+}
+
+/// WP-1.3-Kern: reiner Datenmodell-Stub (ADR-004, Masterplan §4). Die
+/// begünstigte Organisation (z. B. HV) erhält expliziten, auditierbaren
+/// Teilbaum-Zugriff. Guard-Integration ist bewusst NICHT Teil dieses WP
+/// (WP-1.3-Rest); bis dahin wertet kein Codepfad diese Tabelle aus.
+model AccessScope {
+  id             String          @id @default(uuid()) @db.Uuid
+  organizationId String          @db.Uuid
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  scopeType      AccessScopeType
+  propertyId     String?         @db.Uuid
+  property       Property?       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  buildingId     String?         @db.Uuid
+  building       Building?       @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  grantedById    String? // User-ID (better-auth String-ID); im Stub bewusst ohne Relation
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([organizationId])
+  @@map("access_scope")
 }
