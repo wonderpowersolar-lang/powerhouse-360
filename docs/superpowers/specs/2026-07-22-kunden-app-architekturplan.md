@@ -1,6 +1,6 @@
 # Powerhouse 360 — Kunden-App: Anforderungs- & Architekturplan
 
-**Version:** 0.1.0 (Entwurf — zur PO-Freigabe)
+**Version:** 0.1.1 (durch PO freigegeben am 2026-07-22; danach Konsistenz-Nachführung §13)
 **Datum:** 2026-07-22
 **Status:** 🔵 analysiert/konzipiert
 **Pflege:** Dieses Dokument wird während der Umsetzung kontinuierlich aktualisiert (Änderungsverlauf §13). Es ergänzt den Masterplan (`docs/POWERHOUSE_360_MASTER_PLAN.md`); bei Freigabe wird der Masterplan nachgeführt (§12).
@@ -288,9 +288,9 @@ Traceability zur verbindlichen PO-Reihenfolge (Frage 14):
 | **WP-1.2** (bestehender Plan) | better-auth + RBAC + Invitations + Admin/Audit-UI, Tasks 2–13; inkl. V2-Deltas (Testmandant-Seed, IssuingEntity) | F-02, F-19, F-20 | — |
 | **WP-1.3** (bestehend, App-relevanter Kern zuerst) | Property→Unit-Baum, Adressen, Pilotstruktur-Seed (21 Units), AccessScope-Grundlage | F-03 (Teil) | WP-1.2 |
 | **WP-APP-1** | Mess-/Gerätekern (§3.2), `packages/api-contracts` anlegen (Ingest-Contracts), Ingest-API + `packages/ingestion`, Hub-Credentials inkl. Erst-Provisionierung + Rotation + Revocation, **Hub-Simulator**, Lückenerkennung | **F-08 (Kern)**: Idempotenz + raw→validated + Lücken | WP-1.3-Kern |
-| **WP-APP-2** | `PowerParticipant` + `Contract`, Tarife (minimal), `ConsumptionAggregate` + Worker-Aggregation (inkl. serverseitiger Delta-Ableitung), PV/Netz-Split + Ersparnis (soweit Messkonzept), `assertParticipantScope`, **alle `/api/v1/app/*`-Contracts final** in `packages/api-contracts`, Endpunkte + Tests | **F-APP-1 (API)**: Bewohner-Login → eigene Daten, Negativmatrix | WP-APP-1 |
+| **WP-APP-2** | `PowerParticipant` + `Contract`, Tarife (minimal), `ConsumptionAggregate` + Worker-Aggregation (inkl. serverseitiger Delta-Ableitung), PV/Netz-Split + Ersparnis (soweit Messkonzept), `assertParticipantScope`, Rechnungs-/Dokument-Serverseite (Invoice/Document + MinIO + Seed-PDFs), **alle `/api/v1/app/*`-Contracts final** in `packages/api-contracts`, Endpunkte + Tests | **F-APP-1 (API)**: Bewohner-Login → eigene Daten, Negativmatrix | WP-APP-1 |
 | **WP-APP-3** *(parallel ab Contract-Freeze in WP-APP-2)* | `apps/mobile`-Grundgerüst: Expo, Navigation, Theme (Light/Dark), i18n, Auth-Flow, `DataSource`-Interface + `MockDataSource` mit realistischen Fixtures, Kern-Screens gegen Mocks (Demo-fähig) | interner Demo-Build im **iOS-Simulator gegen MockDataSource** | Contracts aus WP-APP-2 |
-| **WP-APP-4** | `ApiDataSource` gegen echte API, Rechnungen/Dokumente (Invoice/Contract/Document + MinIO + Seed-PDFs), Push-Kette (Expo → APNs/FCM; Prioritätsmodell + Anti-Spam), verschlüsselter Offline-Lesecache, Datenstand-UI, DSGVO-Paket Teil 1 (AVV-Matrix, In-App-Datenschutzhinweise) | **F-APP-1 (E2E)** komplett gegen Staging | WP-APP-2 + 3 |
+| **WP-APP-4** | `ApiDataSource` gegen echte API, Rechnungs-/Dokument-UI inkl. Offline-PDF, Push-Kette (Expo → APNs/FCM; Prioritätsmodell + Anti-Spam), verschlüsselter Offline-Lesecache, Datenstand-UI, DSGVO-Paket Teil 1 (AVV-Matrix, In-App-Datenschutzhinweise) | **F-APP-1 (E2E)** komplett gegen Staging | WP-APP-2 + 3 |
 | **WP-APP-5** | Pilot-Anbindung: echte Hubs → Ingest (Verifikation V-02), Datenabgleich Hub-Simulator↔Real, TestFlight-Build + interner Test, DSGVO-Paket Teil 2 (Privacy-URL, Store-Angaben, VVT-Beitrag) | **F-APP-2**: Pilotdaten Ende-zu-Ende in App | WP-APP-4 + PO-Punkte |
 | danach | Android-Beta (gleiche Codebase) · V1.1-Backlog (vollständige PO-Liste): Servicefall melden **inkl. Foto-Upload** + Bearbeitungsstatus, Projekt-/Installationsstatus, Angebote ansehen/bestätigen/unterschreiben, vollständige Stammdaten-Bearbeitung, Abschlagsänderungen, SEPA-Mandate, Datenauskunft/-export als Selbstbedienung, Eigentümer-/Bestandshalter-/HV-Sichten, **Heatmieter-/Chargemieter-/Smokemieter-Module** (Datenmodell dafür erweiterbar ausgelegt: `meterType`/`pointType`) | — | — |
 
@@ -364,3 +364,4 @@ Statusregel: 🟢 nur nach tatsächlich durchlaufenem Nutzerfluss (Masterplan §
 | Datum | Version | Änderung | Begründung |
 |---|---|---|---|
 | 2026-07-22 | 0.1.0 | Erstfassung nach PO-Anforderungsklärung (21 Fragen) + verifizierter Repo-Ist-Analyse; adversariale Review (33 Findings) eingearbeitet | PO-Auftrag Kunden-App |
+| 2026-07-23 | 0.1.1 | §8: Rechnungs-/Dokument-Serverseite von WP-APP-4 nach WP-APP-2 verschoben (WP-APP-4 = nur UI/Offline-PDF) | Konsistenz mit WP-Detailplänen (Cross-Plan-Review) |
