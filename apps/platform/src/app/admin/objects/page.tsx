@@ -1,7 +1,8 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getAuthContext } from "@ph360/auth";
-import { getReadablePropertyTree } from "../../../lib/objects";
+import { prisma } from "@ph360/database";
+import { getAuthContext, recordAudit, AuthzError } from "@ph360/auth";
+import { readablePropertyOrgIds, getPropertyTreeForOrgIds } from "../../../lib/objects";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,7 +13,28 @@ export default async function ObjectsPage() {
   const ctx = await getAuthContext(await headers());
   if (!ctx) redirect(`/login?next=${encodeURIComponent("/admin/objects")}`);
 
-  const properties = await getReadablePropertyTree(ctx);
+  const orgIds = await readablePropertyOrgIds(ctx);
+  if (orgIds !== null && orgIds.length === 0) {
+    // Deny-by-default (F-20) — gleiches Muster wie requirePermission: Best-effort
+    // Audit (ein fehlgeschlagener Audit-Write darf die Verweigerung nie verdecken),
+    // dann AuthzError, die admin/error.tsx als "Kein Zugriff" rendert.
+    await recordAudit(prisma, {
+      action: "authz.denied",
+      subjectType: "Permission",
+      subjectId: "object.read",
+      actorType: "USER",
+      actorId: ctx.userId,
+      after: {
+        permission: "object.read",
+        reason: ctx.memberships.length === 0 ? "no_membership" : "role_lacks_permission",
+      },
+    }).catch((err) => {
+      console.error("[objects] failed to record authz.denied audit", err);
+    });
+    throw new AuthzError();
+  }
+
+  const properties = await getPropertyTreeForOrgIds(orgIds);
 
   return (
     <main className="wrap">
@@ -23,9 +45,8 @@ export default async function ObjectsPage() {
 
       {properties.length === 0 ? (
         <div className="empty">
-          Keine Objekte sichtbar. Entweder existieren noch keine Immobilien in
-          deinen Organisationen oder deine Rolle hat die Berechtigung
-          „object.read" nicht.
+          Keine Objekte sichtbar. In deinen Organisationen wurden noch keine
+          Immobilien angelegt.
         </div>
       ) : (
         properties.map((property) => (
@@ -58,7 +79,15 @@ export default async function ObjectsPage() {
                     {building.units.map((unit) => (
                       <tr key={unit.id}>
                         <td>{unit.label}</td>
-                        <td>{unit.floor === null ? "—" : unit.floor === 0 ? "EG" : `${unit.floor}. OG`}</td>
+                        <td>
+                          {unit.floor === null
+                            ? "—"
+                            : unit.floor === 0
+                              ? "EG"
+                              : unit.floor < 0
+                                ? `${-unit.floor}. UG`
+                                : `${unit.floor}. OG`}
+                        </td>
                         <td>
                           {building.entrances.find((e) => e.id === unit.entranceId)
                             ?.label ?? "—"}

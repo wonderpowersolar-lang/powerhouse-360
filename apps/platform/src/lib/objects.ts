@@ -24,9 +24,14 @@ export async function readablePropertyOrgIds(ctx: AuthContext): Promise<string[]
   return powerhouse ? null : permitted;
 }
 
-/** Vollständiger Lesebaum Property→Building(+Address,+Entrances)→Units. */
-export async function getReadablePropertyTree(ctx: AuthContext) {
-  const orgIds = await readablePropertyOrgIds(ctx);
+/**
+ * Lesebaum Property→Building(+Address,+Entrances)→Units für bereits
+ * aufgelöste Org-Sichtbarkeit (siehe `readablePropertyOrgIds`). Getrennt von
+ * `getReadablePropertyTree`, damit Aufrufer (z.B. die Seite), die die Deny-
+ * Entscheidung bereits getroffen haben, die Sichtbarkeit nicht ein zweites
+ * Mal auflösen müssen.
+ */
+export async function getPropertyTreeForOrgIds(orgIds: string[] | null) {
   if (orgIds !== null && orgIds.length === 0) return [];
   return prisma.property.findMany({
     where: orgIds === null ? {} : { organizationId: { in: orgIds } },
@@ -45,4 +50,10 @@ export async function getReadablePropertyTree(ctx: AuthContext) {
   });
 }
 
-export type PropertyTree = Awaited<ReturnType<typeof getReadablePropertyTree>>[number];
+/** Vollständiger Lesebaum Property→Building(+Address,+Entrances)→Units. */
+export async function getReadablePropertyTree(ctx: AuthContext) {
+  const orgIds = await readablePropertyOrgIds(ctx);
+  return getPropertyTreeForOrgIds(orgIds);
+}
+
+export type PropertyTree = Awaited<ReturnType<typeof getPropertyTreeForOrgIds>>[number];

@@ -60,4 +60,11 @@ describe("Objekt-Lesesicht — Scoping (Deklaration: permission object.read)", (
     expect(await readablePropertyOrgIds(c)).toEqual([hv.id]);
     expect(await getReadablePropertyTree(c)).toEqual([]);
   });
+
+  it("SALES in einer POWERHOUSE-Org (ohne object.read) erhält KEINE Plattformsicht — Filter vor Org-Typ-Check (Reihenfolge-Pin)", async () => {
+    const powerhouse = await createOrg("POWERHOUSE");
+    const c = ctx([{ organizationId: powerhouse.id, role: "SALES" }]);
+    expect(await readablePropertyOrgIds(c)).toEqual([]);
+    expect(await getReadablePropertyTree(c)).toEqual([]);
+  });
 });
