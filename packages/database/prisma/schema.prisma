@@ -156,7 +156,7 @@ model AuditEvent {
   organization   Organization? @relation(fields: [organizationId], references: [id])
 
   actorType   AuditActorType @default(SYSTEM)
-  actorId     String?        @db.Uuid
+  actorId     String? // better-auth user id (non-UUID) or null for SYSTEM/WEBHOOK
   action      String // e.g. "lead.created"
   subjectType String // e.g. "Lead"
   subjectId   String

@@ -20,7 +20,14 @@ export default defineConfig({
           include: ["packages/**/*.itest.ts", "apps/**/*.itest.ts"],
           globalSetup: ["./packages/testing/src/global-setup.ts"],
           setupFiles: ["./packages/testing/src/setup.ts"],
-          env: TEST_DB ? { DATABASE_URL: TEST_DB, DIRECT_DATABASE_URL: TEST_DB } : {},
+          env: TEST_DB
+            ? {
+                DATABASE_URL: TEST_DB,
+                DIRECT_DATABASE_URL: TEST_DB,
+                AUTH_SECRET: process.env.AUTH_SECRET ?? "test-secret-not-for-production-0123456789",
+                AUTH_URL: process.env.AUTH_URL ?? "http://localhost:3100",
+              }
+            : {},
           fileParallelism: false,
           pool: "forks",
           poolOptions: { forks: { singleFork: true } },
