@@ -8,6 +8,7 @@ export const PERMISSIONS = [
   "member.assign_role",
   "member.remove",
   "organization.read",
+  "object.read",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
