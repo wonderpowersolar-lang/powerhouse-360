@@ -41,6 +41,8 @@ model Organization {
 
   leads       Lead[]
   auditEvents AuditEvent[]
+  memberships OrganizationMembership[]
+  invitations Invitation[]
 
   @@map("organization")
 }
@@ -196,4 +198,136 @@ model DomainEvent {
 
   @@index([status, availableAt])
   @@map("domain_event")
+}
+
+// ---------------------------------------------------------------------------
+// identity — auth tables (managed by better-auth; String ids, NOT @db.Uuid)
+// ---------------------------------------------------------------------------
+model User {
+  id            String   @id
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  locale        String   @default("de") // additionalField
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions    Session[]
+  accounts    Account[]
+  memberships OrganizationMembership[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?   // scrypt hash for email+password
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ---------------------------------------------------------------------------
+// rbac — tenancy + roles (our own models; @db.Uuid ids)
+// ---------------------------------------------------------------------------
+enum SystemRole {
+  PLATFORM_ADMIN
+  SALES
+  OPERATIONS
+  SERVICE
+  FINANCE
+  PROPERTY_MANAGER
+  OWNER_BOARD
+  BILLING_CONTACT
+  INSTALLER_PARTNER_ADMIN
+  INSTALLER
+  RESIDENT
+  PARKING_USER
+}
+
+enum MembershipStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+model OrganizationMembership {
+  id             String           @id @default(uuid()) @db.Uuid
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String           @db.Uuid
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  role           SystemRole
+  status         MembershipStatus @default(ACTIVE)
+  invitedById    String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@map("organization_membership")
+}
+
+model Invitation {
+  id             String           @id @default(uuid()) @db.Uuid
+  email          String
+  organizationId String           @db.Uuid
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  role           SystemRole
+  token          String           @unique
+  status         InvitationStatus @default(PENDING)
+  invitedById    String?
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime         @default(now())
+
+  @@index([email])
+  @@index([organizationId, status])
+  @@map("invitation")
 }
