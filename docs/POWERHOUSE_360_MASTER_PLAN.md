@@ -226,7 +226,7 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 |---|---|---|
 | WP-1.0 Repo-/Deploy-Fundament | Monorepo ✅, docker-compose ✅, Prod-Images verifiziert ✅; **offen:** Git-Remote (R-02), CI, VPS-Rollout ([DEPLOYMENT.md](DEPLOYMENT.md), beim PO), Website-Route-Sweep (F-21-Rest) | 🟣 |
 | WP-1.1 Lead-Persistenz | Lead-Kette komplett, F-01 🟢 dev; Prod nach Rollout | 🟢 dev |
-| WP-1.2 Auth/Rollen/Mandanten | Plan+Spec liegen vor (superpowers, 13 Tasks); Task 1 (`packages/permissions`) ✅ committet; **V2-Ergänzungen: Seed um Testmandant (ADR-006) + `IssuingEntity`-Stammdaten (Wonderpower/AKL)**; ersetzt Interim-Basic-Auth | 🟡 |
+| WP-1.2 Auth/Rollen/Mandanten | better-auth (Auth) + eigene RBAC (OrganizationMembership/Invitation/SystemRole), Guards/Audit, Login/Invite/Accept/Members/Audit-UI, Bootstrap-Admin; ersetzt Interim-Basic-Auth (ADR-010). Tasks 1–13 committet, Suite grün (F-02/F-19/F-20) | 🟢 |
 | WP-1.3 Immobilien + CRM | Property→Unit-Baum, CSV-Import (Pilotdaten!), Lead-Qualifizierung → Customer/Property, `AccessScope`-Teilbaum, IssuingEntity-Pflicht auf Außenwirkungs-Entitäten | ⚪ |
 | WP-1.4 Events/Worker-Ausbau | pg-boss-Dauerdienst, `EventHandlerExecution`, Notification-Grundgerüst, Logger-Redaction, Idempotenz-/Berechtigungs-Testsuite (F-19/F-20) | 🟡 (Outbox+Dispatcher stehen) |
 | WP-1.5 Projekt-/Modul-/Dokumentstruktur | Project-Kern, Document-Objekt (MinIO), ModuleSubscription/-Activation-Gerüst, **P3-Datenmodell-Stubs (Heat/Charge)** | ⚪ |
@@ -253,7 +253,7 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 | # | Fluss | Phase | Status |
 |---|---|---|---|
 | F-01 | Lead-Eingang: Funnel → API → DB → CRM sichtbar → Benachrichtigung | 1 | 🟢 2026-07-11 (dev) |
-| F-02 | Mandant & Rollen inkl. Cross-Tenant-Negativtest | 1 | ⚪ |
+| F-02 | Mandant & Rollen inkl. Cross-Tenant-Negativtest | 1 | 🟢 (WP-1.2: Guard requirePermission+assertOrgScope; Cross-Tenant→AuthzError+Audit; itest) |
 | F-03 | Lead → Kunde/Objekt ohne Doppelerfassung | 1 | ⚪ |
 | F-04 | Onboarding generisch (Template→Instanz→Schritte→Blocked/Exception→Ready) | 2 | ⚪ |
 | F-05 | Vertragsprozess Documenso inkl. Webhook-Duplikat-Replay | 3 | ⚪ |
@@ -270,8 +270,8 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 | F-16 | Chargemieter komplett | 10 (P3) | ⚪ |
 | F-17 | Angebot & Portal (Konfigurator→Annahme→Projekt automatisch) | 7 | ⚪ |
 | F-18 | Lexoffice inkl. Zwei-Konten-Routing + Doppelauslösungs-Negativtest | 7 | ⚪ |
-| F-19 | Audit-Vollständigkeit (Statuswechsel, Downloads, Rollen, Retries) | 1+ | ⚪ |
-| F-20 | Berechtigungs-Negativmatrix je Rolle | 1+ | ⚪ (Kern-Unit-Tests ✅) |
+| F-19 | Audit-Vollständigkeit (Statuswechsel, Downloads, Rollen, Retries) | 1+ | 🟢 (WP-1.2: auth.login/member.*/authz.denied + Audit-UI /admin/audit) |
+| F-20 | Berechtigungs-Negativmatrix je Rolle | 1+ | 🟢 (WP-1.2: Unit-Matrix + Guard- + Route-Level-Negativtests) |
 | F-21 | Bestandsschutz Marketing-Site nach Monorepo-Umbau | 1 | 🟣 (Startseite+Funnel-Proxy ✅; Route-Sweep + Prod-Build-Smoke offen) |
 
 ## 13. Offene Entscheidungen und Risiken
@@ -317,7 +317,7 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 | Monorepo-/Deploy-Fundament | 🟣 (Images verifiziert; Rollout/Remote offen) |
 | 1 CRM — Lead-Kern | 🟢 dev (F-01); Qualifizierung ⚪ (WP-1.3) |
 | 17 Audit · 16 Notifications · Events/Outbox | 🟣 (Lead-Pfad live; Ausbau WP-1.4) |
-| 18 Identity/Rollen/Mandanten | 🟡 (Permissions-Kern ✅; better-auth/Memberships = WP-1.2) |
+| 18 Identity/Rollen/Mandanten | 🟢 (Permissions + better-auth + Memberships/Invitations + Audit-UI; F-02/F-19/F-20 grün) |
 | 2 Konfigurator · 3 Portal · 4 Onboarding · 5 Hubs · 6 Registry · 7 PWA · 8 Documenso · 9 Lexoffice · 10 Powermieter · 14 Service · 15 DMS | ⚪ (konzipiert 🔵 in §3–§9) |
 | 11 Smokemieter (P2) · 12/13 Heat/Charge (P3) | ⚪ (P3: nur Datenmodell in WP-1.5) |
 | Marketing-Site + Funnels | 🟢 produktiv (Lead-Zustellung prod: nach Rollout) |
