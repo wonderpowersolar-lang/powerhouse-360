@@ -227,7 +227,7 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 | WP-1.0 Repo-/Deploy-Fundament | Monorepo ✅, docker-compose ✅, Prod-Images verifiziert ✅; **offen:** Git-Remote (R-02), CI, VPS-Rollout ([DEPLOYMENT.md](DEPLOYMENT.md), beim PO), Website-Route-Sweep (F-21-Rest) | 🟣 |
 | WP-1.1 Lead-Persistenz | Lead-Kette komplett, F-01 🟢 dev; Prod nach Rollout | 🟢 dev |
 | WP-1.2 Auth/Rollen/Mandanten | better-auth (Auth) + eigene RBAC (OrganizationMembership/Invitation/SystemRole), Guards/Audit, Login/Invite/Accept/Members/Audit-UI, Bootstrap-Admin; ersetzt Interim-Basic-Auth (ADR-010). Tasks 1–13 committet, Suite grün (F-02/F-19/F-20) | 🟢 |
-| WP-1.3 Immobilien + CRM | Property→Unit-Baum, CSV-Import (Pilotdaten!), Lead-Qualifizierung → Customer/Property, `AccessScope`-Teilbaum, IssuingEntity-Pflicht auf Außenwirkungs-Entitäten | ⚪ |
+| WP-1.3 Immobilien + CRM | **Kern (Objektbaum+Seed+Lesesicht) ✅ 2026-07** — Property/Building/Entrance/Unit/Address + AccessScope-Datenmodell-Stub (Migration `immobilien_kern`), idempotenter Pilotstruktur-Seed (ADR-006: 1 Property, 2 Gebäude, 21 Units), Permission `object.read`, `/admin/objects`-Lesesicht; **entblockt WP-APP-1** (Spec §8). **Rest offen:** CRM/CSV-Import (Pilotdaten!)/Zoho/AccessScope-Guards/Lead-Qualifizierung/IssuingEntity-Pflicht — F-03 bleibt offen | 🟡 |
 | WP-1.4 Events/Worker-Ausbau | pg-boss-Dauerdienst, `EventHandlerExecution`, Notification-Grundgerüst, Logger-Redaction, Idempotenz-/Berechtigungs-Testsuite (F-19/F-20) | 🟡 (Outbox+Dispatcher stehen) |
 | WP-1.5 Projekt-/Modul-/Dokumentstruktur | Project-Kern, Document-Objekt (MinIO), ModuleSubscription/-Activation-Gerüst, **P3-Datenmodell-Stubs (Heat/Charge)** | ⚪ |
 

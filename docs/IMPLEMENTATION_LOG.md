@@ -110,3 +110,22 @@ Branch: `feat/platform-foundation`. Stack bestätigt durch Ausführungsauftrag (
 **Nächster Schritt:** WP-1.3 (Kern-Immobilien) oder VPS-Rollout (PO); vor Merge/Push Git-Remote (R-02) klären.
 
 ---
+
+## 2026-07-24 — WP-1.3-Kern: Immobilien-Objektbaum (Plan `2026-07-22-wp-1.3-kern-immobilien.md`)
+
+**Getan (Branch `feat/platform-foundation`, nicht gepusht — R-02):**
+- Objektbaum-Kern `Property`/`Building`/`Entrance`/`Unit`/`Address` + Migration `immobilien_kern` (Task 1, `b5d5a80`): UUID-Tabellen, Mandantenanker `Property.organizationId` (ADR-004), natürliche Unique-Keys (`[organizationId,name]`, `[propertyId,name]`, `[buildingId,label]`), Kaskaden (Property→Building→Entrance/Unit Cascade, Unit.entranceId SetNull). `AccessScope` als reiner **Datenmodell-Stub** (ohne Guard-Integration — WP-1.3-Rest; kein Codepfad wertet die Tabelle aus).
+- Objekt-Factories `createProperty`/`createBuilding`/`createEntrance`/`createUnit` in `@ph360/testing` (Task 2, `e49fa7e`).
+- Idempotenter Pilotstruktur-Seed (Task 3, `61c5c8c` + Härtung `fac2cd0`): Testmandant ADR-006 („TEST — Pilot Christinenstraße", Wiederverwendung per Namenspräfix, deterministisch via `orderBy createdAt`), 1 Property, 2 Gebäude (Christinenstraße 36 / Lottumstraße 22, 10119 Berlin), 21 Units (11/10, 2 WE je Etage — dokumentierte Annahme bis Pilot-CSV-Realimport), Building+Address als atomarer nested write.
+- Permission `object.read` für PLATFORM_ADMIN/OPERATIONS/PROPERTY_MANAGER (Task 4, `8887171`).
+- Admin-Lesesicht `/admin/objects` (Task 5, `a4d7389` + Härtung `7d8b628`): Lese-Service `readablePropertyOrgIds` (null = POWERHOUSE-Plattformsicht Masterplan §4 Nr. 4 / [] = deny-by-default / [ids]) + `getPropertyTreeForOrgIds`; verweigerte Nutzer erhalten das WP-1.2-„Kein Zugriff"-Pattern (`AuthzError` → admin/error.tsx) **mit `authz.denied`-Audit** (org-los, analog auth.login) statt leerem Zustand; Etagen EG/OG/UG; Nav-Link „Objekte".
+
+**Plan-Abweichungen (Review-getrieben, je Re-Review bestätigt):** Seed-Härtung (deterministische Mandanten-Wahl, atomare Anlage, Address-Count-/Etagen-/Eingangs-Assertions) und `/admin/objects`-Denied-Pattern statt des im Plan vorgesehenen leeren Zustands (Konsistenz mit Leads/Members/Audit + Monitoring).
+
+**Getestet:** unit 9/9, **integration 29/29** real-Postgres (immobilien-Schema inkl. Uniques/Kaskaden, Seed-Idempotenz, Factories, Lesesicht-Scoping F-02/F-20 inkl. SALES-in-POWERHOUSE-Negativtest), `pnpm -r typecheck` grün. Seed-Idempotenz real gegen Dev-DB (2× `pnpm db:seed`, identische IDs). E2E-Nutzerfluss über echte HTTP-Session (Dev-Server + curl, da Browser-Pane-Erfassung in der Session defekt): unauth `/admin/objects` → 307 `/login?next=…`; Login (frischer Bootstrap-Admin) → 200; Seite rendert 1 Property im Testmandanten, 2 Gebäude mit Adressen, 21 Einheiten (4× EG, 17× OG), Eingang „Haupteingang" je Einheit, Nav-Link.
+
+**Nicht getestet / offen:** SALES-denied auf `/admin/objects` nur test-abgedeckt (wie WP-1.2-Routen); Route-Level-itest für `/admin/objects` (aggregierte Sichtbarkeit passt nicht ins requirePermission-Muster von route-guards.itest.ts) als Follow-up empfohlen. Follow-up-Chips: AccessScope-CHECK-Constraint (vor WP-1.3-Rest-Guards), `ALL`-Array aus `PERMISSIONS` ableiten.
+**Restrisiko:** F-03 bleibt **offen** (WP-1.3-Rest: Lead→Kunde/Objekt, CSV-Import, Zoho, AccessScope-Guards). WP-APP-1 ist durch WP-1.3-Kern **entblockt** (Spec §8).
+**Nächster Schritt:** WP-APP-1 (Messkern + Ingestion + Hub-Simulator) gemäß Programmplan; parallel PO-Punkte (Pilotdatenliste, Apple-Account, VPS/DNS, Git-Remote).
+
+---

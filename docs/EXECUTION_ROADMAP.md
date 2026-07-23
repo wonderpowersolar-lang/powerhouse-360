@@ -52,15 +52,16 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 - [ ] Task 13 — Browser-E2E + Doku-Pflege (Masterplan §10/§12/§14, Log, ggf. ADR-Notiz)
 - **Gate:** F-02 🟢 · F-19 🟢 · F-20 🟢 · Interim-Basic-Auth entfernt
 
-### WP-1.3 — Immobilienstruktur & CRM-Qualifizierung  ⚪
+### WP-1.3 — Immobilienstruktur & CRM-Qualifizierung  🟡
 > **Voraussetzung:** WP-1.2 (Mandanten/Guards stehen). [PO]: Pilotdaten + Zoho-Export.
-- [ ] Prisma: Immobilien-Domäne (`Property`, `Building`, `Floor`, `Unit`, `Room`, `TechnicalRoom`, `GridConnection`, `Address`) + Migration; `Property.managedByOrganizationId` (HV) + Eigentümer-Org
+> **Kern erledigt 2026-07 (WP-1.3-Kern):** Property/Building/Entrance/Unit/Address + AccessScope-Tabelle (Stub, ohne Guard-Integration) + idempotenter Pilotstruktur-Seed (Testmandant ADR-006: 1 Property, 2 Gebäude, 21 Units) — **WP-APP-1 damit entblockt** (Spec §8). Offen: `Floor`/`Room`/`TechnicalRoom`/`GridConnection`, `Property.managedByOrganizationId`, Guard-Integration.
+- [ ] Prisma: Immobilien-Domäne (`Property`, `Building`, `Floor`, `Unit`, `Room`, `TechnicalRoom`, `GridConnection`, `Address`) + Migration; `Property.managedByOrganizationId` (HV) + Eigentümer-Org — *Kern erledigt: Property/Building/Entrance/Unit/Address + AccessScope-Tabelle; Rest offen*
 - [ ] Prisma: CRM-Ausbau (`Customer`, `CustomerContact`, `Opportunity`, `Note`, `Task`) + Migration
 - [ ] `AccessScope`-Modell + Auflösung (Property-/Building-/Projekt-Scope) in Guards integrieren — Cross-Tenant der HV auditierbar
 - [ ] IssuingEntity-**Pflichtfeld** auf Außenwirkungs-Entitäten vorbereiten (Offer/Contract/InvoiceRequest/Document — soweit vorhanden)
 - [ ] Domain-Service: Lead **qualifizieren** → `Customer` + `Property` erzeugen (Daten wandern mit, kein Doppel; `Lead.convertedToCustomerId`)
 - [ ] CSV-Import-Werkzeug Property→Building→Unit (idempotent, Probelauf, Fehlerbericht, Audit) — **Pilotdaten Christinenstraße als erster Realimport**
-- [ ] Admin-UI: Kunden-/Objektliste + Lead-Qualifizierungs-Aktion; AccessScope-Verwaltung (Basis)
+- [ ] Admin-UI: Kunden-/Objektliste + Lead-Qualifizierungs-Aktion; AccessScope-Verwaltung (Basis) — *Objektliste (Lesesicht `/admin/objects` hinter `object.read`) ✅*
 - [ ] Zoho-Import-Adapter (Kontakte/Leads) — sofern Export vorliegt; sonst als [!] parken
 - [ ] Tests: F-03 (Lead→Kunde/Objekt ohne Doppelerfassung + Audit) + Scope-Negativtests
 - **Gate:** F-03 🟢 · Pilotobjekt-Struktur importiert
