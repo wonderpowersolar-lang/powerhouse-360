@@ -15,7 +15,11 @@
     "SMTP_PASSWORD",
     "SMTP_FROM",
     "LEAD_NOTIFY_TO",
-    "NEXT_TELEMETRY_DISABLED"
+    "NEXT_TELEMETRY_DISABLED",
+    "DATABASE_URL_TEST",
+    "ADMIN_EMAIL",
+    "ADMIN_PASSWORD",
+    "NEXT_PUBLIC_APP_URL"
   ],
   "tasks": {
     "build": {

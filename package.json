@@ -11,7 +11,11 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
+    "test": "vitest run --project unit",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "pnpm db:test:up && vitest run --project integration",
+    "test:watch": "vitest",
+    "db:test:up": "docker compose up -d --wait postgres",
     "db:generate": "pnpm --filter @ph360/database generate",
     "db:migrate": "pnpm --filter @ph360/database migrate",
     "db:migrate:deploy": "pnpm --filter @ph360/database migrate:deploy",
@@ -22,7 +26,12 @@
     "worker:dev": "pnpm --filter @ph360/worker dev"
   },
   "devDependencies": {
+    "@types/pg": "^8.11.10",
+    "@vitest/coverage-v8": "^3.2.0",
+    "dotenv": "^16.4.7",
+    "pg": "^8.13.1",
     "turbo": "^2.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.0"
   }
 }
