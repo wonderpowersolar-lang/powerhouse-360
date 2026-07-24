@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  PERMISSIONS,
   SYSTEM_ROLES,
   ROLE_PERMISSIONS,
   roleHasPermission,
@@ -11,6 +12,11 @@ describe("roleHasPermission", () => {
   it("PLATFORM_ADMIN has every permission", () => {
     for (const p of ROLE_PERMISSIONS.PLATFORM_ADMIN) expect(roleHasPermission("PLATFORM_ADMIN", p)).toBe(true);
     expect(roleHasPermission("PLATFORM_ADMIN", "member.invite")).toBe(true);
+  });
+
+  it("PLATFORM_ADMIN deckt den kanonischen PERMISSIONS-Katalog vollständig ab", () => {
+    for (const p of PERMISSIONS) expect(roleHasPermission("PLATFORM_ADMIN", p)).toBe(true);
+    expect(ROLE_PERMISSIONS.PLATFORM_ADMIN.length).toBe(PERMISSIONS.length);
   });
 
   it("SALES can read/update leads but NOT invite, assign roles, or read audit", () => {

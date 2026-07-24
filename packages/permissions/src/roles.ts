@@ -1,4 +1,4 @@
-import type { Permission } from "./permissions";
+import { PERMISSIONS, type Permission } from "./permissions";
 
 /** System roles (mirror of the Prisma SystemRole enum — keep in sync). */
 export const SYSTEM_ROLES = [
@@ -18,17 +18,9 @@ export const SYSTEM_ROLES = [
 
 export type SystemRole = (typeof SYSTEM_ROLES)[number];
 
-const ALL: Permission[] = [
-  "lead.read",
-  "lead.update",
-  "audit.read",
-  "member.read",
-  "member.invite",
-  "member.assign_role",
-  "member.remove",
-  "organization.read",
-  "object.read",
-];
+/** PLATFORM_ADMIN erhält jede Permission — aus dem Katalog abgeleitet, damit
+ * neue Einträge in PERMISSIONS nicht vergessen werden können (can.test.ts pinnt das). */
+const ALL: Permission[] = [...PERMISSIONS];
 
 /** Role → permissions (WP-1.2 scope). Empty = no capability until its feature ships. */
 export const ROLE_PERMISSIONS: Record<SystemRole, Permission[]> = {
