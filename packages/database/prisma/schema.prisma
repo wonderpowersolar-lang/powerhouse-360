@@ -426,6 +426,9 @@ enum AccessScopeType {
 /// begünstigte Organisation (z. B. HV) erhält expliziten, auditierbaren
 /// Teilbaum-Zugriff. Guard-Integration ist bewusst NICHT Teil dieses WP
 /// (WP-1.3-Rest); bis dahin wertet kein Codepfad diese Tabelle aus.
+/// DB-seitig (Migration access_scope_shape_constraints, raw SQL — in Prisma
+/// nicht abbildbar): CHECK scopeType↔genau-ein-Ziel-FK + partielle
+/// Unique-Indexe (organizationId, propertyId|buildingId).
 model AccessScope {
   id             String          @id @default(uuid()) @db.Uuid
   organizationId String          @db.Uuid
