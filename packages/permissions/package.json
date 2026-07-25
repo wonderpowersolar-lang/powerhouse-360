@@ -3,7 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "test": "vitest run", "typecheck": "tsc --noEmit" },
-  "devDependencies": { "typescript": "^5", "vitest": "^3.2.0" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
+  },
+  "devDependencies": {
+    "@ph360/eslint-config": "workspace:*",
+    "eslint": "^9",
+    "typescript": "^5",
+    "vitest": "^3.2.0"
+  }
 }

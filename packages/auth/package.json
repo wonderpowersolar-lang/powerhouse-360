@@ -8,7 +8,8 @@
     "./client": "./src/client.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
   },
   "dependencies": {
     "@ph360/database": "workspace:*",
@@ -16,7 +17,9 @@
     "better-auth": "^1.6.23"
   },
   "devDependencies": {
+    "@ph360/eslint-config": "workspace:*",
     "@types/node": "^20",
+    "eslint": "^9",
     "typescript": "^5"
   }
 }

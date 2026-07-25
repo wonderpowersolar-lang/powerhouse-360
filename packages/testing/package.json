@@ -9,7 +9,8 @@
     "./setup": "./src/setup.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
   },
   "dependencies": {
     "@ph360/auth": "workspace:*",
@@ -18,8 +19,10 @@
     "pg": "^8.13.1"
   },
   "devDependencies": {
+    "@ph360/eslint-config": "workspace:*",
     "@types/node": "^20",
     "@types/pg": "^8.11.10",
+    "eslint": "^9",
     "typescript": "^5",
     "vitest": "^3.2.0"
   }
