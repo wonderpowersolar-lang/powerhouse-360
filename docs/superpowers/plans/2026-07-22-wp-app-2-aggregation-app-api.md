@@ -860,7 +860,28 @@ import { appResolutionSchema, isoUtcSchema, kwhStringSchema } from "./common.js"
 /** Dashboard-Aggregat (Spec §4.2 summary). Alle Werte aus ConsumptionAggregate/DeviceState — nie Rohdaten. */
 export const summaryResponseSchema = z.object({
   lastReading: z.object({ valueKwh: kwhStringSchema, ts: isoUtcSchema }).nullable(),
-  today: z.object({ kwh: kwhStringSchema, hasGaps: z.boolean() }),
+  /**
+   * Mittlere Wirkleistung über das letzte ABGESCHLOSSENE Messintervall —
+   * ausdrücklich kein Momentanwert: bei 15-Minuten-Messung gibt es keinen.
+   * `intervalMinutes` mitliefern, damit die App korrekt beschriften kann.
+   * Ganzzahlig in Watt (keine Floats, analog zur kWh-Milli-Arithmetik).
+   */
+  recentPower: z
+    .object({
+      watts: z.number().int(),
+      intervalEnd: isoUtcSchema,
+      intervalMinutes: z.number().int().positive(),
+    })
+    .nullable(),
+  today: z.object({
+    kwh: kwhStringSchema,
+    hasGaps: z.boolean(),
+    /** Kosten des laufenden Tages; null, wenn kein Tarif hinterlegt ist. */
+    costCents: z.number().int().nullable(),
+    /** Tagesbezogene Aufteilung — nur bei splitCalculable, sonst null. */
+    pvKwh: kwhStringSchema.nullable(),
+    gridKwh: kwhStringSchema.nullable(),
+  }),
   month: z.object({
     kwh: kwhStringSchema,
     costCents: z.number().int().nullable(),
@@ -869,7 +890,11 @@ export const summaryResponseSchema = z.object({
     previousMonthKwh: kwhStringSchema.nullable(),
     deltaToPreviousMonthPct: z.number().nullable(),
   }),
-  /** Nur wenn MeteringConcept.splitCalculable (R-A4) — sonst available=false und null-Werte. */
+  /**
+   * MONATSBEZOGENE Aufteilung (der Tageswert steht in `today`).
+   * Nur wenn MeteringConcept.splitCalculable (R-A4) — sonst available=false
+   * und null-Werte.
+   */
   split: z.object({
     available: z.boolean(),
     pvKwh: kwhStringSchema.nullable(),

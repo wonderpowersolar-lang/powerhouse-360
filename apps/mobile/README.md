@@ -92,15 +92,26 @@ SIMCTL_CHILD_PM_API_BASE_URL=https://app.powerhouse360.de xcrun simctl launch �
 `APIConfiguration.makeClient()` ist die einzige Stelle, die zwischen Mock und
 HTTP entscheidet. Views lesen über `@Environment(\.powermieterStore)`.
 
-**Bekannte Vertragslücke:** Der Prototyp zeigt Werte, die der Contract nicht
-liefert — momentane Leistung in kW („Aktueller Verbrauch 3,2 kW"), Tageskosten
-und den Solaranteil des laufenden Tages. Der `summary`-Endpunkt kennt nur
-`today.kwh`, Monatswerte und einen Split ohne Periodenangabe. Das muss vor
-WP-APP-2 geklärt werden: entweder Contract erweitern oder die Kacheln
-umdeuten. Bis dahin bleiben diese Kacheln statisch.
+**Contract erweitert (2026-07-26).** Der `summary`-Endpunkt liefert jetzt
+zusätzlich `recentPower`, `today.costCents` und `today.pvKwh`/`today.gridKwh`;
+`split` ist als monatsbezogen dokumentiert. Geändert in Spec §4.2
+(`docs/superpowers/specs/2026-07-22-kunden-app-architekturplan.md`) und im
+WP-APP-2-Plan — beides muss beim Bau der API so umgesetzt werden.
 
-Verdrahtet sind bisher die Live-Zeile (`dataStatus.lastReceivedAt`) und die
-Tagessumme im Tagesverlauf (`today.kwh` + Solaranteil aus der Stundenkurve).
+`recentPower` heißt bewusst nicht `livePower`: Das Standard-Messkonzept liefert
+15-Minuten-Werte, eine momentane Wirkleistung existiert dort nicht. Der
+Endpunkt gibt den Mittelwert über das letzte abgeschlossene Intervall zurück,
+plus dessen Länge. Die Kachel heißt entsprechend „Ø letzte 15 Min" statt
+„Aktueller Verbrauch" — ein 15-Minuten-Mittel als Live-Wert auszugeben wäre
+eine Falschaussage gegenüber dem Bewohner.
+
+Verdrahtet: Live-Zeile, Tagessumme im Tagesverlauf, Leistung, Solaranteil und
+Tageskosten.
+
+**Weiterhin offen:** Die App-API ist ausschließlich bewohnerbezogen
+(`PowerParticipant`). Die Vermieter- und Verwaltungsansichten haben **keinen**
+Contract — Gebäudeaggregate, Wohneinheiten-Vergleich und Anlagenstatus sind
+nicht abgedeckt und brauchen eine eigene Entscheidung.
 
 ### Noch offen (nicht im Slice)
 

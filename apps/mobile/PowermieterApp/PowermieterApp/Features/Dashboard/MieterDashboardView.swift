@@ -55,15 +55,44 @@ struct MieterDashboardView: View {
 
     // MARK: KPI grid
 
+    // MARK: Werte aus dem Store
+
+    /// Der Contract liefert einen 15-Minuten-Mittelwert, keinen Momentanwert —
+    /// die Beschriftung sagt das jetzt auch.
+    private var powerCaption: String {
+        guard let minutes = store.summary?.recentPower?.intervalMinutes else {
+            return "Aktueller Verbrauch"
+        }
+        return "Ø letzte \(minutes) Min"
+    }
+
+    private var powerValue: String {
+        store.summary?.recentPower?.kilowattsText ?? "3,2"
+    }
+
+    private var powerAccessibilityText: String {
+        "\(powerCaption) \(powerValue) Kilowatt"
+    }
+
+    private var solarSharePercent: Int {
+        store.summary?.today.pvSharePercent ?? 76
+    }
+
+    private var todayCostText: String {
+        guard let cents = store.summary?.today.costCents else { return "2,34 €" }
+        return String(format: "%.2f €", Double(cents) / 100)
+            .replacingOccurrences(of: ".", with: ",")
+    }
+
     private var kpiGrid: some View {
         LazyVGrid(columns: columns, spacing: 12) {
-            KPITile(accessibilityText: "Aktueller Verbrauch 3,2 Kilowatt", sheet: .kpi("verb")) {
+            KPITile(accessibilityText: powerAccessibilityText, sheet: .kpi("verb")) {
                 VStack(alignment: .leading, spacing: 7) {
                     HStack(spacing: 6) {
-                        Text("Aktueller Verbrauch").font(.system(size: 12)).foregroundStyle(Theme.tx2)
+                        Text(powerCaption).font(.system(size: 12)).foregroundStyle(Theme.tx2)
                         PulseDot(size: 6)
                     }
-                    value("3,2", unit: "kW")
+                    value(powerValue, unit: "kW")
                     Sparkline(points: [0.35, 0.42, 0.38, 0.5, 0.44, 0.72, 0.58, 0.9], color: Theme.home)
                         .frame(height: 26)
                 }
@@ -77,7 +106,7 @@ struct MieterDashboardView: View {
                 }
             }
 
-            KPITile(accessibilityText: "Solarstromanteil 76 Prozent heute", sheet: .kpi("solar")) {
+            KPITile(accessibilityText: "Solarstromanteil \(solarSharePercent) Prozent heute", sheet: .kpi("solar")) {
                 HStack(spacing: 8) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Solarstromanteil")
@@ -85,19 +114,19 @@ struct MieterDashboardView: View {
                             .foregroundStyle(Theme.tx2)
                             .lineLimit(1)
                             .minimumScaleFactor(0.75)
-                        value("76", unit: "%")
+                        value(String(solarSharePercent), unit: "%")
                         Text("heute").font(.system(size: 11)).foregroundStyle(Theme.tx3)
                     }
                     Spacer(minLength: 0)
-                    RingGauge(fraction: 0.76, color: Theme.pv)
+                    RingGauge(fraction: CGFloat(solarSharePercent) / 100, color: Theme.pv)
                         .frame(width: 44, height: 44)
                 }
             }
 
-            KPITile(accessibilityText: "Kosten heute 2,34 Euro", sheet: .kpi("kosten")) {
+            KPITile(accessibilityText: "Kosten heute \(todayCostText)", sheet: .kpi("kosten")) {
                 VStack(alignment: .leading, spacing: 7) {
                     Text("Kosten heute").font(.system(size: 12)).foregroundStyle(Theme.tx2)
-                    value("2,34 €", unit: nil)
+                    value(todayCostText, unit: nil)
                     Text("Ø 27,2 ct/kWh · Messwert").font(.system(size: 11)).foregroundStyle(Theme.tx3)
                 }
             }

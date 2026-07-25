@@ -41,7 +41,14 @@ struct MockPowermieterAPI: PowermieterAPI {
     func summary(contextID: String) async throws -> ConsumptionContracts.Summary {
         ConsumptionContracts.Summary(
             lastReading: .init(valueKwh: Kwh(milli: 4_711_250), ts: now),
-            today: .init(kwh: Kwh(milli: 8_600), hasGaps: true),
+            recentPower: .init(watts: 3_200,
+                               intervalEnd: Date().addingTimeInterval(-60),
+                               intervalMinutes: 15),
+            today: .init(kwh: Kwh(milli: 8_600),
+                         hasGaps: true,
+                         costCents: 234,
+                         pvKwh: Kwh(milli: 6_500),
+                         gridKwh: Kwh(milli: 2_100)),
             month: .init(kwh: Kwh(milli: 196_000),
                          costCents: 5_140,
                          projectedMonthEndCents: 6_810,

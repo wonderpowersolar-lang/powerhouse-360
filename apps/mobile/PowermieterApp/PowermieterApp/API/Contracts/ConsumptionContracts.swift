@@ -15,9 +15,36 @@ enum ConsumptionContracts {
             let ts: Date
         }
 
+        /// Mittlere Wirkleistung über das letzte abgeschlossene Messintervall.
+        /// Ausdrücklich kein Momentanwert — bei 15-Minuten-Messung gibt es
+        /// keinen. `intervalMinutes` gehört ins Label.
+        struct RecentPower: Decodable {
+            let watts: Int
+            let intervalEnd: Date
+            let intervalMinutes: Int
+
+            /// „3,2" für 3200 W.
+            var kilowattsText: String {
+                String(format: "%.1f", Double(watts) / 1000)
+                    .replacingOccurrences(of: ".", with: ",")
+            }
+        }
+
         struct Today: Decodable {
             let kwh: Kwh
             let hasGaps: Bool
+            let costCents: Int?
+            /// Tagesbezogene Aufteilung; nil, wenn das Messkonzept sie nicht hergibt.
+            let pvKwh: Kwh?
+            let gridKwh: Kwh?
+
+            /// Solaranteil des laufenden Tages in Prozent.
+            var pvSharePercent: Int? {
+                guard let pvKwh, let gridKwh else { return nil }
+                let total = pvKwh.milli + gridKwh.milli
+                guard total > 0 else { return nil }
+                return Int((Double(pvKwh.milli) / Double(total) * 100).rounded())
+            }
         }
 
         struct Month: Decodable {
@@ -29,7 +56,8 @@ enum ConsumptionContracts {
             let deltaToPreviousMonthPct: Double?
         }
 
-        /// Nur befüllt, wenn das Messkonzept eine Aufteilung hergibt —
+        /// MONATSBEZOGENE Aufteilung — der Tageswert steht in `today`.
+        /// Nur befüllt, wenn das Messkonzept eine Aufteilung hergibt,
         /// sonst `available == false` und alle Werte `nil`.
         struct Split: Decodable {
             let available: Bool
@@ -46,6 +74,7 @@ enum ConsumptionContracts {
         }
 
         let lastReading: LastReading?
+        let recentPower: RecentPower?
         let today: Today
         let month: Month
         let split: Split
