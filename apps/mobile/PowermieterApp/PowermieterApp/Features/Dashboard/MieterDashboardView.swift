@@ -2,6 +2,8 @@ import SwiftUI
 
 /// Mieter · Übersicht — the primary tenant dashboard (prototype `homeM`).
 struct MieterDashboardView: View {
+    @Environment(\.powermieterStore) private var store
+
     private let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
 
     var body: some View {
@@ -28,12 +30,20 @@ struct MieterDashboardView: View {
         .background(Theme.bg)
     }
 
+    /// „vor 1 Min" stammt aus dataStatus.lastReceivedAt, sobald geladen.
+    private var liveText: String {
+        guard let relative = store.lastReceivedText() else {
+            return "Live · aktualisiert vor 1 Min"
+        }
+        return "Live · aktualisiert \(relative)"
+    }
+
     // MARK: Live row
 
     private var liveRow: some View {
         HStack(spacing: 8) {
             PulseDot()
-            Text("Live · aktualisiert vor 1 Min")
+            Text(liveText)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Theme.tx2)
             Spacer()

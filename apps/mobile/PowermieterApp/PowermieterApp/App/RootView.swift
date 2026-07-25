@@ -11,6 +11,9 @@ struct RootView: View {
     @State private var role: OnboardingRole = RootView.initialRole()
     /// Light/dark override from Einstellungen; `.system` follows iOS.
     @State private var appearance: AppAppearance = .system
+    /// App-Daten. Läuft gegen `MockPowermieterAPI`, solange keine Basis-URL
+    /// gesetzt ist — siehe `APIConfiguration`.
+    @State private var store = PowermieterStore()
 
     var body: some View {
         ZStack {
@@ -28,6 +31,8 @@ struct RootView: View {
         }
         .tint(Theme.acc)
         .preferredColorScheme(appearance.colorScheme)
+        .environment(\.powermieterStore, store)
+        .task { await store.load() }
     }
 
     private static func initialRole() -> OnboardingRole {

@@ -71,11 +71,41 @@ liegen gesammelt in `SheetContent`, geöffnet wird über
 `@Environment(\.showToast)` und blendet sich nach 2,6 s selbst aus; bei offenem
 Sheet erscheint er oben statt unten, damit er nicht auf dessen Zeilen liegt.
 
+### App-API-Client
+
+`PowermieterApp/API/` enthält die Client-Schicht zu `/api/v1/app/*`. Die DTOs
+spiegeln 1:1 die Zod-Contracts aus dem WP-APP-2-Plan (`me`, `consumption`,
+`billing`, `settings`, `config`); Energiemengen laufen über `Kwh`, das wie
+serverseitig in ganzzahligen Milli-kWh rechnet statt in `Double`.
+
+**Die API existiert noch nicht** — WP-APP-1 (Messkern, Ingestion) und WP-APP-2
+(Aggregation, Routen) sind ungebaut. Deshalb liefert `MockPowermieterAPI` die
+Werte, die vorher fest in den Views standen. `HTTPPowermieterAPI` ist
+implementiert, aber nie gegen einen laufenden Server gelaufen.
+
+Umschalten auf echt: Basis-URL setzen, sonst nichts.
+
+```sh
+SIMCTL_CHILD_PM_API_BASE_URL=https://app.powerhouse360.de xcrun simctl launch …
+```
+
+`APIConfiguration.makeClient()` ist die einzige Stelle, die zwischen Mock und
+HTTP entscheidet. Views lesen über `@Environment(\.powermieterStore)`.
+
+**Bekannte Vertragslücke:** Der Prototyp zeigt Werte, die der Contract nicht
+liefert — momentane Leistung in kW („Aktueller Verbrauch 3,2 kW"), Tageskosten
+und den Solaranteil des laufenden Tages. Der `summary`-Endpunkt kennt nur
+`today.kwh`, Monatswerte und einen Split ohne Periodenangabe. Das muss vor
+WP-APP-2 geklärt werden: entweder Contract erweitern oder die Kacheln
+umdeuten. Bis dahin bleiben diese Kacheln statisch.
+
+Verdrahtet sind bisher die Live-Zeile (`dataStatus.lastReceivedAt`) und die
+Tagessumme im Tagesverlauf (`today.kwh` + Solaranteil aus der Stundenkurve).
+
 ### Noch offen (nicht im Slice)
 
-Die tatsächliche Anbindung an die App-API (WP-APP-2) statt Mock-Werten; echte
-Instrument-Sans-Schrift ist noch nicht gebündelt (aktuell System-Font SF).
-Damit ist der Prototyp ansonsten vollständig portiert.
+Die restlichen Views lesen weiterhin Festwerte; echte Instrument-Sans-Schrift
+ist nicht gebündelt (aktuell System-Font SF).
 
 ## Einordnung ins Monorepo
 
