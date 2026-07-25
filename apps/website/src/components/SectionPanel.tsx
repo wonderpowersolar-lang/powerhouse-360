@@ -50,7 +50,7 @@ export default function SectionPanel({
         // platform headline pinned at full opacity, colliding with the Hub
         // section as it scrolls up. Fade the copy out by the Hub's own
         // viewport position instead, so the handoff is clean.
-        if (section.id === "dashboard") {
+        if (isStatement) {
           const next = document.getElementById("hub");
           if (next) {
             const vh = window.innerHeight || 1;
@@ -76,7 +76,7 @@ export default function SectionPanel({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [section.index, isCta]);
+  }, [section.index, isCta, isStatement]);
 
   const alignClasses =
     section.align === "right"

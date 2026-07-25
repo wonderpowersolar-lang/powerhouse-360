@@ -134,10 +134,17 @@ export default function ProjectRequestFunnel() {
           state: ProjectFunnelState;
           step: number;
         };
+        /* Beide Seiten werden serverseitig gerendert. Der Restore aus dem
+           sessionStorage darf deshalb erst nach der Hydration laufen: ein
+           Lazy-Initializer in useState() ergäbe auf dem Server einen leeren
+           und auf dem Client einen befüllten Baum. setState im Effect ist
+           hier die von React vorgesehene Lösung. */
+        /* eslint-disable react-hooks/set-state-in-effect */
         if (saved?.state)
           setState({ ...INITIAL_PROJECT_STATE, ...saved.state });
         if (typeof saved?.step === "number")
           setStep(Math.min(saved.step, TOTAL_STEPS - 1));
+        /* eslint-enable react-hooks/set-state-in-effect */
       }
     } catch {
       /* beschädigter Speicher: frisch starten */
