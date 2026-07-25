@@ -1,0 +1,15 @@
+# Xcode build output. `-derivedDataPath build` in the README puts DerivedData
+# here; the repo-root .gitignore only matches /build at the root.
+build/
+DerivedData/
+
+# Xcode user state
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager
+.swiftpm/
+.build/
+Packages/
