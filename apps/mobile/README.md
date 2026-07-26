@@ -124,10 +124,16 @@ LongPress und auch für `simultaneousGesture`; beides wurde im Simulator
 geprüft und verworfen. Auf iPad-Trackpad und Mac zeigt `onContinuousHover`
 zusätzlich echtes Zeiger-Hover.
 
-**Weiterhin offen:** Die App-API ist ausschließlich bewohnerbezogen
-(`PowerParticipant`). Die Vermieter- und Verwaltungsansichten haben **keinen**
-Contract — Gebäudeaggregate, Wohneinheiten-Vergleich und Anlagenstatus sind
-nicht abgedeckt und brauchen eine eigene Entscheidung.
+**Entschieden (ADR-011, 2026-07-26): Die App ist eine Bewohner-App.**
+Vermieter und Hausverwaltung arbeiten über die Web-Plattform; ein zweiter,
+objekt-scoped Endpunktsatz wird nicht gebaut. Die App-API bleibt bei
+`PowerParticipant` als einzigem Scope-Anker.
+
+Damit ist die gebaute Rollen-UI für Vermieter und Verwaltung (beide
+Dashboards, Gebäude- und Vorgänge-Tab, rollenspezifische Tab-Sets,
+Rollenumschalter, rollenabhängige Zweige in mehreren Screens) **funktionslos**.
+Ob sie ausgebaut wird oder als Demo-Modus stehen bleibt, ist noch offen —
+siehe „Offener Folgepunkt" in `docs/DECISIONS/ADR-011-kunden-app-nur-bewohner.md`.
 
 ### Noch offen (nicht im Slice)
 

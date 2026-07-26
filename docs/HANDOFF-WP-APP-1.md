@@ -75,12 +75,13 @@ geliefert wird der Mittelwert des letzten abgeschlossenen Intervalls. Das ist
 für WP-APP-2 relevant, nicht für WP-APP-1 — aber wer den Messkern baut, sollte
 wissen, dass die Aggregation später diese Felder bedienen muss.
 
-## Offene Produktentscheidung (nicht Teil von WP-APP-1)
+## Entschieden am 2026-07-26 (ADR-011)
 
-Die App-API ist ausschliesslich bewohnerbezogen (`PowerParticipant`,
-`assertParticipantScope`). Die Vermieter- und Verwaltungsansichten der App —
-Gebäudeaggregate, Wohneinheiten-Vergleich, Anlagenstatus — haben **keinen**
-Contract. Braucht irgendwann eine eigene Entscheidung.
+Die Kunden-App ist eine **Bewohner-App**. Vermieter und Hausverwaltung
+arbeiten über die Web-Plattform; ein zweiter, objekt-scoped Endpunktsatz wird
+nicht gebaut. Für WP-APP-1 ändert das nichts — der Messkern ist rollenneutral.
+Für WP-APP-2 heisst es: der Zuschnitt bleibt wie geplant, es kommt keine
+Gebäudeseite dazu. Details in `docs/DECISIONS/ADR-011-kunden-app-nur-bewohner.md`.
 
 ## Umfang
 
