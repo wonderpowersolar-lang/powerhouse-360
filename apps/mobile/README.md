@@ -50,6 +50,14 @@ xcrun simctl launch booted de.powerhouse360.powermieter
 
 Oder `PowermieterApp.xcodeproj` in Xcode öffnen und ⌘R.
 
+**Alle `PM_*`-Umschaltungen laufen über `App/DebugEnvironment.swift` und gibt es
+nur im Debug-Build.** Im Release liefert jede Abfrage `nil`, der Compiler
+entfernt den Zweig, und weder die Schlüsselnamen noch der Lesepfad landen im
+ausgelieferten Binary — geprüft per `strings` gegen beide Konfigurationen.
+Wichtig vor allem für `PM_API_BASE_URL`: Sonst liesse sich ein ausgelieferter
+Build über eine Umgebungsvariable auf einen fremden Server umlenken. Im Release
+entscheidet allein der Info.plist-Eintrag `PMAPIBaseURL`.
+
 ### Overlays
 
 Alle 13 Detailscreens des Prototyps sind gebaut und aus den Tabs heraus

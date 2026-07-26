@@ -7,7 +7,7 @@ struct RootView: View {
     // `SIMCTL_CHILD_PM_START=app`, optionally with `SIMCTL_CHILD_PM_ROLE=vermieter`.
     // Defaults to the real onboarding entry as a Mieter.
     @State private var phase: AppPhase =
-        ProcessInfo.processInfo.environment["PM_START"] == "app" ? .app : .onboarding
+        DebugEnvironment.value(.start) == "app" ? .app : .onboarding
     @State private var role: OnboardingRole = RootView.initialRole()
     /// Light/dark override from Einstellungen; `.system` follows iOS.
     @State private var appearance: AppAppearance = .system
@@ -36,7 +36,7 @@ struct RootView: View {
     }
 
     private static func initialRole() -> OnboardingRole {
-        switch ProcessInfo.processInfo.environment["PM_ROLE"] {
+        switch DebugEnvironment.value(.role) {
         case "vermieter", "eigentuemer": return .eigentuemer
         case "verwaltung": return .verwaltung
         default: return .mieter

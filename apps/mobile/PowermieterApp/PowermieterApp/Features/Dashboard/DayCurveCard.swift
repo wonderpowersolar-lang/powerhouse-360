@@ -10,8 +10,8 @@ struct DayCurveCard: View {
     /// verdeckt der Finger genau die Stelle, die man lesen will.
     /// Debug: Startwert per `SIMCTL_CHILD_PM_SCRUB=14` setzen, um den Zustand
     /// ohne Geste zeigen zu können.
-    @State private var scrubbedHour: Int? = ProcessInfo.processInfo
-        .environment["PM_SCRUB"].flatMap(Int.init)
+    @State private var scrubbedHour: Int? = DebugEnvironment.value(.scrub)
+        .flatMap(Int.init)
 
     // Representative 24h sample curves (0...1), matching the prototype's shape.
     private let solar: [CGFloat] = [0, 0, 0, 0, 0, 0.02, 0.08, 0.2, 0.38, 0.58, 0.76, 0.9, 0.97, 0.94, 0.82, 0.64, 0.44, 0.25, 0.1, 0.03, 0, 0, 0, 0]

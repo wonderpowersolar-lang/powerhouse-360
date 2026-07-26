@@ -22,19 +22,18 @@ struct MainTabView: View {
     private var tabs: [AppTab] { AppTab.tabs(for: role) }
 
     private static func initialTab() -> AppTab {
-        guard let raw = ProcessInfo.processInfo.environment["PM_TAB"],
+        guard let raw = DebugEnvironment.value(.tab),
               let tab = AppTab(rawValue: raw) else { return .uebersicht }
         return tab
     }
 
     private static func initialToast() -> String? {
-        // An env var set to "" must not count as a message.
-        let raw = ProcessInfo.processInfo.environment["PM_TOAST"] ?? ""
-        return raw.isEmpty ? nil : raw
+        // Leere Werte filtert DebugEnvironment bereits heraus.
+        DebugEnvironment.value(.toast)
     }
 
     private static func initialSheet() -> AppSheet? {
-        guard let raw = ProcessInfo.processInfo.environment["PM_SHEET"] else { return nil }
+        guard let raw = DebugEnvironment.value(.sheet) else { return nil }
         let parts = raw.split(separator: ":", maxSplits: 1).map(String.init)
         guard let kind = parts.first else { return nil }
         let argument = parts.count > 1 ? parts[1] : ""
@@ -50,7 +49,7 @@ struct MainTabView: View {
     }
 
     private static func initialOverlay() -> AppOverlay? {
-        switch ProcessInfo.processInfo.environment["PM_OVERLAY"] {
+        switch DebugEnvironment.value(.overlay) {
         case "detailanalyse": .detailanalyse
         case "verbrauchsaufteilung": .verbrauchsaufteilung
         case "wohneinheiten": .wohneinheiten

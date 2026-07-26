@@ -45,7 +45,7 @@ struct OnboardingFlow: View {
     /// Debug convenience: `SIMCTL_CHILD_PM_STEP=connect|privacy|done` seeds the
     /// stack so a given step can be launched (and screenshotted) directly.
     private static func initialPath() -> [OnboardingStep] {
-        switch ProcessInfo.processInfo.environment["PM_STEP"] {
+        switch DebugEnvironment.value(.step) {
         case "role": return [.role]
         case "connect": return [.role, .connect]
         case "privacy": return [.role, .connect, .privacy]

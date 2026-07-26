@@ -1,6 +1,7 @@
 # Xcode build output. `-derivedDataPath build` in the README puts DerivedData
 # here; the repo-root .gitignore only matches /build at the root.
 build/
+build-release/
 DerivedData/
 
 # Xcode user state

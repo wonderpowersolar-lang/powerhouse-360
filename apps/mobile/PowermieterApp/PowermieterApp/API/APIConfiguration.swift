@@ -11,8 +11,9 @@ enum APIConfiguration {
     /// `https://app.powerhouse360.de`. Die Pfade `/api/v1/app/*` hängt der
     /// Client selbst an.
     static var baseURL: URL? {
-        if let raw = ProcessInfo.processInfo.environment["PM_API_BASE_URL"],
-           !raw.isEmpty,
+        // Nur im Debug-Build; im Release entscheidet allein die Info.plist,
+        // damit ein ausgelieferter Build nicht umgelenkt werden kann.
+        if let raw = DebugEnvironment.value(.apiBaseURL),
            let url = URL(string: raw) {
             return url
         }
