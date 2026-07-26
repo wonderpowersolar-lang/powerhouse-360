@@ -5,26 +5,22 @@ Ordner für die App-Entwicklung (Mobile App / Kunden-App).
 ## Status
 
 🟢 Nativer SwiftUI-Slice steht (`PowermieterApp/`). Stack: SwiftUI, iOS 18+,
-Xcode 26, keine Fremd-Frameworks. Umgesetzt: **vollständiger Onboarding-Flow**
-(Willkommen → Rolle → Gebäude verbinden → Datenschutz → Fertig, als
-`NavigationStack` mit Zurück-Navigation und Fortschrittspunkten) → **rollenbasiertes
-Dashboard für alle drei Rollen**: Mieter-Übersicht (Energiefluss + KPI-Grid),
-Vermieter-Übersicht (Statuskarte, 6-Knoten-Gebäude-Energiefluss, 8er-KPI-Grid,
-4-Serien-Lastverlauf, Aktions-Kacheln, Report-Zeile) und Verwaltungs-Übersicht
-(6er-Statistik-Grid, Offene Vorgänge, Anmeldestatus, Kommunikation, Messsystem-Zeile).
-Die im Onboarding gewählte Rolle steuert, welches Dashboard erscheint, und ebenso
-das **rollenspezifische Tab-Set** (Mieter: Übersicht · Analyse · Nachhaltig ·
-Dokumente · Einstellungen — Vermieter: statt Nachhaltig das **Gebäude** —
-Verwaltung: **Gebäude + Vorgänge** statt Analyse/Nachhaltig).
+Xcode 26, keine Fremd-Frameworks.
 
-**Alle Tabs sind ausgebaut, es gibt keine Platzhalter mehr:** Gebäude
-(Hero, Statuskacheln, offene Aufgaben, Reports), Vorgänge (Ticketliste),
-Analyse (Zeitraum-Umschalter Heute/Woche/Monat/Jahr/Eigene mit nativ
-gezeichnetem Verlauf-Chart inkl. Tap-Auswahl, Vergleichskarte, rollenspezifischer
-Block), Nachhaltigkeit (CO₂-Ring, Alltags-Äquivalente, Anteil lokaler Energie,
-Hausbilanz), Dokumente (Abschlagskarte + Ordner-Grid mit Drilldown in die
-gefilterte Liste, Bestände je Rolle) und Einstellungen (Profil, Hell/Dunkel,
-**Rollenwechsel zur Laufzeit**, Benachrichtigungen, Datenfreigaben).
+**Seit ADR-011 ist die App eine reine Bewohner-App.** Vermieter und
+Hausverwaltung arbeiten über die Web-Plattform; die Rollen-UI ist ausgebaut.
+
+Umgesetzt: **Onboarding-Flow** (Willkommen → Gebäude verbinden → Datenschutz →
+Fertig, als `NavigationStack` mit Zurück-Navigation und Fortschrittspunkten)
+und fünf Tabs ohne Platzhalter:
+
+- **Übersicht** — Energiefluss, 6er-KPI-Grid, Solar-Tipp, Tagesverlauf, Monatsreport
+- **Analyse** — Zeitraum-Umschalter Heute/Woche/Monat/Jahr/Eigene mit nativ
+  gezeichnetem Verlauf-Chart inkl. Tap-Auswahl und Vergleichskarte
+- **Nachhaltigkeit** — CO₂-Ring, Alltags-Äquivalente, Anteil lokaler Energie, Hausbilanz
+- **Dokumente** — Abschlagskarte + Ordner-Grid mit Drilldown in die gefilterte Liste
+- **Einstellungen** — Profil, Hell/Dunkel, Benachrichtigungen, Datenfreigaben
+
 Vollständiges Light/Dark-Theme aus `design-reference/design-tokens.css`.
 
 ### Bauen & im Simulator zeigen
@@ -37,15 +33,14 @@ xcrun simctl boot "iPhone 17"; open -a Simulator
 xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/PowermieterApp.app
 xcrun simctl launch booted de.powerhouse360.powermieter
 # direkt ins Dashboard:            SIMCTL_CHILD_PM_START=app vor `simctl launch`
-#   Rolle direkt wählen:           zusätzlich SIMCTL_CHILD_PM_ROLE=vermieter|verwaltung
 #   Tab direkt öffnen:             zusätzlich SIMCTL_CHILD_PM_TAB=analyse|nachhaltig|
-#                                  gebaeude|vorgaenge|dokumente|einstellungen
+#                                  dokumente|einstellungen
 #   Overlay direkt öffnen:         zusätzlich SIMCTL_CHILD_PM_OVERLAY=detailanalyse|
 #                                  energiebilanz|sonnenstrompreis|mitteilungen|support|…
 #   Bottom-Sheet direkt öffnen:    zusätzlich SIMCTL_CHILD_PM_SHEET=kpi:kosten|node:bat|
 #                                  info:naeh|doc:<Titel>|building
 #   Toast einblenden:              zusätzlich SIMCTL_CHILD_PM_TOAST="Download gestartet …"
-# direkt auf einen Onboarding-Schritt: SIMCTL_CHILD_PM_STEP=role|connect|privacy|done
+# direkt auf einen Onboarding-Schritt: SIMCTL_CHILD_PM_STEP=connect|privacy|done
 ```
 
 Oder `PowermieterApp.xcodeproj` in Xcode öffnen und ⌘R.
@@ -60,20 +55,21 @@ entscheidet allein der Info.plist-Eintrag `PMAPIBaseURL`.
 
 ### Overlays
 
-Alle 13 Detailscreens des Prototyps sind gebaut und aus den Tabs heraus
-verlinkt: Detailanalyse, Verbrauchsaufteilung, Wohneinheiten, Monatsreport,
-Sonnenstrompreis, Assistent, Energiebilanz, Mitteilungen, Rechnungsübersicht,
-Rechnungsdetail, Messsystemstatus, Störungsfall und Support. Sie schieben sich
+Elf Detailscreens sind gebaut und aus den Tabs heraus verlinkt: Detailanalyse,
+Monatsreport, Sonnenstrompreis, Assistent, Energiebilanz, Mitteilungen,
+Rechnungsübersicht, Rechnungsdetail, Messsystemstatus, Störungsfall und
+Support. Die gebäudebezogenen Overlays (Wohneinheiten, Verbrauchsaufteilung)
+sind mit ADR-011 entfallen. Sie schieben sich
 von rechts über die Tab-Bar (bei aktiviertem „Bewegung reduzieren" nur
 eingeblendet). Geöffnet werden sie über `@Environment(\.openOverlay)`, damit
 kein Binding durch jede Zwischenebene gereicht werden muss.
 
 ### Bottom-Sheet & Toast
 
-Der Bottom-Sheet erklärt Zahlen statt sie nur anzuzeigen und hat fünf
-Varianten: `kpi` (alle 14 Kennzahlkacheln), `node` (die Knoten im
+Der Bottom-Sheet erklärt Zahlen statt sie nur anzuzeigen und hat vier
+Varianten: `kpi` (die sechs Kennzahlkacheln), `node` (die Knoten im
 Energiefluss), `info` (Näherungswerte, Persönliche Daten, Wohnung, Zahlungsart,
-Datenschutz), `document` (mit Öffnen/Herunterladen) und `building`. Inhalte
+Datenschutz) und `document` (mit Öffnen/Herunterladen). Inhalte
 liegen gesammelt in `SheetContent`, geöffnet wird über
 `@Environment(\.openSheet)`. Der Toast quittiert Demo-Aktionen über
 `@Environment(\.showToast)` und blendet sich nach 2,6 s selbst aus; bei offenem
@@ -129,11 +125,8 @@ Vermieter und Hausverwaltung arbeiten über die Web-Plattform; ein zweiter,
 objekt-scoped Endpunktsatz wird nicht gebaut. Die App-API bleibt bei
 `PowerParticipant` als einzigem Scope-Anker.
 
-Damit ist die gebaute Rollen-UI für Vermieter und Verwaltung (beide
-Dashboards, Gebäude- und Vorgänge-Tab, rollenspezifische Tab-Sets,
-Rollenumschalter, rollenabhängige Zweige in mehreren Screens) **funktionslos**.
-Ob sie ausgebaut wird oder als Demo-Modus stehen bleibt, ist noch offen —
-siehe „Offener Folgepunkt" in `docs/DECISIONS/ADR-011-kunden-app-nur-bewohner.md`.
+Die Rollen-UI ist am selben Tag ausgebaut worden: 12 Dateien gelöscht, der
+Rollenbegriff aus 20 weiteren entfernt. 10.165 → 8.006 Zeilen.
 
 ### Noch offen (nicht im Slice)
 

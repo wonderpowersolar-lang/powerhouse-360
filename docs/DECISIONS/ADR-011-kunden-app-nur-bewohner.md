@@ -39,14 +39,13 @@ Es wird **kein** zweiter, objekt-scoped Endpunktsatz für die App gebaut. Die Ap
 - Die Web-Plattform muss für Vermieter und Verwaltung mobiltauglich sein. Sie ist es heute nicht; das ist bislang nirgends als Arbeitspaket erfasst.
 - Im SwiftUI-Client existiert **gebaute, ab jetzt funktionslose UI** für beide Rollen (Vermieter- und Verwaltungs-Dashboard, Gebäude- und Vorgänge-Tab, rollenspezifische Tab-Sets, Rollenumschalter in den Einstellungen, rollenabhängige Zweige in Analyse, Dokumente, Monatsreport, Mitteilungen, Energiebilanz und Detailanalyse).
 
-## Offener Folgepunkt
+## Folgepunkt: Rollen-UI ausgebaut (2026-07-26)
 
-**Der Umgang mit der bestehenden Rollen-UI im Client ist noch nicht entschieden.** Zwei Wege:
+Die Rollen-UI wurde am selben Tag entfernt, statt sie als Demo-Modus stehen zu lassen. Eine funktionslose Oberfläche im Code hätte dauerhaft ein Produkt abgebildet, das es nicht gibt, und jeden künftigen Mitlesenden zu der Annahme eingeladen, die Rollen seien vorgesehen.
 
-1. **Ausbauen** — `OnboardingRole` auf einen Fall reduzieren, die beiden Dashboards und die zwei Tabs löschen, rollenabhängige Zweige auflösen. Ergibt einen erheblich kleineren, ehrlicheren Client, ist aber eine grössere Operation quer durch die App.
-2. **Stehen lassen** — als Demo-Modus hinter dem Rollenumschalter in den Einstellungen. Kostet nichts, bildet aber dauerhaft ein Produkt ab, das es nicht gibt, und lädt jeden künftigen Mitlesenden zu der Annahme ein, die Rollen seien vorgesehen.
+Entfernt: `OnboardingRole` samt Rollenauswahl im Onboarding, Vermieter- und Verwaltungs-Dashboard mit ihren Karten, die Tabs Gebäude und Vorgänge, die gebäudebezogenen Overlays Wohneinheiten und Verbrauchsaufteilung, der Rollenumschalter in den Einstellungen, die gebäudebezogenen Einträge im Bottom-Sheet-Katalog sowie sämtliche rollenabhängigen Zweige in Analyse, Dokumente, Monatsreport, Mitteilungen, Energiebilanz, Detailanalyse und Assistent.
 
-Bis zur Entscheidung bleibt die UI unverändert und läuft weiter gegen `MockPowermieterAPI`.
+12 Dateien gelöscht, der Rollenbegriff aus 20 weiteren entfernt: 10.165 → 8.006 Zeilen (−21 %). `AppTab` hat keine `tabs(for:)`-Funktion mehr, sondern fünf feste Fälle. Debug- und Release-Build grün, App im Simulator gegengeprüft.
 
 ## Revision
 

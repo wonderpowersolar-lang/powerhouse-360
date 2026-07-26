@@ -4,7 +4,6 @@ import SwiftUI
 /// explains a number, a flow node, a document or a settings entry.
 struct BottomSheetView: View {
     let sheet: AppSheet
-    let role: OnboardingRole
     let onClose: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
@@ -12,7 +11,7 @@ struct BottomSheetView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var content: SheetContent {
-        SheetContent.resolve(sheet, role: role)
+        SheetContent.resolve(sheet)
     }
 
     var body: some View {
@@ -66,11 +65,6 @@ struct BottomSheetView: View {
 
             if let document = content.document {
                 documentActions(document)
-                    .padding(.top, 14)
-            }
-
-            if content.isBuilding {
-                buildingCard
                     .padding(.top, 14)
             }
 
@@ -201,58 +195,8 @@ struct BottomSheetView: View {
         else { "Dokument öffnen" }
     }
 
-    private var buildingCard: some View {
-        VStack(spacing: 11) {
-            HStack(spacing: 12) {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Theme.accS)
-                    .frame(width: 38, height: 38)
-                    .overlay {
-                        Image(systemName: "building.2.fill")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(Theme.acc)
-                    }
-                    .accessibilityHidden(true)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Friedrichsruher Straße 35")
-                        .font(.system(size: 13.5, weight: .bold))
-                        .foregroundStyle(Theme.tx)
-                    Text("14193 Berlin · 24 WE · 52,9 kWp")
-                        .font(.system(size: 11.5))
-                        .foregroundStyle(Theme.tx3)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                Image(systemName: "checkmark")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(Theme.acc)
-                    .accessibilityHidden(true)
-            }
-            .padding(14)
-            .background(Theme.card2, in: .rect(cornerRadius: 14, style: .continuous))
-            .accessibilityElement(children: .combine)
-
-            Button {
-                onClose()
-                showToast("Einladungscode angefordert (Demo).")
-            } label: {
-                Text("+ Weiteres Gebäude verbinden")
-                    .font(.system(size: 13.5, weight: .bold))
-                    .foregroundStyle(Theme.tx)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 46)
-                    .background(Theme.card, in: .rect(cornerRadius: 13, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 13, style: .continuous)
-                            .strokeBorder(Theme.line2, lineWidth: 1)
-                    }
-            }
-            .buttonStyle(.pressable)
-        }
-    }
 }
 
 #Preview {
-    BottomSheetView(sheet: .kpi("solar"), role: .mieter, onClose: {})
+    BottomSheetView(sheet: .kpi("solar"), onClose: {})
 }

@@ -3,8 +3,6 @@ import SwiftUI
 /// Analyse tab (prototype `tabAnalyse`) — period picker, KPI chips, the
 /// Verlauf chart, a period comparison, and role-specific follow-ups.
 struct AnalyseView: View {
-    var role: OnboardingRole = .mieter
-
     @Environment(\.openOverlay) private var openOverlay
 
     @State private var period: AnalysePeriod = .monat
@@ -19,15 +17,11 @@ struct AnalyseView: View {
                         emptyState
                     } else {
                         kpiChips
-                        AnalyseChartCard(period: period, role: role)
+                        AnalyseChartCard(period: period)
                         comparisonCard
                     }
 
-                    if role == .mieter {
-                        flatComparisonCard
-                    } else {
-                        buildingTiles
-                    }
+                    flatComparisonCard
 
                     outlineActions
                     solarPriceRow
@@ -46,7 +40,7 @@ struct AnalyseView: View {
     }
 
     private var subtitle: String {
-        role == .mieter ? "Wohnung 12 · Juli 2026" : "Gebäude · Juli 2026"
+        "Wohnung 12 · Juli 2026"
     }
 
     // MARK: Period picker
@@ -110,13 +104,8 @@ struct AnalyseView: View {
     }
 
     private var chips: [(label: String, value: String)] {
-        if role == .mieter {
-            [("Verbrauch", "196 kWh"), ("Solaranteil", "76 %"),
-             ("Netzbezug", "47 kWh"), ("Kosten", "51,40 €")]
-        } else {
-            [("Erzeugung", "4,2 MWh"), ("Eigenverbrauch", "68 %"),
-             ("Einspeisung", "1,3 MWh"), ("Erlös", "583 €")]
-        }
+        [("Verbrauch", "196 kWh"), ("Solaranteil", "76 %"),
+         ("Netzbezug", "47 kWh"), ("Kosten", "51,40 €")]
     }
 
     // MARK: Comparison
@@ -255,34 +244,7 @@ struct AnalyseView: View {
         .accessibilityValue(value)
     }
 
-    private var buildingTiles: some View {
-        HStack(spacing: 12) {
-            actionTile(title: "Verbrauchsaufteilung", caption: "Donut nach Kategorie",
-                       target: .verbrauchsaufteilung)
-            actionTile(title: "Wohneinheiten", caption: "Vergleich · Messstatus",
-                       target: .wohneinheiten)
-        }
-    }
 
-    private func actionTile(title: String, caption: String, target: AppOverlay) -> some View {
-        Button { openOverlay(target) } label: {
-            VStack(alignment: .leading, spacing: 7) {
-                Text(title)
-                    .font(.system(size: 13.5, weight: .bold))
-                    .foregroundStyle(Theme.tx)
-                Text(caption)
-                    .font(.system(size: 11.5))
-                    .foregroundStyle(Theme.tx3)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(14)
-            .pmCard(cornerRadius: Theme.radiusTile)
-        }
-        .buttonStyle(.pressable)
-        .accessibilityElement(children: .combine)
-    }
-
-    // MARK: Footer actions
 
     private var outlineActions: some View {
         HStack(spacing: 10) {
@@ -344,10 +306,6 @@ struct AnalyseView: View {
     }
 }
 
-#Preview("Mieter") {
-    AnalyseView(role: .mieter)
-}
-
-#Preview("Vermieter") {
-    AnalyseView(role: .eigentuemer)
+#Preview {
+    AnalyseView()
 }

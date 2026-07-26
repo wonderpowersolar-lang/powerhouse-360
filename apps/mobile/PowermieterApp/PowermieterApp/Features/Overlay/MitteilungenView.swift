@@ -2,7 +2,6 @@ import SwiftUI
 
 /// Overlay "Mitteilungen" — priority inbox, split into Wichtig and Weitere.
 struct MitteilungenView: View {
-    let role: OnboardingRole
     let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
@@ -46,15 +45,7 @@ struct MitteilungenView: View {
                  time: "Heute, 07:12", target: .detailanalyse)
         ]
 
-        guard role != .mieter else { return tenant }
-
-        let buildingAlert = Item(id: 6, important: true, symbol: "exclamationmark.triangle.fill",
-                                 tint: Theme.crit, softTint: Theme.critS,
-                                 title: "Zähler WE 07 verzögert",
-                                 body: "Seit 6 Stunden keine Daten vom Wohnungszähler. Ersatzwerte sind aktiv.",
-                                 time: "06:30", target: .messsystem)
-        // The building view drops the tenant-only consumption warning.
-        return [buildingAlert] + tenant.filter { $0.id != 2 }
+        return tenant
     }
 
     private var important: [Item] { cleared ? [] : items.filter(\.important) }
@@ -199,5 +190,5 @@ struct MitteilungenView: View {
 }
 
 #Preview {
-    MitteilungenView(role: .mieter, onBack: {})
+    MitteilungenView(onBack: {})
 }

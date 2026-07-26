@@ -4,7 +4,6 @@ import SwiftUI
 /// demo role switcher write straight back into the app shell, so switching a
 /// role here swaps the dashboards and the tab set live.
 struct EinstellungenView: View {
-    @Binding var role: OnboardingRole
     @Binding var appearance: AppAppearance
 
     @Environment(\.colorScheme) private var colorScheme
@@ -24,7 +23,6 @@ struct EinstellungenView: View {
                 VStack(spacing: 13) {
                     profileCard
                     appearanceCard
-                    roleCard
                     notificationsCard
                     sharingCard
                     detailRowsCard
@@ -73,29 +71,9 @@ struct EinstellungenView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private var name: String {
-        switch role {
-        case .mieter: "Leon Berger"
-        case .eigentuemer: "Sabine Sommer"
-        case .verwaltung: "Brandt & Partner"
-        }
-    }
-
-    private var subtitle: String {
-        switch role {
-        case .mieter: "leon.berger@mail.de · WE 12"
-        case .eigentuemer: "Eigentümerin · Friedrichsruher Str. 35"
-        case .verwaltung: "Hausverwaltung · 1 Gebäude"
-        }
-    }
-
-    private var initials: String {
-        switch role {
-        case .mieter: "LB"
-        case .eigentuemer: "SS"
-        case .verwaltung: "BP"
-        }
-    }
+    private let name = "Leon Berger"
+    private let subtitle = "leon.berger@mail.de · WE 12"
+    private let initials = "LB"
 
     // MARK: Appearance
 
@@ -136,47 +114,6 @@ struct EinstellungenView: View {
         .buttonStyle(.plain)
         .accessibilityLabel(title)
         .accessibilityAddTraits(isActive ? [.isSelected, .isButton] : .isButton)
-    }
-
-    // MARK: Role switcher
-
-    private var roleCard: some View {
-        VStack(spacing: 0) {
-            sectionTitle("Rolle · Demo")
-                .padding(.top, 11)
-                .padding(.bottom, 5)
-
-            roleRow(.mieter, label: "Mieter:in — Leon Berger")
-            roleRow(.eigentuemer, label: "Eigentümerin — Sabine Sommer")
-            roleRow(.verwaltung, label: "Hausverwaltung — Brandt & Partner")
-        }
-        .padding(.horizontal, 16)
-        .pmCard()
-    }
-
-    private func roleRow(_ value: OnboardingRole, label: String) -> some View {
-        let selected = role == value
-        return Button {
-            role = value
-        } label: {
-            HStack(spacing: 11) {
-                Text(label)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Theme.tx)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                if selected {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Theme.acc)
-                        .accessibilityHidden(true)
-                }
-            }
-            .padding(.vertical, 12)
-            .overlay(alignment: .top) { Divider().overlay(Theme.line) }
-        }
-        .buttonStyle(.pressable)
-        .accessibilityLabel(label)
-        .accessibilityAddTraits(selected ? [.isSelected, .isButton] : .isButton)
     }
 
     // MARK: Toggle groups
@@ -318,7 +255,6 @@ struct EinstellungenView: View {
 }
 
 #Preview {
-    @Previewable @State var role: OnboardingRole = .mieter
     @Previewable @State var appearance: AppAppearance = .system
-    EinstellungenView(role: $role, appearance: $appearance)
+    EinstellungenView(appearance: $appearance)
 }

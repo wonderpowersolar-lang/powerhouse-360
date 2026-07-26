@@ -16,7 +16,6 @@ import Foundation
 enum DebugEnvironment {
     enum Key: String {
         case start = "PM_START"
-        case role = "PM_ROLE"
         case step = "PM_STEP"
         case tab = "PM_TAB"
         case overlay = "PM_OVERLAY"

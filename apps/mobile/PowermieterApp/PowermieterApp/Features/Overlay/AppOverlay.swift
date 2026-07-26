@@ -2,10 +2,12 @@ import SwiftUI
 
 /// Full-screen detail screens that slide in over the tab shell
 /// (prototype `overlay` state, `z-index:7`, `pmSlide`).
+///
+/// Die gebäudebezogenen Overlays (Wohneinheiten, Verbrauchsaufteilung) sind
+/// mit ADR-011 entfallen — sie waren nur aus den Vermieter- und
+/// Verwaltungsansichten erreichbar.
 enum AppOverlay: Identifiable, Equatable {
     case detailanalyse
-    case verbrauchsaufteilung
-    case wohneinheiten
     case monatsreport
     case sonnenstrompreis
     case assistent
@@ -20,8 +22,6 @@ enum AppOverlay: Identifiable, Equatable {
     var id: String {
         switch self {
         case .detailanalyse: "detailanalyse"
-        case .verbrauchsaufteilung: "verbrauchsaufteilung"
-        case .wohneinheiten: "wohneinheiten"
         case .monatsreport: "monatsreport"
         case .sonnenstrompreis: "sonnenstrompreis"
         case .assistent: "assistent"

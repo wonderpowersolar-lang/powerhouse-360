@@ -3,7 +3,6 @@ import SwiftUI
 /// Overlay "Energiebilanz" — a Sankey of where today's kilowatt-hours came
 /// from and went, the hourly source mix, and the reasoning behind it.
 struct EnergiebilanzView: View {
-    let role: OnboardingRole
     let onBack: () -> Void
 
     private struct Node {
@@ -39,7 +38,7 @@ struct EnergiebilanzView: View {
     var body: some View {
         VStack(spacing: 0) {
             OverlayHeader(title: "Energiebilanz",
-                          subtitle: role == .mieter ? "Wohnung 12 · heute" : "Friedrichsruher Str. 35 · heute",
+                          subtitle: "Wohnung 12 · heute",
                           onBack: onBack)
 
             ScrollView {
@@ -352,5 +351,5 @@ struct EnergiebilanzView: View {
 }
 
 #Preview {
-    EnergiebilanzView(role: .eigentuemer, onBack: {})
+    EnergiebilanzView(onBack: {})
 }

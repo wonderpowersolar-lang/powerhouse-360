@@ -62,9 +62,7 @@ struct ConnectBuildingView: View {
         VStack(alignment: .leading, spacing: 16) {
             labelledField("Gebäudeadresse", value: "Friedrichsruher Straße 35, 14193 Berlin")
 
-            if model.role == .mieter {
-                labelledField("Wohnung", value: "WE 12 · 3. OG links")
-            }
+            labelledField("Wohnung", value: "WE 12 · 3. OG links")
 
             invitationField
 

@@ -3,8 +3,6 @@ import SwiftUI
 /// Dokumente tab (prototype `tabDocs`) — the billing summary plus a folder
 /// grid that drills down into a filtered document list.
 struct DokumenteView: View {
-    var role: OnboardingRole = .mieter
-
     @Environment(\.openOverlay) private var openOverlay
     @Environment(\.openSheet) private var openSheet
 
@@ -12,7 +10,7 @@ struct DokumenteView: View {
 
     private let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
 
-    private var documents: [DocumentItem] { DocumentItem.all(for: role) }
+    private var documents: [DocumentItem] { DocumentItem.tenant }
 
     private var filtered: [DocumentItem] {
         guard let filter else { return [] }
@@ -33,9 +31,7 @@ struct DokumenteView: View {
                             }
                         }
                     } else {
-                        if role == .mieter {
-                            billingCard
-                        }
+                        billingCard
                         categoryGrid
                     }
                 }
@@ -254,10 +250,6 @@ struct DokumenteView: View {
     }
 }
 
-#Preview("Mieter") {
-    DokumenteView(role: .mieter)
-}
-
-#Preview("Verwaltung") {
-    DokumenteView(role: .verwaltung)
+#Preview {
+    DokumenteView()
 }

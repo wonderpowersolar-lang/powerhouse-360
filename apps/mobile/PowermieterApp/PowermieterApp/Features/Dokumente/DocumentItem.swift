@@ -48,7 +48,7 @@ struct DocumentItem: Identifiable {
 }
 
 extension DocumentItem {
-    /// What a tenant sees.
+    /// Seit ADR-011 kennt die App nur noch Bewohner-Dokumente.
     static let tenant: [DocumentItem] = [
         .init(category: .vertrag, title: "Stromliefervertrag Mieterstrom",
               date: "12.03.2025", size: "PDF · 1,1 MB", statusText: "unterschrieben", status: .ok),
@@ -74,27 +74,4 @@ extension DocumentItem {
               date: "12.03.2025", size: "PDF · 0,2 MB", statusText: "Version 2.1", status: .muted)
     ]
 
-    /// What an owner or a property manager sees.
-    static let building: [DocumentItem] = [
-        .init(category: .vertrag, title: "Betreibervertrag Mieterstrom",
-              date: "12.03.2025", size: "PDF · 2,4 MB", statusText: "unterschrieben", status: .ok),
-        .init(category: .vertrag, title: "Wartungsvertrag PV-Anlage",
-              date: "02.04.2025", size: "PDF · 0,9 MB", statusText: "aktiv", status: .ok),
-        .init(category: .rechnung, title: "Einspeiseabrechnung Q2 2026",
-              date: "10.07.2026", size: "PDF · 0,3 MB", statusText: "583,20 € gutgeschrieben", status: .ok),
-        .init(category: .rechnung, title: "Sammelrechnung Allgemeinstrom Juni",
-              date: "30.06.2026", size: "PDF · 0,2 MB", statusText: "bezahlt", status: .ok),
-        .init(category: .bericht, title: "Monatsreport Gebäude Juni 2026",
-              date: "01.07.2026", size: "PDF · 1,1 MB", statusText: "neu", status: .info),
-        .init(category: .preis, title: "Preisblatt Mieterstrom 2026",
-              date: "01.01.2026", size: "PDF · 0,1 MB", statusText: "gültig", status: .ok),
-        .init(category: .sonst, title: "Messkonzept Gebäude",
-              date: "12.03.2025", size: "PDF · 1,6 MB", statusText: "Version 1.3", status: .muted),
-        .init(category: .sonst, title: "Aushang Energieinfo Juli",
-              date: "05.07.2026", size: "PDF · 0,3 MB", statusText: "neu", status: .info)
-    ]
-
-    static func all(for role: OnboardingRole) -> [DocumentItem] {
-        role == .mieter ? tenant : building
-    }
 }

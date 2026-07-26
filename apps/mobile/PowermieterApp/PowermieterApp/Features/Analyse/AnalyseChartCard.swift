@@ -5,7 +5,6 @@ import SwiftUI
 /// and Jahr. Tapping a column reveals the value read-out underneath.
 struct AnalyseChartCard: View {
     let period: AnalysePeriod
-    let role: OnboardingRole
 
     @State private var selected: Int?
 
@@ -175,7 +174,8 @@ struct AnalyseChartCard: View {
     // MARK: Sample series
 
     /// Household scale factor — the building sees roughly 21× a single flat.
-    private var scale: Double { role == .mieter ? 1 : 21 }
+    /// Wohnungsmassstab — die App zeigt seit ADR-011 nur Bewohnerdaten.
+    private var scale: Double { 1 }
 
     private func gauss(_ value: Double, _ mean: Double, _ spread: Double) -> Double {
         exp(-pow((value - mean) / spread, 2))
@@ -199,14 +199,9 @@ struct AnalyseChartCard: View {
         var pv: [Double] = [], cons: [Double] = []
         for index in 0..<21 {
             let i = Double(index)
-            if role == .mieter {
-                let c = 6.2 + 1.5 * sin(i / 2.9) + 1.2 * sin(i * 1.7) + 0.5 * sin(i * 0.7)
-                cons.append(c)
-                pv.append(c * (0.62 + 0.18 * sin(i / 3 + 1)))
-            } else {
-                cons.append(128 + 26 * sin(i / 3) + 18 * sin(i * 1.9))
-                pv.append(165 + 52 * sin(i / 2.5 + 0.6) + 20 * sin(i * 1.3))
-            }
+            let c = 6.2 + 1.5 * sin(i / 2.9) + 1.2 * sin(i * 1.7) + 0.5 * sin(i * 0.7)
+            cons.append(c)
+            pv.append(c * (0.62 + 0.18 * sin(i / 3 + 1)))
         }
         return (pv, cons)
     }
@@ -328,7 +323,7 @@ struct AnalyseChartCard: View {
 }
 
 #Preview {
-    AnalyseChartCard(period: .heute, role: .mieter)
+    AnalyseChartCard(period: .heute)
         .padding()
         .background(Theme.bg)
 }

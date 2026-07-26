@@ -3,7 +3,6 @@ import SwiftUI
 /// Overlay "Detailanalyse" — the 24-hour curve with per-series toggles,
 /// a day switch and the cost breakdown underneath.
 struct DetailanalyseView: View {
-    let role: OnboardingRole
     let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
@@ -47,7 +46,7 @@ struct DetailanalyseView: View {
     @State private var selected: Int?
 
     private var availableSeries: [Series] {
-        role == .mieter ? [.pv, .verbrauch, .netz] : Series.allCases
+        [.pv, .verbrauch, .netz]
     }
 
     var body: some View {
@@ -67,12 +66,8 @@ struct DetailanalyseView: View {
                     seriesChips
                     chartCard
 
-                    if role == .mieter {
-                        costCard
-                        recommendationCard
-                    } else {
-                        economicsCard
-                    }
+                    costCard
+                    recommendationCard
                 }
                 .padding(.horizontal, 18)
                 .padding(.bottom, 40)
@@ -93,7 +88,7 @@ struct DetailanalyseView: View {
                     if on { active.remove(series) } else { active.insert(series) }
                     selected = nil
                 } label: {
-                    chipLabel(role == .mieter ? series.tenantLabel : series.label,
+                    chipLabel(series.tenantLabel,
                               dot: { Circle().fill(series.color).frame(width: 8, height: 8) },
                               on: on)
                 }
@@ -230,8 +225,8 @@ struct DetailanalyseView: View {
 
     // MARK: Series data
 
-    private var scale: Double { role == .mieter ? 1 : 21 }
-    private var scaleMax: Double { role == .mieter ? 1.35 : 24 }
+    private var scale: Double { 1 }
+    private var scaleMax: Double { 1.35 }
 
     private func gauss(_ value: Double, _ mean: Double, _ spread: Double) -> Double {
         exp(-pow((value - mean) / spread, 2))
@@ -300,7 +295,7 @@ struct DetailanalyseView: View {
         let parts = availableSeries.filter { active.contains($0) }.map { series in
             let value = values(for: series)[hour]
             let formatted = String(format: "%.1f", value).replacingOccurrences(of: ".", with: ",")
-            return "\(role == .mieter ? series.tenantLabel : series.label) \(formatted) \(unit)"
+            return "\(series.tenantLabel) \(formatted) \(unit)"
         }
         return "\(String(format: "%02d", hour)):00 Uhr · " + parts.joined(separator: " · ")
     }
@@ -313,17 +308,6 @@ struct DetailanalyseView: View {
             valueRow("Solarstrom · 6,5 kWh × 24,9 ct", "1,62 €")
             valueRow("Netzstrom · 2,1 kWh × 34,2 ct", "0,72 €")
             valueRow("Summe bis 11:24 Uhr", "2,34 €", emphasised: true)
-        }
-        .padding(.horizontal, 16)
-        .pmCard()
-    }
-
-    private var economicsCard: some View {
-        VStack(spacing: 0) {
-            cardTitle("Wirtschaftlichkeit heute")
-            valueRow("Mieterstrom · 75 kWh × 24,9 ct", "18,68 €")
-            valueRow("Einspeisung · 57 kWh × 7,9 ct", "4,50 €")
-            valueRow("Erlöse heute", "23,18 €", emphasised: true)
         }
         .padding(.horizontal, 16)
         .pmCard()
@@ -386,5 +370,5 @@ struct DetailanalyseView: View {
 }
 
 #Preview {
-    DetailanalyseView(role: .mieter, onBack: {})
+    DetailanalyseView(onBack: {})
 }

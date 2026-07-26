@@ -2,12 +2,11 @@ import SwiftUI
 
 /// Overlay "Monatsreport" — the June summary with recommendations.
 struct MonatsreportView: View {
-    let role: OnboardingRole
     let onBack: () -> Void
 
     @Environment(\.showToast) private var showToast
 
-    private var isTenant: Bool { role == .mieter }
+    private let isTenant = true
 
     private var rows: [(label: String, value: String, delta: String, isGood: Bool)] {
         if isTenant {
@@ -154,5 +153,5 @@ struct MonatsreportView: View {
 }
 
 #Preview {
-    MonatsreportView(role: .mieter, onBack: {})
+    MonatsreportView(onBack: {})
 }

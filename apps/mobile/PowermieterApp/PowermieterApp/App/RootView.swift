@@ -4,11 +4,9 @@ import SwiftUI
 /// Mirrors the prototype's `sWelcome` → `sApp` screen states.
 struct RootView: View {
     // Debug convenience: launch straight into the app shell via
-    // `SIMCTL_CHILD_PM_START=app`, optionally with `SIMCTL_CHILD_PM_ROLE=vermieter`.
-    // Defaults to the real onboarding entry as a Mieter.
+    // `SIMCTL_CHILD_PM_START=app`. Defaults to the real onboarding entry.
     @State private var phase: AppPhase =
         DebugEnvironment.value(.start) == "app" ? .app : .onboarding
-    @State private var role: OnboardingRole = RootView.initialRole()
     /// Light/dark override from Einstellungen; `.system` follows iOS.
     @State private var appearance: AppAppearance = .system
     /// App-Daten. Läuft gegen `MockPowermieterAPI`, solange keine Basis-URL
@@ -19,13 +17,12 @@ struct RootView: View {
         ZStack {
             switch phase {
             case .onboarding:
-                OnboardingFlow(onFinish: { chosen in
-                    role = chosen
+                OnboardingFlow(onFinish: {
                     withAnimation(.easeInOut(duration: 0.35)) { phase = .app }
                 })
                 .transition(.opacity)
             case .app:
-                MainTabView(role: $role, appearance: $appearance)
+                MainTabView(appearance: $appearance)
                     .transition(.opacity)
             }
         }
@@ -33,14 +30,6 @@ struct RootView: View {
         .preferredColorScheme(appearance.colorScheme)
         .environment(\.powermieterStore, store)
         .task { await store.load() }
-    }
-
-    private static func initialRole() -> OnboardingRole {
-        switch DebugEnvironment.value(.role) {
-        case "vermieter", "eigentuemer": return .eigentuemer
-        case "verwaltung": return .verwaltung
-        default: return .mieter
-        }
     }
 }
 

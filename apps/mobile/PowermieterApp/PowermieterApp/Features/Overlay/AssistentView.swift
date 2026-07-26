@@ -3,7 +3,6 @@ import SwiftUI
 /// Overlay "Assistent" — demo chat that explains prices, storage and meter
 /// readings. Answers are canned; the typing pause is simulated.
 struct AssistentView: View {
-    let role: OnboardingRole
     let onBack: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -34,7 +33,7 @@ struct AssistentView: View {
     ]
 
     private var greeting: String {
-        role == .mieter ? " Leon" : ""
+        " Leon"
     }
 
     var body: some View {
@@ -217,5 +216,5 @@ struct AssistentView: View {
 }
 
 #Preview {
-    AssistentView(role: .mieter, onBack: {})
+    AssistentView(onBack: {})
 }

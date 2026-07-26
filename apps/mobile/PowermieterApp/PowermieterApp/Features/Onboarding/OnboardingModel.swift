@@ -5,7 +5,6 @@ import Observation
 /// `swShare` / `swTips` toggles (both default on).
 @Observable
 final class OnboardingModel {
-    var role: OnboardingRole = .mieter
     var shareAnon: Bool = true
     var tips: Bool = true
 }

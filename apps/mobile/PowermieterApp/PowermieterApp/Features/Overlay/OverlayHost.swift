@@ -4,28 +4,23 @@ import SwiftUI
 /// keep one piece of state.
 struct OverlayHost: View {
     let overlay: AppOverlay
-    let role: OnboardingRole
     let onClose: () -> Void
 
     @ViewBuilder
     var body: some View {
         switch overlay {
         case .detailanalyse:
-            DetailanalyseView(role: role, onBack: onClose)
-        case .verbrauchsaufteilung:
-            VerbrauchsaufteilungView(onBack: onClose)
-        case .wohneinheiten:
-            WohneinheitenView(onBack: onClose)
+            DetailanalyseView(onBack: onClose)
         case .monatsreport:
-            MonatsreportView(role: role, onBack: onClose)
+            MonatsreportView(onBack: onClose)
         case .sonnenstrompreis:
             SonnenstrompreisView(onBack: onClose)
         case .assistent:
-            AssistentView(role: role, onBack: onClose)
+            AssistentView(onBack: onClose)
         case .energiebilanz:
-            EnergiebilanzView(role: role, onBack: onClose)
+            EnergiebilanzView(onBack: onClose)
         case .mitteilungen:
-            MitteilungenView(role: role, onBack: onClose)
+            MitteilungenView(onBack: onClose)
         case .rechnungen:
             RechnungenView(onBack: onClose)
         case .rechnungsdetail(let month):
