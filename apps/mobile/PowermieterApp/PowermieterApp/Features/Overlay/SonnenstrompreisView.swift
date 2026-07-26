@@ -34,7 +34,7 @@ struct SonnenstrompreisView: View {
                     forecastCard
 
                     Text("Empfohlene Zeitfenster")
-                        .font(.system(size: 14.5, weight: .bold))
+                        .pmFont(14.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 3)
@@ -47,7 +47,7 @@ struct SonnenstrompreisView: View {
                               isOn: $remindCheapest)
 
                     Text("Prognose auf Basis von Wetterdaten und Börsenpreisen · alle Preise inkl. USt.")
-                        .font(.system(size: 11))
+                        .pmFont(11)
                         .foregroundStyle(Theme.tx3)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
@@ -67,29 +67,29 @@ struct SonnenstrompreisView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
                 Text("Dein Preis jetzt")
-                    .font(.system(size: 12))
+                    .pmFont(12)
                     .foregroundStyle(Theme.tx2)
                 StatusPill(text: "günstig", color: Theme.ok, background: Theme.okS, horizontalPadding: 8)
                 Spacer(minLength: 0)
                 Text("Stand 11:24 Uhr")
-                    .font(.system(size: 11))
+                    .pmFont(11)
                     .foregroundStyle(Theme.tx3)
             }
 
             HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text("26,4")
-                    .font(.system(size: 36, weight: .heavy))
+                    .pmFont(36, weight: .heavy)
                     .tracking(-1)
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
                 Text("ct/kWh")
-                    .font(.system(size: 14, weight: .semibold))
+                    .pmFont(14, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
             }
             .padding(.top, 4)
 
             Text("76 % deines Stroms kommen gerade vom Dach.")
-                .font(.system(size: 12.5))
+                .pmFont(12.5)
                 .foregroundStyle(Theme.tx2)
                 .padding(.top, 2)
 
@@ -109,11 +109,11 @@ struct SonnenstrompreisView: View {
             HStack(spacing: 6) {
                 Circle().fill(color).frame(width: 8, height: 8)
                 Text(label)
-                    .font(.system(size: 11.5))
+                    .pmFont(11.5)
                     .foregroundStyle(Theme.tx2)
             }
             Text(value)
-                .font(.system(size: 15, weight: .heavy))
+                .pmFont(15, weight: .heavy)
                 .foregroundStyle(Theme.tx)
                 .monospacedDigit()
         }
@@ -130,7 +130,7 @@ struct SonnenstrompreisView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 12) {
                 Text("Nächste 24 Stunden")
-                    .font(.system(size: 14.5, weight: .bold))
+                    .pmFont(14.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 legendItem("Preis", Theme.acc)
@@ -183,7 +183,7 @@ struct SonnenstrompreisView: View {
             HStack(spacing: 0) {
                 ForEach(["00", "06", "12", "18", "24"], id: \.self) { label in
                     Text(label)
-                        .font(.system(size: 11))
+                        .pmFont(11)
                         .foregroundStyle(Theme.tx3)
                     if label != "24" { Spacer(minLength: 0) }
                 }
@@ -204,7 +204,7 @@ struct SonnenstrompreisView: View {
         HStack(spacing: 5) {
             Circle().fill(color).frame(width: 8, height: 8)
             Text(label)
-                .font(.system(size: 11))
+                .pmFont(11)
                 .foregroundStyle(Theme.tx2)
         }
         .accessibilityElement(children: .combine)
@@ -216,11 +216,11 @@ struct SonnenstrompreisView: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
                 Text(caption)
-                    .font(.system(size: 12))
+                    .pmFont(12)
                     .foregroundStyle(Theme.tx2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -229,7 +229,7 @@ struct SonnenstrompreisView: View {
                 isOn.wrappedValue.toggle()
             } label: {
                 Image(systemName: isOn.wrappedValue ? "bell.fill" : "bell")
-                    .font(.system(size: 16, weight: .semibold))
+                    .pmFont(16, weight: .semibold)
                     .foregroundStyle(isOn.wrappedValue ? Theme.acc : Theme.tx3)
                     .frame(width: 40, height: 40)
                     .background(isOn.wrappedValue ? Theme.accS : Theme.card2, in: .rect(cornerRadius: 12, style: .continuous))

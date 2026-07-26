@@ -15,7 +15,7 @@ struct OnboardingDoneView: View {
                 .padding(.top, 34)
 
             Text("Alles startklar!")
-                .font(.system(size: 27, weight: .heavy))
+                .pmFont(27, weight: .heavy)
                 .tracking(-0.4)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Theme.tx)
@@ -24,7 +24,7 @@ struct OnboardingDoneView: View {
                 .accessibilityAddTraits(.isHeader)
 
             Text("Dein Gebäude ist verbunden und liefert Daten.")
-                .font(.system(size: 14))
+                .pmFont(14)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Theme.tx2)
                 .frame(maxWidth: .infinity)
@@ -60,7 +60,7 @@ struct OnboardingDoneView: View {
             .frame(width: 86, height: 86)
             .overlay {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 40, weight: .heavy))
+                    .pmFont(40, weight: .heavy)
                     .foregroundStyle(Theme.acc)
             }
             .frame(maxWidth: .infinity)
@@ -104,11 +104,11 @@ struct OnboardingDoneView: View {
         HStack(spacing: 12) {
             leadingDot
             Text(title)
-                .font(.system(size: 14, weight: .semibold))
+                .pmFont(14, weight: .semibold)
                 .foregroundStyle(Theme.tx)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Text(trailing)
-                .font(.system(size: 12.5))
+                .pmFont(12.5)
                 .foregroundStyle(Theme.tx2)
         }
         .padding(.vertical, 13)

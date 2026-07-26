@@ -76,6 +76,28 @@ final class PowermieterStore {
         await load()
     }
 
+    /// Wie eine View mit einem Wert umgehen soll, den sie (noch) nicht hat.
+    ///
+    /// Ohne diese Unterscheidung fallen alle Views auf ihre eingebauten
+    /// Prototyp-Werte zurück, und ein fehlgeschlagener Ladevorgang sieht
+    /// exakt aus wie ein erfolgreicher — nur mit falschen Zahlen.
+    enum DataPresentation {
+        /// Echte Werte liegen vor.
+        case ready
+        /// Wird gerade geladen — Platzhalter anzeigen, keine Zahlen.
+        case placeholder
+        /// Kein Wert zu bekommen (Fehler oder keine Teilnahme) — „–" anzeigen.
+        case unavailable
+    }
+
+    var presentation: DataPresentation {
+        if summary != nil { return .ready }
+        return switch state {
+        case .idle, .loading: .placeholder
+        case .failed, .loaded: .unavailable
+        }
+    }
+
     // MARK: Abgeleitete Anzeigewerte
 
     /// Heutiger Verbrauch, z. B. „8,6".

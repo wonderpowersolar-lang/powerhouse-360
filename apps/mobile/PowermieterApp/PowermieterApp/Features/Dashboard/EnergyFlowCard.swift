@@ -15,6 +15,13 @@ struct EnergyFlowCard: View {
             diagram
                 .frame(height: 250)
                 .padding(.top, 4)
+                // Das Diagramm setzt seine Knoten mit `.position` auf feste
+                // Punkte einer 250 pt hohen Fläche. Wachsen die Beschriftungen
+                // weiter, schieben sich die Kacheln übereinander und über das
+                // Gebäude — unlesbar statt nur klein. Bis das Layout selbst
+                // mitwächst, ist hier Schluss; die Zahlen stehen zusätzlich in
+                // den Kennzahlkacheln und im Bottom-Sheet, beide skalieren voll.
+                .dynamicTypeSize(...DynamicTypeSize.xLarge)
         }
         .padding(.horizontal, 16)
         .padding(.top, 14)
@@ -27,16 +34,16 @@ struct EnergyFlowCard: View {
     private var header: some View {
         HStack(spacing: 7) {
             Text("Energiefluss")
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
             Spacer(minLength: 0)
             Text("Jetzt")
-                .font(.system(size: 11, weight: .bold))
+                .pmFont(11, weight: .bold)
                 .foregroundStyle(Theme.acc)
                 .padding(.horizontal, 9).padding(.vertical, 4)
                 .background(Theme.accS, in: .capsule)
             Text("Bilanz")
-                .font(.system(size: 11, weight: .bold))
+                .pmFont(11, weight: .bold)
                 .foregroundStyle(Theme.btnT)
                 .padding(.horizontal, 10).padding(.vertical, 4)
                 .background(Theme.btn, in: .capsule)
@@ -78,7 +85,7 @@ struct EnergyFlowCard: View {
                     .position(whg)
 
                 Text("76 % deines Stroms kommen gerade vom Dach · Tippe für Details")
-                    .font(.system(size: 11))
+                    .pmFont(11)
                     .foregroundStyle(Theme.tx3)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
@@ -105,7 +112,7 @@ struct EnergyFlowCard: View {
 
     private var buildingGlyph: some View {
         Image(systemName: "building.2.fill")
-            .font(.system(size: 46, weight: .regular))
+            .pmFont(46, weight: .regular)
             .foregroundStyle(Theme.home)
             .frame(width: 84, height: 84)
             .background(Theme.card2, in: .circle)
@@ -118,14 +125,14 @@ struct EnergyFlowCard: View {
         Button { openSheet(sheet) } label: {
             HStack(spacing: 8) {
             Image(systemName: symbol)
-                .font(.system(size: 14, weight: .semibold))
+                .pmFont(14, weight: .semibold)
                 .foregroundStyle(tint)
             VStack(alignment: .leading, spacing: 0) {
                 Text(label)
-                    .font(.system(size: 10))
+                    .pmFont(10)
                     .foregroundStyle(Theme.tx2)
                 Text(value)
-                    .font(.system(size: 14.5, weight: .heavy))
+                    .pmFont(14.5, weight: .heavy)
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
             }

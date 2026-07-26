@@ -56,22 +56,22 @@ struct DokumenteView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Aktueller Abschlag")
-                        .font(.system(size: 12))
+                        .pmFont(12)
                         .foregroundStyle(Theme.tx2)
 
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text("68,00 €")
-                            .font(.system(size: 23, weight: .heavy))
+                            .pmFont(23, weight: .heavy)
                             .foregroundStyle(Theme.tx)
                             .monospacedDigit()
                         Text("/ Monat")
-                            .font(.system(size: 13, weight: .semibold))
+                            .pmFont(13, weight: .semibold)
                             .foregroundStyle(Theme.tx2)
                     }
                     .padding(.top, 3)
 
                     Text("Offene Beträge: 0,00 € · nächste Abbuchung 01.08.")
-                        .font(.system(size: 11.5))
+                        .pmFont(11.5)
                         .foregroundStyle(Theme.tx3)
                         .padding(.top, 4)
                 }
@@ -80,7 +80,7 @@ struct DokumenteView: View {
                 StatusPill(text: "alles bezahlt", color: Theme.ok, background: Theme.okS)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .bold))
+                    .pmFont(13, weight: .bold)
                     .foregroundStyle(Theme.tx3)
                     .accessibilityHidden(true)
             }
@@ -107,7 +107,7 @@ struct DokumenteView: View {
                                 .frame(width: 42, height: 42)
                                 .overlay {
                                     Image(systemName: category.symbol)
-                                        .font(.system(size: 17, weight: .semibold))
+                                        .pmFont(17, weight: .semibold)
                                         .foregroundStyle(category.tint)
                                 }
                                 .accessibilityHidden(true)
@@ -122,10 +122,10 @@ struct DokumenteView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(category.title)
-                                .font(.system(size: 14.5, weight: .bold))
+                                .pmFont(14.5, weight: .bold)
                                 .foregroundStyle(Theme.tx)
                             Text(countLabel(items.count))
-                                .font(.system(size: 11.5))
+                                .pmFont(11.5)
                                 .foregroundStyle(Theme.tx3)
                         }
                     }
@@ -158,10 +158,11 @@ struct DokumenteView: View {
                 filter = nil
             } label: {
                 Image(systemName: "arrow.left")
-                    .font(.system(size: 15, weight: .semibold))
+                    .pmFont(15, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
                     .frame(width: 36, height: 36)
                     .background(Theme.card, in: .rect(cornerRadius: 12, style: .continuous))
+                    .pmHitTarget()
                     .overlay {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .strokeBorder(Theme.line2, lineWidth: 1)
@@ -172,11 +173,11 @@ struct DokumenteView: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(category.title)
-                    .font(.system(size: 15.5, weight: .heavy))
+                    .pmFont(15.5, weight: .heavy)
                     .foregroundStyle(Theme.tx)
                     .accessibilityAddTraits(.isHeader)
                 Text(filtered.isEmpty ? "Keine Dokumente" : countLabel(filtered.count))
-                    .font(.system(size: 11))
+                    .pmFont(11)
                     .foregroundStyle(Theme.tx3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -193,18 +194,18 @@ struct DokumenteView: View {
                     .frame(width: 38, height: 38)
                     .overlay {
                         Image(systemName: "doc.text")
-                            .font(.system(size: 15, weight: .semibold))
+                            .pmFont(15, weight: .semibold)
                             .foregroundStyle(Theme.tx2)
                     }
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(document.title)
-                        .font(.system(size: 13.5, weight: .bold))
+                        .pmFont(13.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .lineLimit(1)
                     Text(document.meta)
-                        .font(.system(size: 11.5))
+                        .pmFont(11.5)
                         .foregroundStyle(Theme.tx3)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -228,17 +229,17 @@ struct DokumenteView: View {
                 .frame(width: 52, height: 52)
                 .overlay {
                     Image(systemName: "folder")
-                        .font(.system(size: 21))
+                        .pmFont(21)
                         .foregroundStyle(Theme.tx2)
                 }
                 .accessibilityHidden(true)
 
             Text("Hier ist noch nichts abgelegt")
-                .font(.system(size: 15.5, weight: .bold))
+                .pmFont(15.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
 
             Text("Ältere Dokumente werden nach 24 Monaten automatisch ins Archiv verschoben.")
-                .font(.system(size: 13))
+                .pmFont(13)
                 .foregroundStyle(Theme.tx2)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 270)

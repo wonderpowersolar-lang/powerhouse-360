@@ -128,6 +128,38 @@ objekt-scoped Endpunktsatz wird nicht gebaut. Die App-API bleibt bei
 Die Rollen-UI ist am selben Tag ausgebaut worden: 12 Dateien gelöscht, der
 Rollenbegriff aus 20 weiteren entfernt. 10.165 → 8.006 Zeilen.
 
+### Barrierefreiheit und Ladezustände (2026-07-26)
+
+Aus dem iOS-Design-Review sind vier Befunde umgesetzt:
+
+- **Dynamic Type.** Die App hatte 306 feste Schriftgrößen und ignorierte
+  „Textgröße" in den iOS-Einstellungen vollständig. Alle Aufrufstellen laufen
+  jetzt über `Theme/ScaledFont.swift`: `.pmFont(13, weight: .bold)` koppelt die
+  Punktgröße an die nächstpassende Textstufe und lässt sie von `ScaledMetric`
+  mitskalieren. Die Punktgrößen bleiben erhalten — sie sind über die ganze App
+  aufeinander abgestimmt. `Text + Text`-Verkettungen brauchen einen `Font`
+  statt eines Modifiers und nutzen `Font.pmScaled(_:for:)`.
+  Gedeckelt auf `accessibility1`: darüber schneiden die aus dem Prototyp
+  übernommenen festen Höhen Zahlen ab. Die Tab-Leiste zeigt ab
+  Bedienungshilfen-Größen nur Symbole (fünf Beschriftungen passen nicht mehr
+  nebeneinander, VoiceOver liest weiter den vollen Namen); der Energiefluss
+  ist auf `xLarge` gedeckelt, weil er seine Knoten mit `.position` setzt.
+- **Ladezustände.** `PowermieterStore.presentation` unterscheidet
+  *lädt* / *da* / *nicht verfügbar*. Bei einem Fehler erscheint
+  `DataStatusBanner` mit Grund und „Erneut", und der Dashboard-Inhalt wird
+  redigiert statt Prototyp-Zahlen zu zeigen. Vorher war ein Ladefehler von
+  einem erfolgreichen Laden nicht zu unterscheiden — nur mit falschen Zahlen.
+  Der Tagesverlauf hat einen eigenen Leerzustand, weil `.redacted` gezeichnete
+  Pfade nicht erfasst.
+- **Trefferflächen.** `.pmHitTarget()` bringt Sheet-Schließen, Overlay-Zurück
+  und Dokumente-Zurück auf die 44 pt der HIG, ohne die Optik zu ändern.
+- **Kontrast.** `Theme.tx2`/`tx3` weichen bewusst von `design-tokens.css` ab:
+  Die CSS-Werte erreichten 2,5:1 (`tx3`) und verfehlten WCAG AA deutlich.
+  Gerechnet ist jetzt gegen Karte *und* App-Hintergrund, beide ≥ 4,5:1.
+
+Ausprobieren: `xcrun simctl ui booted content_size accessibility-medium`,
+Fehlerpfad mit `SIMCTL_CHILD_PM_API_BASE_URL=http://127.0.0.1:9`.
+
 ### Noch offen (nicht im Slice)
 
 Die restlichen Views lesen weiterhin Festwerte; echte Instrument-Sans-Schrift

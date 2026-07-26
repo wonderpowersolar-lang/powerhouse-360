@@ -8,7 +8,7 @@ struct PrimaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 16.5, weight: .bold))
+                .pmFont(16.5, weight: .bold)
                 .foregroundStyle(Theme.btnT)
                 .frame(maxWidth: .infinity)
                 .frame(height: 54)

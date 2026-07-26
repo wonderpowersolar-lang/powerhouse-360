@@ -58,7 +58,7 @@ struct MitteilungenView: View {
                     readIDs = Set(items.map(\.id))
                 } label: {
                     Text("Alle gelesen")
-                        .font(.system(size: 12.5, weight: .bold))
+                        .pmFont(12.5, weight: .bold)
                         .foregroundStyle(Theme.acc)
                 }
                 .buttonStyle(.plain)
@@ -81,7 +81,7 @@ struct MitteilungenView: View {
                                 cleared = true
                             } label: {
                                 Text("Alle löschen")
-                                    .font(.system(size: 13.5, weight: .bold))
+                                    .pmFont(13.5, weight: .bold)
                                     .foregroundStyle(Theme.tx2)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 46)
@@ -107,7 +107,7 @@ struct MitteilungenView: View {
 
     private func sectionTitle(_ text: String) -> some View {
         Text(text.uppercased())
-            .font(.system(size: 11.5, weight: .bold))
+            .pmFont(11.5, weight: .bold)
             .tracking(0.6)
             .foregroundStyle(Theme.tx3)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -126,20 +126,20 @@ struct MitteilungenView: View {
                     .frame(width: 38, height: 38)
                     .overlay {
                         Image(systemName: item.symbol)
-                            .font(.system(size: 16, weight: .semibold))
+                            .pmFont(16, weight: .semibold)
                             .foregroundStyle(item.tint)
                     }
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(item.title)
-                        .font(.system(size: 14, weight: .bold))
+                        .pmFont(14, weight: .bold)
                         .foregroundStyle(Theme.tx)
                     Text(item.body)
-                        .font(.system(size: 12.5))
+                        .pmFont(12.5)
                         .foregroundStyle(Theme.tx2)
                     Text(item.time)
-                        .font(.system(size: 11))
+                        .pmFont(11)
                         .foregroundStyle(Theme.tx3)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -167,17 +167,17 @@ struct MitteilungenView: View {
                 .frame(width: 52, height: 52)
                 .overlay {
                     Image(systemName: "bell")
-                        .font(.system(size: 22))
+                        .pmFont(22)
                         .foregroundStyle(Theme.tx2)
                 }
                 .accessibilityHidden(true)
 
             Text("Keine Benachrichtigungen")
-                .font(.system(size: 15.5, weight: .bold))
+                .pmFont(15.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
 
             Text("Neue Mitteilungen zu Solarstrom, Rechnungen und Störungen erscheinen hier.")
-                .font(.system(size: 13))
+                .pmFont(13)
                 .foregroundStyle(Theme.tx2)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 270)

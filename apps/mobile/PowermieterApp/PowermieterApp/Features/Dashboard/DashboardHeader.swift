@@ -16,18 +16,18 @@ struct DashboardHeader: View {
                 .frame(width: 34, height: 34)
                 .overlay {
                     Image(systemName: "bolt.fill")
-                        .font(.system(size: 16, weight: .bold))
+                        .pmFont(16, weight: .bold)
                         .foregroundStyle(Theme.accT)
                 }
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(greeting)
-                    .font(.system(size: 20, weight: .heavy))
+                    .pmFont(20, weight: .heavy)
                     .tracking(-0.4)
                     .foregroundStyle(Theme.tx)
                 Text(subtitle)
-                    .font(.system(size: 12.5))
+                    .pmFont(12.5)
                     .foregroundStyle(Theme.tx2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -50,7 +50,7 @@ struct DashboardHeader: View {
                             action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 18, weight: .semibold))
+                .pmFont(18, weight: .semibold)
                 .foregroundStyle(Theme.tx2)
                 .frame(width: 44, height: 44)
                 .background(Theme.card, in: .rect(cornerRadius: 15, style: .continuous))
@@ -61,7 +61,7 @@ struct DashboardHeader: View {
                 .overlay(alignment: .topTrailing) {
                     if badge > 0 {
                         Text("\(badge)")
-                            .font(.system(size: 9.5, weight: .heavy))
+                            .pmFont(9.5, weight: .heavy)
                             .foregroundStyle(.white)
                             .padding(.horizontal, 4)
                             .frame(minWidth: 16, minHeight: 16)

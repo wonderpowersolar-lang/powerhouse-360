@@ -12,15 +12,15 @@ struct SolarTipCard: View {
                     .frame(width: 38, height: 38)
                     .overlay {
                         Image(systemName: "sun.max.fill")
-                            .font(.system(size: 18, weight: .semibold))
+                            .pmFont(18, weight: .semibold)
                             .foregroundStyle(Theme.pv)
                     }
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Jetzt viel Solarstrom verfügbar")
-                        .font(.system(size: 15, weight: .bold))
+                        .pmFont(15, weight: .bold)
                         .foregroundStyle(Theme.tx)
                     Text("Ein guter Zeitpunkt für Waschmaschine oder Geschirrspüler – bis ca. 15:00 Uhr liefert das Dach mehr, als das Haus verbraucht.")
-                        .font(.system(size: 13))
+                        .pmFont(13)
                         .foregroundStyle(Theme.tx2)
                         .lineSpacing(3)
                 }
@@ -28,7 +28,7 @@ struct SolarTipCard: View {
 
             Button { openOverlay(.sonnenstrompreis) } label: {
                 Text("Details ansehen")
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.btnT)
                     .padding(.horizontal, 18)
                     .frame(height: 42)

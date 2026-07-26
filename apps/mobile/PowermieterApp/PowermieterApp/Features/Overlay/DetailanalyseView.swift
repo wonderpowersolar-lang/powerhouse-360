@@ -3,6 +3,7 @@ import SwiftUI
 /// Overlay "Detailanalyse" — the 24-hour curve with per-series toggles,
 /// a day switch and the cost breakdown underneath.
 struct DetailanalyseView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
@@ -120,7 +121,7 @@ struct DetailanalyseView: View {
         HStack(spacing: 7) {
             dot()
             Text(title)
-                .font(.system(size: 12, weight: .semibold))
+                .pmFont(12, weight: .semibold)
         }
         .foregroundStyle(on ? Theme.tx : Theme.tx3)
         .padding(.horizontal, 12)
@@ -156,7 +157,7 @@ struct DetailanalyseView: View {
             HStack(spacing: 0) {
                 ForEach(["00", "06", "12", "18", "24"], id: \.self) { label in
                     Text(label)
-                        .font(.system(size: 11))
+                        .pmFont(11)
                         .foregroundStyle(Theme.tx3)
                     if label != "24" { Spacer(minLength: 0) }
                 }
@@ -167,7 +168,7 @@ struct DetailanalyseView: View {
             if let selected {
                 HStack(spacing: 8) {
                     Text(readout(for: selected))
-                        .font(.system(size: 12, weight: .semibold))
+                        .pmFont(12, weight: .semibold)
                         .foregroundStyle(Theme.tx2)
                         .monospacedDigit()
                     if (5...7).contains(selected) {
@@ -315,7 +316,7 @@ struct DetailanalyseView: View {
 
     private func cardTitle(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 14.5, weight: .bold))
+            .pmFont(14.5, weight: .bold)
             .foregroundStyle(Theme.tx)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, 12)
@@ -328,11 +329,11 @@ struct DetailanalyseView: View {
             Divider().overlay(Theme.line)
             HStack {
                 Text(label)
-                    .font(.system(size: 12.5, weight: emphasised ? .bold : .regular))
+                    .pmFont(12.5, weight: emphasised ? .bold : .regular)
                     .foregroundStyle(emphasised ? Theme.tx : Theme.tx2)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(value)
-                    .font(.system(size: emphasised ? 14 : 12.5, weight: emphasised ? .heavy : .semibold))
+                    .font(.pmScaled(emphasised ? 14 : 12.5, weight: emphasised ? .heavy : .semibold, for: dynamicTypeSize))
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
             }
@@ -344,18 +345,18 @@ struct DetailanalyseView: View {
     private var recommendationCard: some View {
         VStack(alignment: .leading, spacing: 11) {
             Text("Empfehlung")
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
 
             Text("Verschiebe Waschmaschine und Geschirrspüler in die Mittagszeit — dort kostet deine Kilowattstunde bis zu 27 % weniger.")
-                .font(.system(size: 12.5))
+                .pmFont(12.5)
                 .foregroundStyle(Theme.tx2)
 
             Button {
                 openOverlay(.sonnenstrompreis)
             } label: {
                 Text("Sonnenstrompreis ansehen")
-                    .font(.system(size: 13.5, weight: .bold))
+                    .pmFont(13.5, weight: .bold)
                     .foregroundStyle(Theme.btnT)
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)

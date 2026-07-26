@@ -30,7 +30,7 @@ struct AnalyseChartCard: View {
 
             if let selected, let readout = readout(for: selected) {
                 Text(readout)
-                    .font(.system(size: 12, weight: .semibold))
+                    .pmFont(12, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
                     .monospacedDigit()
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -50,7 +50,7 @@ struct AnalyseChartCard: View {
     private var legend: some View {
         HStack(spacing: 12) {
             Text("Verlauf")
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -68,7 +68,7 @@ struct AnalyseChartCard: View {
                 .fill(color)
                 .frame(width: 8, height: 8)
             Text(label)
-                .font(.system(size: 11))
+                .pmFont(11)
                 .foregroundStyle(Theme.tx2)
         }
         .accessibilityElement(children: .combine)
@@ -317,7 +317,7 @@ struct AnalyseChartCard: View {
 
     private func axisText(_ label: String) -> some View {
         Text(label)
-            .font(.system(size: 11))
+            .pmFont(11)
             .foregroundStyle(Theme.tx3)
     }
 }

@@ -50,7 +50,7 @@ struct PrivacyView: View {
 
     private var title: some View {
         Text("Deine Daten,\nklar geregelt")
-            .font(.system(size: 27, weight: .heavy))
+            .pmFont(27, weight: .heavy)
             .tracking(-0.4)
             .foregroundStyle(Theme.tx)
             .fixedSize(horizontal: false, vertical: true)
@@ -64,17 +64,17 @@ struct PrivacyView: View {
                 .frame(width: 36, height: 36)
                 .overlay {
                     Image(systemName: icon)
-                        .font(.system(size: 15, weight: .semibold))
+                        .pmFont(15, weight: .semibold)
                         .foregroundStyle(tint)
                 }
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(head)
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Text(detail)
-                    .font(.system(size: 12.5))
+                    .pmFont(12.5)
                     .foregroundStyle(Theme.tx2)
                     .lineSpacing(2)
             }
@@ -90,7 +90,7 @@ struct PrivacyView: View {
             settingRow(title: "Abrechnung & Anzeige",
                        sub: "Erforderlich für Mieterstrom") {
                 Text("immer aktiv")
-                    .font(.system(size: 11, weight: .bold))
+                    .pmFont(11, weight: .bold)
                     .foregroundStyle(Theme.tx3)
                     .padding(.vertical, 4)
                     .padding(.horizontal, 9)
@@ -129,10 +129,10 @@ struct PrivacyView: View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 13.5, weight: .semibold))
+                    .pmFont(13.5, weight: .semibold)
                     .foregroundStyle(Theme.tx)
                 Text(sub)
-                    .font(.system(size: 11.5))
+                    .pmFont(11.5)
                     .foregroundStyle(Theme.tx3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)

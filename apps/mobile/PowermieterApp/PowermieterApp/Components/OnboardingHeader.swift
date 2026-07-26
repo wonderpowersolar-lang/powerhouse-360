@@ -10,7 +10,7 @@ struct OnboardingHeader: View {
         HStack {
             Button(action: onBack) {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 16, weight: .semibold))
+                    .pmFont(16, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
                     .frame(width: 40, height: 40)
                     .background(Theme.card, in: .rect(cornerRadius: 13, style: .continuous))

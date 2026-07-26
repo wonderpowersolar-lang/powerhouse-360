@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Overlay "Messsystem" — meter fleet health plus the glossary of states.
 struct MesssystemView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
@@ -57,11 +58,11 @@ struct MesssystemView: View {
                            _ color: Color, _ background: Color) -> some View {
         VStack(spacing: 2) {
             Text(value)
-                .font(.system(size: 20, weight: .heavy))
+                .pmFont(20, weight: .heavy)
                 .foregroundStyle(color)
                 .monospacedDigit()
             Text(label)
-                .font(.system(size: 11.5, weight: .semibold))
+                .pmFont(11.5, weight: .semibold)
                 .foregroundStyle(Theme.tx2)
         }
         .frame(maxWidth: .infinity)
@@ -78,17 +79,17 @@ struct MesssystemView: View {
                     .frame(width: 38, height: 38)
                     .overlay {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 16, weight: .semibold))
+                            .pmFont(16, weight: .semibold)
                             .foregroundStyle(Theme.warn)
                     }
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Wohnungszähler WE 07 verzögert")
-                        .font(.system(size: 14, weight: .bold))
+                        .pmFont(14, weight: .bold)
                         .foregroundStyle(Theme.tx)
                     Text("Letzter Wert vor 6 Stunden. Bis zur Verbindung werden die Werte nach Standardprofil geschätzt und danach automatisch korrigiert.")
-                        .font(.system(size: 12.5))
+                        .pmFont(12.5)
                         .foregroundStyle(Theme.tx2)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -99,7 +100,7 @@ struct MesssystemView: View {
                 openOverlay(.stoerungsfall)
             } label: {
                 Text("Supportfall erstellen")
-                    .font(.system(size: 13.5, weight: .bold))
+                    .pmFont(13.5, weight: .bold)
                     .foregroundStyle(Theme.btnT)
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
@@ -121,11 +122,11 @@ struct MesssystemView: View {
                         .frame(width: 9, height: 9)
                         .accessibilityHidden(true)
                     Text(device.name)
-                        .font(.system(size: 13.5, weight: .semibold))
+                        .pmFont(13.5, weight: .semibold)
                         .foregroundStyle(Theme.tx)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Text(device.state)
-                        .font(.system(size: 11.5))
+                        .pmFont(11.5)
                         .foregroundStyle(Theme.tx3)
                 }
                 .padding(.vertical, 12)
@@ -139,15 +140,15 @@ struct MesssystemView: View {
     private var glossaryCard: some View {
         VStack(alignment: .leading, spacing: 9) {
             Text("Was bedeuten die Zustände?")
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
                 .padding(.bottom, 2)
 
             ForEach(Array(glossary.enumerated()), id: \.offset) { _, entry in
                 Group {
-                    Text(entry.term).font(.system(size: 12.5, weight: .bold))
-                    + Text(" — ").font(.system(size: 12.5))
-                    + Text(entry.meaning).font(.system(size: 12.5))
+                    Text(entry.term).font(.pmScaled(12.5, weight: .bold, for: dynamicTypeSize))
+                    + Text(" — ").font(.pmScaled(12.5, for: dynamicTypeSize))
+                    + Text(entry.meaning).font(.pmScaled(12.5, for: dynamicTypeSize))
                 }
                 .foregroundStyle(Theme.tx2)
                 .frame(maxWidth: .infinity, alignment: .leading)

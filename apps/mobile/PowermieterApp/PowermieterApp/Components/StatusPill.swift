@@ -10,7 +10,7 @@ struct StatusPill: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 11, weight: .bold))
+            .pmFont(11, weight: .bold)
             .foregroundStyle(color)
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, 4)

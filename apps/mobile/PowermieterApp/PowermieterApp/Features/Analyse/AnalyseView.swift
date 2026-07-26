@@ -53,7 +53,7 @@ struct AnalyseView: View {
                     period = option
                 } label: {
                     Text(option.title)
-                        .font(.system(size: 12.5, weight: .bold))
+                        .pmFont(12.5, weight: .bold)
                         .foregroundStyle(active ? Theme.btnT : Theme.tx2)
                         .frame(maxWidth: .infinity)
                         .frame(height: 34)
@@ -81,10 +81,10 @@ struct AnalyseView: View {
                 ForEach(chips, id: \.label) { chip in
                     VStack(alignment: .leading, spacing: 3) {
                         Text(chip.label)
-                            .font(.system(size: 11))
+                            .pmFont(11)
                             .foregroundStyle(Theme.tx2)
                         Text(chip.value)
-                            .font(.system(size: 15.5, weight: .heavy))
+                            .pmFont(15.5, weight: .heavy)
                             .foregroundStyle(Theme.tx)
                             .monospacedDigit()
                     }
@@ -113,7 +113,7 @@ struct AnalyseView: View {
     private var comparisonCard: some View {
         VStack(spacing: 0) {
             Text(period.comparisonTitle)
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 11)
@@ -123,7 +123,7 @@ struct AnalyseView: View {
                 Divider().overlay(Theme.line)
                 HStack(spacing: 10) {
                     Text(row.label)
-                        .font(.system(size: 13))
+                        .pmFont(13)
                         .foregroundStyle(Theme.tx2)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     StatusPill(text: row.delta,
@@ -147,17 +147,17 @@ struct AnalyseView: View {
                 .frame(width: 52, height: 52)
                 .overlay {
                     Image(systemName: "clock")
-                        .font(.system(size: 22, weight: .regular))
+                        .pmFont(22, weight: .regular)
                         .foregroundStyle(Theme.tx2)
                 }
                 .accessibilityHidden(true)
 
             Text("Noch keine Daten für diesen Zeitraum")
-                .font(.system(size: 15.5, weight: .bold))
+                .pmFont(15.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
 
             Text("Benutzerdefinierte Zeiträume werden aus dem Messstellen-Archiv geladen. Im Prototyp stehen Heute, Woche, Monat und Jahr bereit.")
-                .font(.system(size: 13))
+                .pmFont(13)
                 .foregroundStyle(Theme.tx2)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 280)
@@ -166,7 +166,7 @@ struct AnalyseView: View {
                 period = .monat
             } label: {
                 Text("Zurück zu Monat")
-                    .font(.system(size: 13.5, weight: .bold))
+                    .pmFont(13.5, weight: .bold)
                     .foregroundStyle(Theme.btnT)
                     .padding(.horizontal, 20)
                     .frame(height: 42)
@@ -186,7 +186,7 @@ struct AnalyseView: View {
     private var flatComparisonCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Deine Wohnung im Vergleich")
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
 
             VStack(spacing: 10) {
@@ -199,11 +199,11 @@ struct AnalyseView: View {
 
             HStack(alignment: .top, spacing: 9) {
                 Image(systemName: "checkmark.shield")
-                    .font(.system(size: 13, weight: .semibold))
+                    .pmFont(13, weight: .semibold)
                     .foregroundStyle(Theme.tx3)
                     .accessibilityHidden(true)
                 Text("Verbrauchsdaten anderer Wohnungen sind geschützt und nur als anonymer Durchschnitt sichtbar.")
-                    .font(.system(size: 11.5))
+                    .pmFont(11.5)
                     .foregroundStyle(Theme.tx3)
             }
             .padding(.horizontal, 12)
@@ -221,11 +221,11 @@ struct AnalyseView: View {
         VStack(spacing: 5) {
             HStack {
                 Text(label)
-                    .font(.system(size: 12))
+                    .pmFont(12)
                     .foregroundStyle(Theme.tx2)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(value)
-                    .font(.system(size: 12, weight: .bold))
+                    .pmFont(12, weight: .bold)
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
             }
@@ -256,7 +256,7 @@ struct AnalyseView: View {
     private func outlineButton(_ title: String, target: AppOverlay) -> some View {
         Button { openOverlay(target) } label: {
             Text(title)
-                .font(.system(size: 13.5, weight: .bold))
+                .pmFont(13.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
@@ -277,23 +277,23 @@ struct AnalyseView: View {
                     .frame(width: 38, height: 38)
                     .overlay {
                         Image(systemName: "bolt.fill")
-                            .font(.system(size: 16, weight: .semibold))
+                            .pmFont(16, weight: .semibold)
                             .foregroundStyle(Theme.pv)
                     }
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Dynamischer Sonnenstrompreis")
-                        .font(.system(size: 14, weight: .bold))
+                        .pmFont(14, weight: .bold)
                         .foregroundStyle(Theme.tx)
                     Text("Jetzt 26,4 ct/kWh · günstig bis 15:00 Uhr")
-                        .font(.system(size: 12))
+                        .pmFont(12)
                         .foregroundStyle(Theme.tx2)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .bold))
+                    .pmFont(13, weight: .bold)
                     .foregroundStyle(Theme.tx3)
                     .accessibilityHidden(true)
             }

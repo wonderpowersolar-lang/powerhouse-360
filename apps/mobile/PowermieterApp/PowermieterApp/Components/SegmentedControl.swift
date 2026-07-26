@@ -19,7 +19,7 @@ struct SegmentedControl<Value: Hashable>: View {
                     selection = option
                 } label: {
                     Text(title(option))
-                        .font(.system(size: fontSize, weight: .bold))
+                        .pmFont(fontSize, weight: .bold)
                         .foregroundStyle(active ? Theme.btnT : Theme.tx2)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)

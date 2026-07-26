@@ -3,6 +3,7 @@ import SwiftUI
 /// Overlay "Störungsfall" — raise a support case for the delayed WE 07 meter.
 /// Submitting swaps the form for the confirmation state.
 struct StoerungsfallView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let onBack: () -> Void
 
     @State private var submitted = false
@@ -42,17 +43,17 @@ struct StoerungsfallView: View {
                 .frame(width: 38, height: 38)
                 .overlay {
                     Image(systemName: "gauge.with.dots.needle.bottom.50percent")
-                        .font(.system(size: 16, weight: .semibold))
+                        .pmFont(16, weight: .semibold)
                         .foregroundStyle(Theme.tx2)
                 }
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Wohnungszähler WE 07")
-                    .font(.system(size: 13.5, weight: .bold))
+                    .pmFont(13.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Text("Nr. 1EMH0047110712 · LoRaWAN")
-                    .font(.system(size: 11.5))
+                    .pmFont(11.5)
                     .foregroundStyle(Theme.tx3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -67,7 +68,7 @@ struct StoerungsfallView: View {
     private var timelineCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Verlauf")
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
                 .padding(.bottom, 10)
 
@@ -91,9 +92,9 @@ struct StoerungsfallView: View {
                 .accessibilityHidden(true)
 
             Group {
-                Text(time).font(.system(size: 12.5, weight: .bold))
-                + Text(" — ").font(.system(size: 12.5))
-                + Text(text).font(.system(size: 12.5))
+                Text(time).font(.pmScaled(12.5, weight: .bold, for: dynamicTypeSize))
+                + Text(" — ").font(.pmScaled(12.5, for: dynamicTypeSize))
+                + Text(text).font(.pmScaled(12.5, for: dynamicTypeSize))
             }
             .foregroundStyle(Theme.tx2)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -106,11 +107,11 @@ struct StoerungsfallView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text("Kategorie")
-                    .font(.system(size: 12.5))
+                    .pmFont(12.5)
                     .foregroundStyle(Theme.tx2)
                 Spacer()
                 Text("Zähler & Messtechnik")
-                    .font(.system(size: 12.5, weight: .semibold))
+                    .pmFont(12.5, weight: .semibold)
                     .foregroundStyle(Theme.tx)
             }
             .padding(.bottom, 11)
@@ -119,7 +120,7 @@ struct StoerungsfallView: View {
             Divider().overlay(Theme.line)
 
             Text("Wohnungszähler WE 07 liefert seit 04:12 Uhr keine Daten. Reconnect über Gateway erfolglos. Bitte Funkstrecke bzw. Zähler vor Ort prüfen.")
-                .font(.system(size: 12.5))
+                .pmFont(12.5)
                 .foregroundStyle(Theme.tx2)
                 .padding(.top, 11)
         }
@@ -143,18 +144,18 @@ struct StoerungsfallView: View {
                 .frame(width: 64, height: 64)
                 .overlay {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 28, weight: .bold))
+                        .pmFont(28, weight: .bold)
                         .foregroundStyle(Theme.ok)
                 }
                 .accessibilityHidden(true)
 
             Text("Fall #2493 angelegt")
-                .font(.system(size: 17, weight: .heavy))
+                .pmFont(17, weight: .heavy)
                 .foregroundStyle(Theme.tx)
                 .accessibilityAddTraits(.isHeader)
 
             Text("Der Messstellenbetreiber wurde informiert. Den Status findest du jederzeit unter Vorgänge bzw. Hilfe & Support.")
-                .font(.system(size: 13))
+                .pmFont(13)
                 .foregroundStyle(Theme.tx2)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 280)

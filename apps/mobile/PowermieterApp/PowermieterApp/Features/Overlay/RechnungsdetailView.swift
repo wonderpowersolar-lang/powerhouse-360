@@ -34,14 +34,14 @@ struct RechnungsdetailView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text("Rechnungsbetrag")
-                    .font(.system(size: 12))
+                    .pmFont(12)
                     .foregroundStyle(Theme.tx2)
                 Spacer()
                 StatusPill(text: invoice.paid, color: Theme.ok, background: Theme.okS)
             }
 
             Text(invoice.sum)
-                .font(.system(size: 32, weight: .heavy))
+                .pmFont(32, weight: .heavy)
                 .tracking(-0.8)
                 .foregroundStyle(Theme.tx)
                 .monospacedDigit()
@@ -67,7 +67,7 @@ struct RechnungsdetailView: View {
                 legendItem("Netz", Theme.grid)
                 Spacer(minLength: 0)
                 Text("\(invoice.kwh) gesamt")
-                    .font(.system(size: 11.5, weight: .semibold))
+                    .pmFont(11.5, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
                     .monospacedDigit()
             }
@@ -83,7 +83,7 @@ struct RechnungsdetailView: View {
         HStack(spacing: 5) {
             Circle().fill(color).frame(width: 8, height: 8)
             Text(label)
-                .font(.system(size: 11.5))
+                .pmFont(11.5)
                 .foregroundStyle(Theme.tx2)
         }
     }
@@ -96,11 +96,11 @@ struct RechnungsdetailView: View {
                 if index > 0 { Divider().overlay(Theme.line) }
                 HStack(alignment: .top, spacing: 10) {
                     Text(row.key)
-                        .font(.system(size: 12.5))
+                        .pmFont(12.5)
                         .foregroundStyle(Theme.tx2)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Text(row.value)
-                        .font(.system(size: 12.5, weight: .semibold))
+                        .pmFont(12.5, weight: .semibold)
                         .foregroundStyle(Theme.tx)
                         .monospacedDigit()
                 }
@@ -112,11 +112,11 @@ struct RechnungsdetailView: View {
 
             HStack {
                 Text("Gesamtbetrag")
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.tx)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(invoice.sum)
-                    .font(.system(size: 14, weight: .heavy))
+                    .pmFont(14, weight: .heavy)
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
             }
@@ -133,11 +133,11 @@ struct RechnungsdetailView: View {
         VStack(spacing: 0) {
             HStack {
                 Text("Grundversorgung hätte gekostet")
-                    .font(.system(size: 13))
+                    .pmFont(13)
                     .foregroundStyle(Theme.tx2)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(invoice.reference)
-                    .font(.system(size: 13, weight: .semibold))
+                    .pmFont(13, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
                     .monospacedDigit()
                     .strikethrough()
@@ -149,11 +149,11 @@ struct RechnungsdetailView: View {
 
             HStack {
                 Text("Deine Ersparnis")
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.tx)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(invoice.saving)
-                    .font(.system(size: 15, weight: .heavy))
+                    .pmFont(15, weight: .heavy)
                     .foregroundStyle(Theme.ok)
                     .monospacedDigit()
             }
@@ -170,7 +170,7 @@ struct RechnungsdetailView: View {
         HStack(spacing: 10) {
             Button { showToast("PDF wird geöffnet … (Demo)") } label: {
                 Text("PDF öffnen")
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.btnT)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
@@ -182,7 +182,7 @@ struct RechnungsdetailView: View {
                 openOverlay(.support)
             } label: {
                 Text("Frage stellen")
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.tx)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
@@ -198,7 +198,7 @@ struct RechnungsdetailView: View {
 
     private var legalNote: some View {
         Text("Alle Preise inkl. 19 % USt. · Abrechnung nach § 42a EnWG · Zählpunkt DE 0001 4711 0012")
-            .font(.system(size: 11))
+            .pmFont(11)
             .foregroundStyle(Theme.tx3)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)

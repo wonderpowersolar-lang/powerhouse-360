@@ -20,7 +20,7 @@ struct WelcomeView: View {
                         .padding(.top, 40)
 
                     Text("Sieh live, wie viel Solarstrom euer Dach liefert, was deine Wohnung verbraucht und was du dabei sparst.")
-                        .font(.system(size: 15.5))
+                        .pmFont(15.5)
                         .foregroundStyle(Theme.tx2)
                         .lineSpacing(4)
                         .frame(maxWidth: 300, alignment: .leading)
@@ -42,14 +42,14 @@ struct WelcomeView: View {
                         .padding(.top, 24)
 
                     Button("Ich habe bereits ein Konto", action: onSkip)
-                        .font(.system(size: 14.5, weight: .semibold))
+                        .pmFont(14.5, weight: .semibold)
                         .foregroundStyle(Theme.tx2)
                         .frame(maxWidth: .infinity)
                         .frame(height: 34)
                         .padding(.top, 14)
 
                     Text("POWERHOUSE 360 · GANZHEITLICHE ENERGIESYSTEME")
-                        .font(.system(size: 11, weight: .medium))
+                        .pmFont(11, weight: .medium)
                         .tracking(1.4)
                         .foregroundStyle(Theme.tx3)
                         .frame(maxWidth: .infinity)
@@ -72,12 +72,12 @@ struct WelcomeView: View {
                 .frame(width: 40, height: 40)
                 .overlay {
                     Image(systemName: "bolt.fill")
-                        .font(.system(size: 19, weight: .bold))
+                        .pmFont(19, weight: .bold)
                         .foregroundStyle(Theme.accT)
                 }
             (Text("power").foregroundStyle(Theme.tx)
              + Text("mieter").foregroundStyle(Theme.acc))
-                .font(.system(size: 21, weight: .heavy))
+                .pmFont(21, weight: .heavy)
                 .tracking(-0.4)
         }
         .accessibilityElement(children: .combine)
@@ -87,7 +87,7 @@ struct WelcomeView: View {
     private var headline: some View {
         (Text("Dein Strom.\nDein Gebäude.\n").foregroundStyle(Theme.tx)
          + Text("Volle Transparenz.").foregroundStyle(Theme.acc))
-            .font(.system(size: 36, weight: .heavy))
+            .pmFont(36, weight: .heavy)
             .tracking(-0.8)
             .lineSpacing(2)
             .fixedSize(horizontal: false, vertical: true)
@@ -100,11 +100,11 @@ struct WelcomeView: View {
                 .frame(width: 34, height: 34)
                 .overlay {
                     Image(systemName: icon)
-                        .font(.system(size: 15, weight: .semibold))
+                        .pmFont(15, weight: .semibold)
                         .foregroundStyle(tint)
                 }
             Text(text)
-                .font(.system(size: 14.5))
+                .pmFont(14.5)
                 .foregroundStyle(Theme.tx)
         }
     }

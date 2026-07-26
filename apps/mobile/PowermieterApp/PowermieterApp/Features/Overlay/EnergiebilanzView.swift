@@ -62,7 +62,7 @@ struct EnergiebilanzView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text("Woher & wohin")
-                    .font(.system(size: 14.5, weight: .bold))
+                    .pmFont(14.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Spacer()
                 StatusPill(text: "Heute", color: Theme.tx2, background: Theme.elev, horizontalPadding: 9)
@@ -94,7 +94,7 @@ struct EnergiebilanzView: View {
     private func nodeLegend(title: String, nodes: [Node]) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title.uppercased())
-                .font(.system(size: 10.5, weight: .bold))
+                .pmFont(10.5, weight: .bold)
                 .tracking(0.6)
                 .foregroundStyle(Theme.tx3)
 
@@ -103,12 +103,12 @@ struct EnergiebilanzView: View {
                     Circle().fill(node.color).frame(width: 7, height: 7)
                         .accessibilityHidden(true)
                     Text(node.label)
-                        .font(.system(size: 11.5))
+                        .pmFont(11.5)
                         .foregroundStyle(Theme.tx2)
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Text("\(Int(node.value))")
-                        .font(.system(size: 11.5, weight: .bold))
+                        .pmFont(11.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .monospacedDigit()
                 }
@@ -187,7 +187,7 @@ struct EnergiebilanzView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 12) {
                 Text("Quellen im Tagesverlauf")
-                    .font(.system(size: 14.5, weight: .bold))
+                    .pmFont(14.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 mixLegend("Solar", Theme.pv)
@@ -225,7 +225,7 @@ struct EnergiebilanzView: View {
             HStack(spacing: 0) {
                 ForEach(["00", "06", "12", "18", "24"], id: \.self) { label in
                     Text(label)
-                        .font(.system(size: 11))
+                        .pmFont(11)
                         .foregroundStyle(Theme.tx3)
                     if label != "24" { Spacer(minLength: 0) }
                 }
@@ -234,7 +234,7 @@ struct EnergiebilanzView: View {
             .accessibilityHidden(true)
 
             Text("So setzte sich der verbrauchte Strom stündlich zusammen.")
-                .font(.system(size: 11.5))
+                .pmFont(11.5)
                 .foregroundStyle(Theme.tx3)
                 .padding(.top, 9)
         }
@@ -246,7 +246,7 @@ struct EnergiebilanzView: View {
         HStack(spacing: 5) {
             Circle().fill(color).frame(width: 8, height: 8)
             Text(label)
-                .font(.system(size: 11))
+                .pmFont(11)
                 .foregroundStyle(Theme.tx2)
         }
         .accessibilityElement(children: .combine)
@@ -258,7 +258,7 @@ struct EnergiebilanzView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text("Speicher-Ladung · Herkunft")
-                    .font(.system(size: 14.5, weight: .bold))
+                    .pmFont(14.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Spacer()
                 StatusPill(text: "grün geladen", color: Theme.ok, background: Theme.okS, horizontalPadding: 9)
@@ -281,7 +281,7 @@ struct EnergiebilanzView: View {
                 mixLegend("Netz 14 %", Theme.grid)
                 Spacer(minLength: 0)
                 Text("Stand 74 % · 106 kWh")
-                    .font(.system(size: 11.5, weight: .semibold))
+                    .pmFont(11.5, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
                     .monospacedDigit()
             }
@@ -297,7 +297,7 @@ struct EnergiebilanzView: View {
     private var reasoningCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Systemlogik · Warum passiert das?")
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
                 .padding(.bottom, 4)
 
@@ -331,16 +331,16 @@ struct EnergiebilanzView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 13.5, weight: .bold))
+                        .pmFont(13.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                     Text(body)
-                        .font(.system(size: 12))
+                        .pmFont(12)
                         .foregroundStyle(Theme.tx2)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text(time)
-                    .font(.system(size: 11))
+                    .pmFont(11)
                     .foregroundStyle(Theme.tx3)
                     .monospacedDigit()
             }

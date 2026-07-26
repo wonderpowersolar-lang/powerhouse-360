@@ -7,10 +7,10 @@ struct ToastView: View {
     var body: some View {
         HStack(spacing: 9) {
             Image(systemName: "checkmark")
-                .font(.system(size: 12, weight: .bold))
+                .pmFont(12, weight: .bold)
                 .accessibilityHidden(true)
             Text(message)
-                .font(.system(size: 13, weight: .semibold))
+                .pmFont(13, weight: .semibold)
         }
         .foregroundStyle(Theme.accT)
         .padding(.horizontal, 16)

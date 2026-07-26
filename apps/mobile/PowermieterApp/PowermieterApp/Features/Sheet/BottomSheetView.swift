@@ -44,7 +44,7 @@ struct BottomSheetView: View {
 
             if let value = content.value {
                 Text(value)
-                    .font(.system(size: 27, weight: .heavy))
+                    .pmFont(27, weight: .heavy)
                     .tracking(-0.6)
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
@@ -53,7 +53,7 @@ struct BottomSheetView: View {
 
             if let description = content.description {
                 Text(description)
-                    .font(.system(size: 13))
+                    .pmFont(13)
                     .foregroundStyle(Theme.tx2)
                     .padding(.top, content.value == nil ? 6 : 8)
             }
@@ -74,7 +74,7 @@ struct BottomSheetView: View {
                     openOverlay(.detailanalyse)
                 } label: {
                     Text("Zur Detailanalyse")
-                        .font(.system(size: 14, weight: .bold))
+                        .pmFont(14, weight: .bold)
                         .foregroundStyle(Theme.btnT)
                         .frame(maxWidth: .infinity)
                         .frame(height: 48)
@@ -110,7 +110,7 @@ struct BottomSheetView: View {
             }
 
             Text(content.title)
-                .font(.system(size: 16.5, weight: .heavy))
+                .pmFont(16.5, weight: .heavy)
                 .foregroundStyle(Theme.tx)
                 .accessibilityAddTraits(.isHeader)
 
@@ -122,10 +122,11 @@ struct BottomSheetView: View {
 
             Button(action: onClose) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 12, weight: .bold))
+                    .pmFont(12, weight: .bold)
                     .foregroundStyle(Theme.tx2)
                     .frame(width: 32, height: 32)
                     .background(Theme.card2, in: .circle)
+                    .pmHitTarget()
             }
             .buttonStyle(.pressable)
             .accessibilityLabel("Schließen")
@@ -138,11 +139,11 @@ struct BottomSheetView: View {
                 if index > 0 { Divider().overlay(Theme.line) }
                 HStack(alignment: .top, spacing: 12) {
                     Text(row.key)
-                        .font(.system(size: 12.5))
+                        .pmFont(12.5)
                         .foregroundStyle(Theme.tx2)
                     Spacer(minLength: 8)
                     Text(row.value)
-                        .font(.system(size: 12.5, weight: .semibold))
+                        .pmFont(12.5, weight: .semibold)
                         .foregroundStyle(Theme.tx)
                         .multilineTextAlignment(.trailing)
                 }
@@ -167,7 +168,7 @@ struct BottomSheetView: View {
                 }
             } label: {
                 Text(openLabel(for: document))
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.btnT)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
@@ -179,7 +180,7 @@ struct BottomSheetView: View {
                 showToast("Download gestartet …")
             } label: {
                 Image(systemName: "arrow.down")
-                    .font(.system(size: 16, weight: .bold))
+                    .pmFont(16, weight: .bold)
                     .foregroundStyle(Theme.tx2)
                     .frame(width: 48, height: 48)
                     .background(Theme.card2, in: .rect(cornerRadius: 14, style: .continuous))

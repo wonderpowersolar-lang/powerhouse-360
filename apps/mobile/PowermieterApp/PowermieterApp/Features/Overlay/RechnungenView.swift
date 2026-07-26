@@ -17,7 +17,7 @@ struct RechnungenView: View {
                     creditCard
 
                     Text("Monatsrechnungen")
-                        .font(.system(size: 14.5, weight: .bold))
+                        .pmFont(14.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 3)
@@ -35,16 +35,16 @@ struct RechnungenView: View {
     private var abschlagCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Aktueller Abschlag")
-                .font(.system(size: 12))
+                .pmFont(12)
                 .foregroundStyle(Theme.tx2)
 
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("68,00 €")
-                    .font(.system(size: 28, weight: .heavy))
+                    .pmFont(28, weight: .heavy)
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
                 Text("/ Monat")
-                    .font(.system(size: 13, weight: .semibold))
+                    .pmFont(13, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
             }
             .padding(.top, 3)
@@ -64,11 +64,11 @@ struct RechnungenView: View {
             Divider().overlay(Theme.line)
             HStack {
                 Text(label)
-                    .font(.system(size: 13))
+                    .pmFont(13)
                     .foregroundStyle(Theme.tx2)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(value)
-                    .font(.system(size: 13, weight: .semibold))
+                    .pmFont(13, weight: .semibold)
                     .foregroundStyle(Theme.tx)
             }
             .padding(.vertical, 11)
@@ -83,17 +83,17 @@ struct RechnungenView: View {
                 .frame(width: 38, height: 38)
                 .overlay {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 16, weight: .bold))
+                        .pmFont(16, weight: .bold)
                         .foregroundStyle(Theme.ok)
                 }
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Guthaben aus Jahresabrechnung 2025")
-                    .font(.system(size: 13.5, weight: .bold))
+                    .pmFont(13.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Text("42,30 € — erstattet am 15.02.2026")
-                    .font(.system(size: 12))
+                    .pmFont(12)
                     .foregroundStyle(Theme.tx2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -112,16 +112,16 @@ struct RechnungenView: View {
                 } label: {
                     HStack(spacing: 10) {
                         Text(invoice.shortTitle)
-                            .font(.system(size: 13.5, weight: .semibold))
+                            .pmFont(13.5, weight: .semibold)
                             .foregroundStyle(Theme.tx)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         Text(invoice.sum)
-                            .font(.system(size: 13.5, weight: .bold))
+                            .pmFont(13.5, weight: .bold)
                             .foregroundStyle(Theme.tx)
                             .monospacedDigit()
                         StatusPill(text: "bezahlt", color: Theme.ok, background: Theme.okS)
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .bold))
+                            .pmFont(12, weight: .bold)
                             .foregroundStyle(Theme.tx3)
                             .accessibilityHidden(true)
                     }

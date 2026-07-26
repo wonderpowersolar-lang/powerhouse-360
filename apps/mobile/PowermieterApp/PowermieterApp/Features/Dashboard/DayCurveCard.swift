@@ -49,19 +49,28 @@ struct DayCurveCard: View {
         hourly.map { $0.map { normalized($0.kwhGrid) } } ?? grid
     }
 
-    /// Fällt auf die Prototyp-Werte zurück, solange nichts geladen ist.
+    /// Beim Laden die Prototyp-Zeile als Platzhalterform (die Karte ist dabei
+    /// redigiert), bei einem Ladefehler eine ehrliche Aussage statt Zahlen.
     private var todayText: String {
         guard let total = store.todayKwhText, let solar = store.todaySolarKwh else {
-            return "Heute: 8,6 kWh · davon 6,5 kWh Solar"
+            return store.presentation == .placeholder
+                ? "Heute: 8,6 kWh · davon 6,5 kWh Solar"
+                : "Heute: keine Messwerte"
         }
         return "Heute: \(total) kWh · davon \(solar.formatted(fractionDigits: 1)) kWh Solar"
+    }
+
+    /// Ohne Messwerte keine Kurven — ein gezeichneter Tagesverlauf aus
+    /// Prototyp-Zahlen wäre von einem echten nicht zu unterscheiden.
+    private var showsCurves: Bool {
+        hourly != nil || store.presentation == .placeholder
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Text("Tagesverlauf")
-                    .font(.system(size: 14.5, weight: .bold))
+                    .pmFont(14.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Spacer(minLength: 0)
                 legendDot(color: Theme.pv, label: "Solar")
@@ -74,7 +83,7 @@ struct DayCurveCard: View {
 
             HStack {
                 ForEach(["00", "06", "12", "18", "24"], id: \.self) { h in
-                    Text(h).font(.system(size: 11)).foregroundStyle(Theme.tx3)
+                    Text(h).pmFont(11).foregroundStyle(Theme.tx3)
                     if h != "24" { Spacer() }
                 }
             }
@@ -83,7 +92,7 @@ struct DayCurveCard: View {
 
             HStack(spacing: 8) {
                 Text(scrubbedHour.flatMap(readout) ?? todayText)
-                    .font(.system(size: 12, weight: scrubbedHour == nil ? .regular : .semibold))
+                    .pmFont(12, weight: scrubbedHour == nil ? .regular : .semibold)
                     .foregroundStyle(scrubbedHour == nil ? Theme.tx2 : Theme.tx)
                     .monospacedDigit()
                     .lineLimit(1)
@@ -91,7 +100,7 @@ struct DayCurveCard: View {
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.12), value: scrubbedHour)
                 Spacer()
                 Button("Detailanalyse") { openOverlay(.detailanalyse) }
-                    .font(.system(size: 12.5, weight: .bold))
+                    .pmFont(12.5, weight: .bold)
                     .foregroundStyle(Theme.acc)
             }
         }
@@ -113,12 +122,23 @@ struct DayCurveCard: View {
                     .stroke(Theme.line, style: StrokeStyle(lineWidth: 1, dash: [3, 4]))
                 }
 
-                areaPath(solarCurve, in: size).fill(Theme.pvS)
-                linePath(gridCurve, in: size).stroke(Theme.grid.opacity(0.85), style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round))
-                linePath(consumptionCurve, in: size).stroke(Theme.home, style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))
+                if showsCurves {
+                    areaPath(solarCurve, in: size).fill(Theme.pvS)
+                    linePath(gridCurve, in: size).stroke(Theme.grid.opacity(0.85), style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round))
+                    linePath(consumptionCurve, in: size).stroke(Theme.home, style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))
 
-                if let hour = scrubbedHour {
-                    scrubIndicator(hour: hour, in: size)
+                    if let hour = scrubbedHour {
+                        scrubIndicator(hour: hour, in: size)
+                    }
+                } else {
+                    // Die Kurven sind Pfade, die `.redacted` nicht erfasst —
+                    // ohne diesen Zweig stünde bei einem Ladefehler ein voll
+                    // gezeichneter, erfundener Tagesverlauf auf dem Schirm.
+                    Text("Für heute liegen keine Messwerte vor.")
+                        .pmFont(12)
+                        .foregroundStyle(Theme.tx3)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .unredacted()
                 }
             }
             .contentShape(.rect)
@@ -232,7 +252,7 @@ struct DayCurveCard: View {
     private func legendDot(color: Color, label: String) -> some View {
         HStack(spacing: 5) {
             Circle().fill(color).frame(width: 8, height: 8)
-            Text(label).font(.system(size: 11)).foregroundStyle(Theme.tx2)
+            Text(label).pmFont(11).foregroundStyle(Theme.tx2)
         }
     }
 }

@@ -22,14 +22,14 @@ struct ConnectBuildingView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Gebäude verbinden")
-                        .font(.system(size: 27, weight: .heavy))
+                        .pmFont(27, weight: .heavy)
                         .tracking(-0.4)
                         .foregroundStyle(Theme.tx)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.top, 26)
 
                     Text("Wir haben deine Daten aus dem Einladungslink übernommen.")
-                        .font(.system(size: 14))
+                        .pmFont(14)
                         .foregroundStyle(Theme.tx2)
                         .lineSpacing(3)
                         .fixedSize(horizontal: false, vertical: true)
@@ -86,10 +86,10 @@ struct ConnectBuildingView: View {
             valueBox {
                 HStack(spacing: 10) {
                     Text("PWM-8H4T-2026")
-                        .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                        .pmFont(15, weight: .semibold, design: .monospaced)
                     Spacer(minLength: 8)
                     Text("übernommen")
-                        .font(.system(size: 11, weight: .bold))
+                        .pmFont(11, weight: .bold)
                         .foregroundStyle(Theme.ok)
                         .padding(.vertical, 4)
                         .padding(.horizontal, 9)
@@ -106,7 +106,7 @@ struct ConnectBuildingView: View {
                     .accessibilityHidden(true)
                 Text("Stattdessen QR-Code scannen")
             }
-            .font(.system(size: 13.5, weight: .semibold))
+            .pmFont(13.5, weight: .semibold)
             .foregroundStyle(Theme.tx2)
             .frame(maxWidth: .infinity)
             .padding(12)
@@ -121,7 +121,7 @@ struct ConnectBuildingView: View {
 
     private func fieldLabel(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 11.5, weight: .semibold))
+            .pmFont(11.5, weight: .semibold)
             .textCase(.uppercase)
             .tracking(0.5)
             .foregroundStyle(Theme.tx3)
@@ -129,7 +129,7 @@ struct ConnectBuildingView: View {
 
     private func valueBox<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
         content()
-            .font(.system(size: 15, weight: .semibold))
+            .pmFont(15, weight: .semibold)
             .foregroundStyle(Theme.tx)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 13)
@@ -158,7 +158,7 @@ struct ConnectBuildingView: View {
         HStack(spacing: 9) {
             statusDot(index)
             Text(label)
-                .font(.system(size: 13.5))
+                .pmFont(13.5)
                 .foregroundStyle(Theme.tx)
         }
         .accessibilityElement(children: .combine)
@@ -174,7 +174,7 @@ struct ConnectBuildingView: View {
                     .frame(width: 9, height: 9)
                     .overlay {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 5, weight: .bold))
+                            .pmFont(5, weight: .bold)
                             .foregroundStyle(.white)
                     }
             } else {
@@ -205,7 +205,7 @@ struct ConnectBuildingView: View {
             ProgressView()
                 .tint(.white)
             Text("Verbinde …")
-                .font(.system(size: 16.5, weight: .bold))
+                .pmFont(16.5, weight: .bold)
                 .foregroundStyle(Theme.btnT)
         }
         .frame(maxWidth: .infinity)

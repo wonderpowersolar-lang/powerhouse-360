@@ -3,9 +3,18 @@ import SwiftUI
 /// The translucent floating pill nav from the prototype (`--navbg`, blur,
 /// 26pt radius, inset 12pt from the edges).
 struct FloatingTabBar: View {
-    /// The role-specific tab set to render (see `AppTab.tabs(for:)`).
     let tabs: [AppTab]
     @Binding var selection: AppTab
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// Ab den Bedienungshilfen-Größen bleiben nur die Symbole.
+    ///
+    /// Fünf Beschriftungen nebeneinander passen dort nicht mehr in die Leiste;
+    /// vorher wurden sie zu „Nachha…" und „Dokum…" abgeschnitten, was weniger
+    /// aussagt als das Symbol allein. VoiceOver liest weiterhin den vollen
+    /// Namen aus `accessibilityLabel`.
+    private var showsLabels: Bool { !dynamicTypeSize.isAccessibilitySize }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -16,11 +25,13 @@ struct FloatingTabBar: View {
                 } label: {
                     VStack(spacing: 4) {
                         Image(systemName: tab.symbol)
-                            .font(.system(size: 18, weight: .semibold))
-                        Text(tab.title)
-                            .font(.system(size: 10, weight: .semibold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .pmFont(18, weight: .semibold)
+                        if showsLabels {
+                            Text(tab.title)
+                                .pmFont(10, weight: .semibold)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
                     }
                     .foregroundStyle(active ? Theme.accT : Color.white.opacity(0.6))
                     .frame(maxWidth: .infinity)

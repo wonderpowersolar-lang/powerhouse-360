@@ -12,7 +12,7 @@ struct OverlayHeader<Trailing: View>: View {
         HStack(spacing: 11) {
             Button(action: onBack) {
                 Image(systemName: "arrow.left")
-                    .font(.system(size: 16, weight: .semibold))
+                    .pmFont(16, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
                     .frame(width: 38, height: 38)
                     .background(Theme.card, in: .rect(cornerRadius: 12, style: .continuous))
@@ -20,19 +20,20 @@ struct OverlayHeader<Trailing: View>: View {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .strokeBorder(Theme.line2, lineWidth: 1)
                     }
+                    .pmHitTarget()
             }
             .buttonStyle(.pressable)
             .accessibilityLabel("Zurück")
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(title)
-                    .font(.system(size: 17, weight: .heavy))
+                    .pmFont(17, weight: .heavy)
                     .tracking(-0.2)
                     .foregroundStyle(Theme.tx)
                     .accessibilityAddTraits(.isHeader)
                 if let subtitle {
                     Text(subtitle)
-                        .font(.system(size: 11.5))
+                        .pmFont(11.5)
                         .foregroundStyle(Theme.tx3)
                 }
             }

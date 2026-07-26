@@ -51,17 +51,17 @@ struct EinstellungenView: View {
                 .frame(width: 48, height: 48)
                 .overlay {
                     Text(initials)
-                        .font(.system(size: 16, weight: .heavy))
+                        .pmFont(16, weight: .heavy)
                         .foregroundStyle(Theme.acc)
                 }
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(name)
-                    .font(.system(size: 15.5, weight: .heavy))
+                    .pmFont(15.5, weight: .heavy)
                     .foregroundStyle(Theme.tx)
                 Text(subtitle)
-                    .font(.system(size: 12))
+                    .pmFont(12)
                     .foregroundStyle(Theme.tx2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -100,7 +100,7 @@ struct EinstellungenView: View {
             appearance = value
         } label: {
             Text(title)
-                .font(.system(size: 13, weight: .bold))
+                .pmFont(13, weight: .bold)
                 .foregroundStyle(isActive ? Theme.btnT : Theme.tx2)
                 .frame(maxWidth: .infinity)
                 .frame(height: 36)
@@ -150,10 +150,10 @@ struct EinstellungenView: View {
         Toggle(isOn: binding) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(title)
-                    .font(.system(size: 13.5, weight: .semibold))
+                    .pmFont(13.5, weight: .semibold)
                     .foregroundStyle(Theme.tx)
                 Text(caption)
-                    .font(.system(size: 11.5))
+                    .pmFont(11.5)
                     .foregroundStyle(Theme.tx3)
             }
         }
@@ -187,16 +187,16 @@ struct EinstellungenView: View {
         } label: {
             HStack(spacing: 11) {
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .pmFont(14, weight: .semibold)
                     .foregroundStyle(Theme.tx)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if let value {
                     Text(value)
-                        .font(.system(size: 12.5))
+                        .pmFont(12.5)
                         .foregroundStyle(Theme.tx3)
                 }
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .bold))
+                    .pmFont(12, weight: .bold)
                     .foregroundStyle(Theme.tx3)
                     .accessibilityHidden(true)
             }
@@ -214,7 +214,7 @@ struct EinstellungenView: View {
     private var logoutButton: some View {
         Button { showToast("Abgemeldet (Demo).") } label: {
             Text("Abmelden")
-                .font(.system(size: 14, weight: .bold))
+                .pmFont(14, weight: .bold)
                 .foregroundStyle(Theme.crit)
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
@@ -230,7 +230,7 @@ struct EinstellungenView: View {
     private var footer: some View {
         VStack(spacing: 9) {
             Text("Powermieter 1.0 · Teil von Powerhouse 360")
-                .font(.system(size: 11))
+                .pmFont(11)
                 .foregroundStyle(Theme.tx3)
 
             HStack(spacing: 7) {
@@ -247,7 +247,7 @@ struct EinstellungenView: View {
 
     private func sectionTitle(_ text: String) -> some View {
         Text(text.uppercased())
-            .font(.system(size: 12, weight: .bold))
+            .pmFont(12, weight: .bold)
             .tracking(0.6)
             .foregroundStyle(Theme.tx3)
             .frame(maxWidth: .infinity, alignment: .leading)

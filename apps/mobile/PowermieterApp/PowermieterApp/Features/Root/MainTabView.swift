@@ -6,6 +6,7 @@ struct MainTabView: View {
     @Binding var appearance: AppAppearance
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.powermieterStore) private var store
 
     // Debug convenience: open a specific tab via `SIMCTL_CHILD_PM_TAB=analyse`.
     @State private var selection: AppTab = MainTabView.initialTab()
@@ -99,6 +100,21 @@ struct MainTabView: View {
                     .zIndex(2)
             }
 
+            // Ladefehler steht über den Tabs, aber unter Overlay und Sheet:
+            // Er gilt für die ganze App, soll aber keine offene Detailansicht
+            // überdecken.
+            if case .failed(let message) = store.state {
+                VStack(spacing: 0) {
+                    DataStatusBanner(message: message) {
+                        Task { await store.load() }
+                    }
+                    .padding(.top, 4)
+                    Spacer(minLength: 0)
+                }
+                .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+                .zIndex(0.5)
+            }
+
             if let toast {
                 VStack(spacing: 0) {
                     // An open sheet owns the bottom of the screen, so the
@@ -137,6 +153,7 @@ struct MainTabView: View {
                 withAnimation(reduceMotion ? nil : .easeOut(duration: 0.22)) { toast = nil }
             }
         })
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: store.state)
         .animation(reduceMotion ? nil : .easeOut(duration: 0.3), value: overlay)
         .animation(reduceMotion ? nil : .spring(duration: 0.34, bounce: 0.12), value: sheet)
     }

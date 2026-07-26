@@ -83,7 +83,7 @@ struct AssistentView: View {
             inputBar
 
             Text("Demo mit Beispielantworten. Im Produkt analysiert der Assistent eure Live-Messwerte, Tarife und Wetterprognose.")
-                .font(.system(size: 11))
+                .pmFont(11)
                 .foregroundStyle(Theme.tx3)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
@@ -97,7 +97,7 @@ struct AssistentView: View {
 
     private func assistantBubble(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 13.5))
+            .pmFont(13.5)
             .foregroundStyle(Theme.tx)
             .padding(.horizontal, 14)
             .padding(.vertical, 11)
@@ -111,7 +111,7 @@ struct AssistentView: View {
 
     private func userBubble(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 13.5, weight: .semibold))
+            .pmFont(13.5, weight: .semibold)
             .foregroundStyle(Theme.accT)
             .padding(.horizontal, 14)
             .padding(.vertical, 11)
@@ -144,7 +144,7 @@ struct AssistentView: View {
                         send(suggestion)
                     } label: {
                         Text(suggestion)
-                            .font(.system(size: 12.5, weight: .semibold))
+                            .pmFont(12.5, weight: .semibold)
                             .foregroundStyle(Theme.tx2)
                             .lineLimit(1)
                             .padding(.horizontal, 13)
@@ -166,7 +166,7 @@ struct AssistentView: View {
     private var inputBar: some View {
         HStack(spacing: 9) {
             TextField("Eigene Frage stellen …", text: $input)
-                .font(.system(size: 13.5))
+                .pmFont(13.5)
                 .foregroundStyle(Theme.tx)
                 .padding(.horizontal, 14)
                 .frame(height: 46)
@@ -183,7 +183,7 @@ struct AssistentView: View {
                 send(input)
             } label: {
                 Image(systemName: "arrow.up")
-                    .font(.system(size: 16, weight: .bold))
+                    .pmFont(16, weight: .bold)
                     .foregroundStyle(Theme.btnT)
                     .frame(width: 46, height: 46)
                     .background(Theme.btn, in: .rect(cornerRadius: 14, style: .continuous))

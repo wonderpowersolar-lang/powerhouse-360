@@ -49,7 +49,7 @@ struct MonatsreportView: View {
                     summaryCard
 
                     Text("Empfehlungen")
-                        .font(.system(size: 14.5, weight: .bold))
+                        .pmFont(14.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 3)
@@ -75,10 +75,10 @@ struct MonatsreportView: View {
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(row.label)
-                            .font(.system(size: 12.5))
+                            .pmFont(12.5)
                             .foregroundStyle(Theme.tx2)
                         Text(row.value)
-                            .font(.system(size: 16, weight: .heavy))
+                            .pmFont(16, weight: .heavy)
                             .foregroundStyle(Theme.tx)
                             .monospacedDigit()
                     }
@@ -97,7 +97,7 @@ struct MonatsreportView: View {
             Text(isTenant
                  ? "Im laufenden Jahr hast du bereits 148,20 € gegenüber der Grundversorgung gespart."
                  : "Im laufenden Jahr wurden 21,6 MWh erzeugt und 6.240 € Mieterstromerlöse erzielt.")
-                .font(.system(size: 12))
+                .pmFont(12)
                 .foregroundStyle(Theme.tx3)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 12)
@@ -113,17 +113,17 @@ struct MonatsreportView: View {
                 .frame(width: 38, height: 38)
                 .overlay {
                     Image(systemName: "lightbulb.fill")
-                        .font(.system(size: 16, weight: .semibold))
+                        .pmFont(16, weight: .semibold)
                         .foregroundStyle(Theme.acc)
                 }
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(item.title)
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Text(item.body)
-                    .font(.system(size: 12.5))
+                    .pmFont(12.5)
                     .foregroundStyle(Theme.tx2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -137,10 +137,10 @@ struct MonatsreportView: View {
         Button { showToast("Download gestartet …") } label: {
             HStack(spacing: 8) {
                 Image(systemName: "arrow.down.circle")
-                    .font(.system(size: 15, weight: .semibold))
+                    .pmFont(15, weight: .semibold)
                     .accessibilityHidden(true)
                 Text("Als PDF herunterladen")
-                    .font(.system(size: 14, weight: .bold))
+                    .pmFont(14, weight: .bold)
             }
             .foregroundStyle(Theme.btnT)
             .frame(maxWidth: .infinity)

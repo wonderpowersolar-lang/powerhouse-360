@@ -10,12 +10,12 @@ struct HintNote: View {
     var body: some View {
         HStack(alignment: .top, spacing: 9) {
             Image(systemName: symbol)
-                .font(.system(size: 12, weight: .semibold))
+                .pmFont(12, weight: .semibold)
                 .foregroundStyle(tint)
                 .padding(.top, 1)
                 .accessibilityHidden(true)
             Text(text)
-                .font(.system(size: 11.5))
+                .pmFont(11.5)
                 .foregroundStyle(Theme.tx3)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

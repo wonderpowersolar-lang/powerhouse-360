@@ -42,18 +42,18 @@ struct NachhaltigkeitView: View {
                 .frame(width: 72, height: 72)
                 .overlay {
                     Image(systemName: "leaf.fill")
-                        .font(.system(size: 20))
+                        .pmFont(20)
                         .foregroundStyle(Theme.acc)
                 }
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text("CO₂ vermieden im Juli")
-                    .font(.system(size: 12.5))
+                    .pmFont(12.5)
                     .foregroundStyle(Theme.tx2)
 
                 Text("12,6 kg")
-                    .font(.system(size: 30, weight: .heavy))
+                    .pmFont(30, weight: .heavy)
                     .tracking(-0.6)
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
@@ -62,9 +62,9 @@ struct NachhaltigkeitView: View {
                 Button { openSheet(.info("naeh")) } label: {
                     HStack(spacing: 5) {
                         Text("Näherungswert")
-                            .font(.system(size: 11, weight: .bold))
+                            .pmFont(11, weight: .bold)
                         Image(systemName: "info.circle")
-                            .font(.system(size: 10, weight: .semibold))
+                            .pmFont(10, weight: .semibold)
                             .accessibilityHidden(true)
                     }
                     .foregroundStyle(Theme.tx2)
@@ -103,18 +103,18 @@ struct NachhaltigkeitView: View {
                                 value: String, caption: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Image(systemName: symbol)
-                .font(.system(size: 19))
+                .pmFont(19)
                 .foregroundStyle(tint)
                 // Fixed box so both tiles put their value on the same baseline
                 // regardless of the glyph's own height.
                 .frame(height: 24)
                 .accessibilityHidden(true)
             Text(value)
-                .font(.system(size: 21, weight: .heavy))
+                .pmFont(21, weight: .heavy)
                 .foregroundStyle(Theme.tx)
                 .monospacedDigit()
             Text(caption)
-                .font(.system(size: 11.5))
+                .pmFont(11.5)
                 .foregroundStyle(Theme.tx2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -129,11 +129,11 @@ struct NachhaltigkeitView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text("Anteil lokaler Energie")
-                    .font(.system(size: 14.5, weight: .bold))
+                    .pmFont(14.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Spacer()
                 Text("letzte 6 Monate")
-                    .font(.system(size: 12))
+                    .pmFont(12)
                     .foregroundStyle(Theme.tx3)
             }
 
@@ -144,11 +144,11 @@ struct NachhaltigkeitView: View {
 
                 VStack(alignment: .leading, spacing: 0) {
                     Text("76 %")
-                        .font(.system(size: 24, weight: .heavy))
+                        .pmFont(24, weight: .heavy)
                         .foregroundStyle(Theme.tx)
                         .monospacedDigit()
                     Text("deines Stroms kamen im Juli direkt vom Dach – dein bester Wert bisher.")
-                        .font(.system(size: 12))
+                        .pmFont(12)
                         .foregroundStyle(Theme.tx2)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -163,7 +163,7 @@ struct NachhaltigkeitView: View {
                             .fill(entry.isCurrent ? Theme.pv : Theme.elev)
                             .frame(height: entry.height)
                         Text(entry.month)
-                            .font(.system(size: 10, weight: entry.isCurrent ? .bold : .regular))
+                            .pmFont(10, weight: entry.isCurrent ? .bold : .regular)
                             .foregroundStyle(entry.isCurrent ? Theme.tx : Theme.tx3)
                     }
                     .frame(maxWidth: .infinity)
@@ -184,28 +184,28 @@ struct NachhaltigkeitView: View {
     private var buildingTotalCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Euer Haus gesamt")
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
 
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("3,1 t")
-                    .font(.system(size: 26, weight: .heavy))
+                    .pmFont(26, weight: .heavy)
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
                 Text("CO₂ vermieden seit Januar")
-                    .font(.system(size: 12.5))
+                    .pmFont(12.5)
                     .foregroundStyle(Theme.tx2)
             }
             .padding(.top, 10)
 
             Text("Entspricht etwa 15.500 Pkw-Kilometern oder der Jahresbindung von 250 Bäumen.")
-                .font(.system(size: 12.5))
+                .pmFont(12.5)
                 .foregroundStyle(Theme.tx2)
                 .padding(.top, 8)
 
             Button { openSheet(.info("naeh")) } label: {
                 Text("Alle Werte sind Näherungswerte – so rechnen wir")
-                    .font(.system(size: 11.5, weight: .semibold))
+                    .pmFont(11.5, weight: .semibold)
                     .foregroundStyle(Theme.tx3)
                     .underline()
             }
@@ -227,23 +227,23 @@ struct NachhaltigkeitView: View {
                     .frame(width: 38, height: 38)
                     .overlay {
                         Image(systemName: "doc.text.fill")
-                            .font(.system(size: 16, weight: .semibold))
+                            .pmFont(16, weight: .semibold)
                             .foregroundStyle(Theme.info)
                     }
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Monatsreport Juni öffnen")
-                        .font(.system(size: 14, weight: .bold))
+                        .pmFont(14, weight: .bold)
                         .foregroundStyle(Theme.tx)
                     Text("Mit persönlichen Empfehlungen")
-                        .font(.system(size: 12))
+                        .pmFont(12)
                         .foregroundStyle(Theme.tx2)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .bold))
+                    .pmFont(13, weight: .bold)
                     .foregroundStyle(Theme.tx3)
                     .accessibilityHidden(true)
             }

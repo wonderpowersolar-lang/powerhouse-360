@@ -15,9 +15,25 @@ enum Theme {
     static let line2 = Color(light: 0x172B43, lightAlpha: 0.16, dark: 0x94D2C4, darkAlpha: 0.18)
 
     // Text
+    //
+    // `tx2` and `tx3` weichen bewusst von `design-tokens.css` ab. Die
+    // CSS-Werte (#5E6D82 / #97A4B4) erreichen auf Kartenweiß nur 5,3:1 und
+    // 2,5:1 — `tx3` verfehlt WCAG AA (4,5:1) deutlich, und es trägt quer durch
+    // die App Zeitstempel, Bildunterschriften und Metazeilen. `tx3` allein
+    // abzudunkeln hätte es mit `tx2` verschmelzen lassen, deshalb sind beide
+    // Stufen nachgezogen. Dunkelmodus analog gegen `card` gerechnet.
+    //
+    // Gerechnet gegen die jeweils ungünstigere der beiden Flächen, auf denen
+    // Text steht — `card`/`bg2` und `bg`. Nur gegen Kartenweiß zu prüfen hätte
+    // die Abschnittstitel übersehen, die direkt auf `bg` liegen.
+    //
+    //         hell: Karte / bg     dunkel: Karte / bg
+    // tx      15,6  / 13,9         15,4  / 16,9
+    // tx2      7,9  /  7,0          6,9  /  7,6
+    // tx3      5,1  /  4,5          4,5  /  5,0
     static let tx = Color(light: 0x16243A, dark: 0xEAF4F0)
-    static let tx2 = Color(light: 0x5E6D82, dark: 0x93A8A6)
-    static let tx3 = Color(light: 0x97A4B4, dark: 0x5E7472)
+    static let tx2 = Color(light: 0x475262, dark: 0x93A8A6)
+    static let tx3 = Color(light: 0x676F7A, dark: 0x6E8885)
 
     // Accent (brand green)
     static let acc = Color(light: 0x39954C, dark: 0x4ED584)

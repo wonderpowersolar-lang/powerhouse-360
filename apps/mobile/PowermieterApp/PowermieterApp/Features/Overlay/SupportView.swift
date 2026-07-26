@@ -42,7 +42,7 @@ struct SupportView: View {
                     callbackCard
 
                     Text("Meine Anfragen")
-                        .font(.system(size: 14.5, weight: .bold))
+                        .pmFont(14.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 3)
@@ -69,23 +69,23 @@ struct SupportView: View {
                     .frame(width: 38, height: 38)
                     .overlay {
                         Image(systemName: "sparkles")
-                            .font(.system(size: 16, weight: .semibold))
+                            .pmFont(16, weight: .semibold)
                             .foregroundStyle(Theme.acc)
                     }
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Assistent fragen")
-                        .font(.system(size: 14, weight: .bold))
+                        .pmFont(14, weight: .bold)
                         .foregroundStyle(Theme.tx)
                     Text("„Warum lädt der Speicher?“ – Antworten in Sekunden")
-                        .font(.system(size: 12))
+                        .pmFont(12)
                         .foregroundStyle(Theme.tx2)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .bold))
+                    .pmFont(13, weight: .bold)
                     .foregroundStyle(Theme.tx3)
                     .accessibilityHidden(true)
             }
@@ -110,12 +110,12 @@ struct SupportView: View {
                 } label: {
                     HStack(spacing: 10) {
                         Text(entry.question)
-                            .font(.system(size: 13.5, weight: .semibold))
+                            .pmFont(13.5, weight: .semibold)
                             .foregroundStyle(Theme.tx)
                             .multilineTextAlignment(.leading)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         Image(systemName: "chevron.down")
-                            .font(.system(size: 12, weight: .bold))
+                            .pmFont(12, weight: .bold)
                             .foregroundStyle(Theme.tx3)
                             .rotationEffect(.degrees(isOpen ? 180 : 0))
                             .accessibilityHidden(true)
@@ -128,7 +128,7 @@ struct SupportView: View {
 
                 if isOpen {
                     Text(entry.answer)
-                        .font(.system(size: 12.5))
+                        .pmFont(12.5)
                         .foregroundStyle(Theme.tx2)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.bottom, 13)
@@ -145,7 +145,7 @@ struct SupportView: View {
     private var reportForm: some View {
         VStack(alignment: .leading, spacing: 11) {
             Text("Problem melden")
-                .font(.system(size: 14.5, weight: .bold))
+                .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
 
             Picker("Kategorie", selection: $category) {
@@ -159,7 +159,7 @@ struct SupportView: View {
             .background(Theme.card2, in: .rect(cornerRadius: 12, style: .continuous))
 
             TextEditor(text: $message)
-                .font(.system(size: 13.5))
+                .pmFont(13.5)
                 .foregroundStyle(Theme.tx)
                 .scrollContentBackground(.hidden)
                 .frame(height: 92)
@@ -169,7 +169,7 @@ struct SupportView: View {
                 .overlay(alignment: .topLeading) {
                     if message.isEmpty {
                         Text("Beschreibe kurz dein Anliegen …")
-                            .font(.system(size: 13.5))
+                            .pmFont(13.5)
                             .foregroundStyle(Theme.tx3)
                             .padding(.horizontal, 13)
                             .padding(.vertical, 14)
@@ -183,10 +183,10 @@ struct SupportView: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: attached ? "checkmark" : "camera")
-                        .font(.system(size: 13, weight: .semibold))
+                        .pmFont(13, weight: .semibold)
                         .accessibilityHidden(true)
                     Text(attached ? "zaehlerstand_we12.jpg" : "Zählerstand oder Foto anhängen")
-                        .font(.system(size: 12.5, weight: .semibold))
+                        .pmFont(12.5, weight: .semibold)
                 }
                 .foregroundStyle(attached ? Theme.ok : Theme.tx2)
                 .frame(maxWidth: .infinity)
@@ -217,24 +217,24 @@ struct SupportView: View {
                 .frame(width: 38, height: 38)
                 .overlay {
                     Image(systemName: "phone.fill")
-                        .font(.system(size: 15, weight: .semibold))
+                        .pmFont(15, weight: .semibold)
                         .foregroundStyle(Theme.info)
                 }
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Rückruf anfordern")
-                    .font(.system(size: 13.5, weight: .bold))
+                    .pmFont(13.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Text("Mo–Fr, 9–17 Uhr · meist innerhalb von 2 Std")
-                    .font(.system(size: 11.5))
+                    .pmFont(11.5)
                     .foregroundStyle(Theme.tx3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Button { showToast("Rückruf angefordert – wir melden uns.") } label: {
                 Text("Anfordern")
-                    .font(.system(size: 12.5, weight: .bold))
+                    .pmFont(12.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                     .padding(.horizontal, 13)
                     .frame(height: 36)
@@ -254,16 +254,16 @@ struct SupportView: View {
                 if index > 0 { Divider().overlay(Theme.line) }
                 HStack(spacing: 11) {
                     Text(ticket.id)
-                        .font(.system(size: 12, weight: .bold))
+                        .pmFont(12, weight: .bold)
                         .foregroundStyle(Theme.tx3)
                         .monospacedDigit()
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(ticket.title)
-                            .font(.system(size: 13.5, weight: .semibold))
+                            .pmFont(13.5, weight: .semibold)
                             .foregroundStyle(Theme.tx)
                         Text(ticket.date)
-                            .font(.system(size: 11.5))
+                            .pmFont(11.5)
                             .foregroundStyle(Theme.tx3)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
