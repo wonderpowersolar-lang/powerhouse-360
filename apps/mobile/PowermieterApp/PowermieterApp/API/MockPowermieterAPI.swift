@@ -70,13 +70,25 @@ struct MockPowermieterAPI: PowermieterAPI {
                      resolution: ConsumptionContracts.Resolution,
                      from: Date,
                      to: Date) async throws -> ConsumptionContracts.Series {
-        // Dieselbe Tageskurve wie im Chart: Morgen- und Abendspitze, mittags PV.
-        let points = (0..<24).map { hour -> ConsumptionContracts.Point in
+        // Die Stundenwerte müssen zur Tagessumme aus `summary` passen,
+        // sonst widerspricht der Chart seiner eigenen Beschriftung.
+        let shape = (0..<24).map { hour -> Double in
             let h = Double(hour)
-            let pv = 1.18 * gauss(h, 13, 3.1)
-            let total = 0.16 + 0.52 * gauss(h, 7.5, 1.5) + 0.88 * gauss(h, 19.5, 2.1)
+            return 0.16 + 0.52 * gauss(h, 7.5, 1.5) + 0.88 * gauss(h, 19.5, 2.1)
                 + 0.14 * gauss(h, 13, 3.4)
-            let solar = min(total, pv)
+        }
+        let totalScale = 8.6 / shape.reduce(0, +)
+        let totals = shape.map { $0 * totalScale }
+
+        // Solaranteil je Stunde: mittags fast vollständig, nachts aus dem
+        // Speicher. Anschliessend so skaliert, dass die Summe 6,5 kWh trifft.
+        let rawShares = (0..<24).map { 0.45 + 0.5 * gauss(Double($0), 13, 4.2) }
+        let rawSolar = zip(totals, rawShares).map { $0 * $1 }
+        let solarScale = 6.5 / rawSolar.reduce(0, +)
+
+        let points = (0..<24).map { hour -> ConsumptionContracts.Point in
+            let total = totals[hour]
+            let solar = min(total, rawSolar[hour] * solarScale)
             // 05:00–07:00 ist im Prototyp die geschätzte Lücke.
             let estimated = (5...7).contains(hour)
             return .init(periodStart: date(2026, 7, 21, hour: hour),

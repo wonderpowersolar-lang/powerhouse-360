@@ -6,8 +6,8 @@ struct DayCurveCard: View {
     @Environment(\.powermieterStore) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    /// Stunde unter dem Finger bzw. Zeiger. Nur währenddessen sichtbar —
-    /// es gibt keine Verwerfen-Geste, also darf der Wert nicht kleben.
+    /// Abgelesene Stunde. Bleibt nach dem Abheben stehen: beim Ziehen
+    /// verdeckt der Finger genau die Stelle, die man lesen will.
     /// Debug: Startwert per `SIMCTL_CHILD_PM_SCRUB=14` setzen, um den Zustand
     /// ohne Geste zeigen zu können.
     @State private var scrubbedHour: Int? = ProcessInfo.processInfo
@@ -122,25 +122,32 @@ struct DayCurveCard: View {
                 }
             }
             .contentShape(.rect)
-            // Auf dem iPhone gibt es kein Hover — kurz aufliegen und ziehen
-            // ist das Äquivalent. Der vorgeschaltete LongPress ist nötig,
-            // damit die umgebende ScrollView weiter scrollt: ein Drag mit
-            // minimumDistance 0 würde jede vertikale Wischgeste über dem
-            // Chart abfangen.
-            .gesture(
-                LongPressGesture(minimumDuration: 0.12)
-                    .sequenced(before: DragGesture(minimumDistance: 0))
-                    .onChanged { value in
-                        guard case .second(_, let drag?) = value else { return }
-                        scrub(to: drag.location.x, width: size.width)
+            // Antippen statt Ziehen — bewusst.
+            //
+            // Jede DragGesture auf einem Kind der ScrollView beansprucht die
+            // Berührung und macht das Dashboard über dem Chart unscrollbar;
+            // das gilt auch mit vorgeschaltetem LongPress und auch für
+            // `simultaneousGesture` (beides im Simulator geprüft). Ein Tap
+            // konkurriert nicht mit dem Scrollen — dasselbe Muster benutzt
+            // `AnalyseChartCard`. Erneutes Antippen derselben Stunde blendet
+            // den Wert wieder aus.
+            .overlay {
+                HStack(spacing: 0) {
+                    ForEach(0..<max(consumptionCurve.count, 1), id: \.self) { hour in
+                        Rectangle()
+                            .fill(.clear)
+                            .contentShape(.rect)
+                            .onTapGesture {
+                                scrubbedHour = (scrubbedHour == hour) ? nil : hour
+                            }
                     }
-                    .onEnded { _ in scrubbedHour = nil }
-            )
+                }
+            }
             // Für iPad-Trackpad und Mac: echtes Zeiger-Hover.
             .onContinuousHover { phase in
                 switch phase {
                 case .active(let location): scrub(to: location.x, width: size.width)
-                case .ended: scrubbedHour = nil
+                case .ended: break
                 }
             }
         }
@@ -149,6 +156,8 @@ struct DayCurveCard: View {
 
     // MARK: Scrubbing
 
+    /// Nur noch für Zeiger-Hover (iPad-Trackpad, Mac) — auf dem Telefon
+    /// wählt der Tap die Stunde.
     private func scrub(to x: CGFloat, width: CGFloat) {
         guard hourly != nil, width > 0 else { return }
         let count = consumptionCurve.count

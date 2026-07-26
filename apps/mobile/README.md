@@ -105,8 +105,16 @@ plus dessen Länge. Die Kachel heißt entsprechend „Ø letzte 15 Min" statt
 „Aktueller Verbrauch" — ein 15-Minuten-Mittel als Live-Wert auszugeben wäre
 eine Falschaussage gegenüber dem Bewohner.
 
-Verdrahtet: Live-Zeile, Tagessumme im Tagesverlauf, Leistung, Solaranteil und
-Tageskosten.
+Verdrahtet: Live-Zeile, Tagesverlauf-Kurven und -summe, Leistung, Solaranteil
+und Tageskosten.
+
+**Tagesverlauf ablesen:** Antippen wählt eine Stunde und zeigt Verbrauch, Solar
+und Netz; erneutes Antippen blendet aus. Bewusst kein Ziehen — jede
+DragGesture auf einem Kind der ScrollView beansprucht die Berührung und macht
+das Dashboard über dem Chart unscrollbar. Das gilt auch mit vorgeschaltetem
+LongPress und auch für `simultaneousGesture`; beides wurde im Simulator
+geprüft und verworfen. Auf iPad-Trackpad und Mac zeigt `onContinuousHover`
+zusätzlich echtes Zeiger-Hover.
 
 **Weiterhin offen:** Die App-API ist ausschließlich bewohnerbezogen
 (`PowerParticipant`). Die Vermieter- und Verwaltungsansichten haben **keinen**
