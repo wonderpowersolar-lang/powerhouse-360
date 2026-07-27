@@ -3,14 +3,12 @@ import SwiftUI
 /// Overlay "Rechnungsdetail" — one month's bill broken into its line items.
 struct RechnungsdetailView: View {
     let invoice: Invoice
-    let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
     @Environment(\.showToast) private var showToast
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: invoice.title, subtitle: invoice.period, onBack: onBack)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -26,6 +24,7 @@ struct RechnungsdetailView: View {
             .scrollIndicators(.hidden)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: invoice.title, subtitle: invoice.period)
     }
 
     // MARK: Amount
@@ -207,5 +206,5 @@ struct RechnungsdetailView: View {
 }
 
 #Preview {
-    RechnungsdetailView(invoice: .named("juni"), onBack: {})
+    RechnungsdetailView(invoice: .named("juni"))
 }

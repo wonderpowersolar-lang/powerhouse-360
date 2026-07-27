@@ -3,16 +3,13 @@ import SwiftUI
 /// Overlay "Störungsfall" — raise a support case for the delayed WE 07 meter.
 /// Submitting swaps the form for the confirmation state.
 struct StoerungsfallView: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    let onBack: () -> Void
 
     @State private var submitted = false
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: "Störung · WE 07",
-                          subtitle: "Wohnungszähler · verzögert",
-                          onBack: onBack)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -31,6 +28,7 @@ struct StoerungsfallView: View {
             .scrollIndicators(.hidden)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: "Störung · WE 07", subtitle: "Wohnungszähler · verzögert")
         .animation(.easeOut(duration: 0.25), value: submitted)
     }
 
@@ -163,7 +161,7 @@ struct StoerungsfallView: View {
             StatusPill(text: "Status: offen", color: Theme.info, background: Theme.infoS)
                 .padding(.top, 2)
 
-            PrimaryButton(title: "Fertig", action: onBack)
+            PrimaryButton(title: "Fertig") { dismiss() }
                 .padding(.top, 8)
         }
         .frame(maxWidth: .infinity)
@@ -174,5 +172,5 @@ struct StoerungsfallView: View {
 }
 
 #Preview {
-    StoerungsfallView(onBack: {})
+    StoerungsfallView()
 }

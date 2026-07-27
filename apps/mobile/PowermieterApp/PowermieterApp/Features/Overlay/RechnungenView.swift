@@ -3,13 +3,11 @@ import SwiftUI
 /// Overlay "Rechnungen & Abschlag" — the standing charge plus the archive of
 /// monthly bills.
 struct RechnungenView: View {
-    let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: "Rechnungen & Abschlag", onBack: onBack)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -30,6 +28,7 @@ struct RechnungenView: View {
             .scrollIndicators(.hidden)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: "Rechnungen & Abschlag")
     }
 
     private var abschlagCard: some View {
@@ -137,5 +136,5 @@ struct RechnungenView: View {
 }
 
 #Preview {
-    RechnungenView(onBack: {})
+    RechnungenView()
 }

@@ -53,16 +53,47 @@ Wichtig vor allem für `PM_API_BASE_URL`: Sonst liesse sich ein ausgelieferter
 Build über eine Umgebungsvariable auf einen fremden Server umlenken. Im Release
 entscheidet allein der Info.plist-Eintrag `PMAPIBaseURL`.
 
+### Navigation und Sheet (2026-07-27)
+
+**Detailscreens laufen über `NavigationStack`, das Sheet über `.sheet` mit
+`presentationDetents`.** Beides war vorher nachgebaut.
+
+Drei Dinge, die dabei herauskamen:
+
+- **Die Overlays verloren ihre Historie.** Die Hülle hielt genau *ein*
+  `overlay`, also ersetzten sich die Ketten gegenseitig: „Zurück" aus dem
+  Support landete im Tab, nicht in der Rechnung, aus der man kam. Ein Pfad
+  statt eines Slots behebt das.
+- **`.toolbar(.hidden, for: .navigationBar)` deaktiviert den Kantenwisch
+  zurück.** Der erste Anlauf behielt den eigenen Kopfbereich und blendete die
+  Systemleiste aus — der Stack schob korrekt, aber keine der beiden
+  Wischvarianten ging zurück. Deshalb tragen die elf Detailscreens jetzt die
+  Systemleiste (`pmOverlayChrome`): Titel und Untertitel in einem
+  `principal`-Element, Zurück per System-Chevron. Nur die Tab-Wurzel bleibt
+  ohne Leiste, sie hat ihren eigenen Kopfbereich.
+- **Ziele eines `navigationDestination` erben Environment-Werte nicht, die
+  außerhalb des `NavigationStack` gesetzt wurden.** `ShellActions` hängt
+  `openOverlay`/`openSheet`/`showToast` deshalb an jede Präsentationsgrenze
+  einzeln. Per A/B im Simulator belegt — ohne den Modifier feuert der Knopf
+  (der Ungelesen-Punkt verschwindet), aber es wird nichts geschoben.
+
+Der Toast wird bei offenem Sheet vom Sheet selbst gezeigt: `.sheet` ist eine
+eigene Präsentation und läge sonst darüber, obwohl der Toast genau von dort
+ausgelöst wird („Download gestartet …").
+
+Die Tab-Leiste bleibt bewusst eigenbau (PO-Entscheidung 2026-07-27): Die
+System-`TabView` brächte iPad-Anpassung und Tastaturnavigation, aber der
+dunkle Pill-Look mit grünem Chip ist das Erkennungsmerkmal der App.
+
 ### Overlays
 
 Elf Detailscreens sind gebaut und aus den Tabs heraus verlinkt: Detailanalyse,
 Monatsreport, Sonnenstrompreis, Assistent, Energiebilanz, Mitteilungen,
 Rechnungsübersicht, Rechnungsdetail, Messsystemstatus, Störungsfall und
 Support. Die gebäudebezogenen Overlays (Wohneinheiten, Verbrauchsaufteilung)
-sind mit ADR-011 entfallen. Sie schieben sich
-von rechts über die Tab-Bar (bei aktiviertem „Bewegung reduzieren" nur
-eingeblendet). Geöffnet werden sie über `@Environment(\.openOverlay)`, damit
-kein Binding durch jede Zwischenebene gereicht werden muss.
+sind mit ADR-011 entfallen. Sie werden auf den `NavigationStack` geschoben; geöffnet
+werden sie über `@Environment(\.openOverlay)`, damit kein Binding durch jede
+Zwischenebene gereicht werden muss.
 
 ### Bottom-Sheet & Toast
 
@@ -73,7 +104,7 @@ Datenschutz) und `document` (mit Öffnen/Herunterladen). Inhalte
 liegen gesammelt in `SheetContent`, geöffnet wird über
 `@Environment(\.openSheet)`. Der Toast quittiert Demo-Aktionen über
 `@Environment(\.showToast)` und blendet sich nach 2,6 s selbst aus; bei offenem
-Sheet erscheint er oben statt unten, damit er nicht auf dessen Zeilen liegt.
+Sheet zeigt ihn das Sheet selbst (siehe oben).
 
 ### App-API-Client
 

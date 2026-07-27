@@ -3,7 +3,6 @@ import SwiftUI
 /// Overlay "Messsystem" — meter fleet health plus the glossary of states.
 struct MesssystemView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
 
@@ -27,9 +26,6 @@ struct MesssystemView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: "Messsystem",
-                          subtitle: "Letzter Empfang vor 2 Min · Gateway stabil",
-                          onBack: onBack)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -44,6 +40,7 @@ struct MesssystemView: View {
             .scrollIndicators(.hidden)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: "Messsystem", subtitle: "Letzter Empfang vor 2 Min · Gateway stabil")
     }
 
     private var statusPills: some View {
@@ -160,5 +157,5 @@ struct MesssystemView: View {
 }
 
 #Preview {
-    MesssystemView(onBack: {})
+    MesssystemView()
 }

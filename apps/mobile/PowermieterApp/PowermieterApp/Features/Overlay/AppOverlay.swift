@@ -1,12 +1,14 @@
 import SwiftUI
 
-/// Full-screen detail screens that slide in over the tab shell
-/// (prototype `overlay` state, `z-index:7`, `pmSlide`).
+/// Die Detailscreens. Werden auf den `NavigationStack` der Tab-Hülle
+/// geschoben (im Prototyp waren es `z-index:7`-Overlays mit `pmSlide`).
+///
+/// `Hashable`, weil der Typ als Element des Navigationspfads dient.
 ///
 /// Die gebäudebezogenen Overlays (Wohneinheiten, Verbrauchsaufteilung) sind
 /// mit ADR-011 entfallen — sie waren nur aus den Vermieter- und
 /// Verwaltungsansichten erreichbar.
-enum AppOverlay: Identifiable, Equatable {
+enum AppOverlay: Identifiable, Hashable {
     case detailanalyse
     case monatsreport
     case sonnenstrompreis

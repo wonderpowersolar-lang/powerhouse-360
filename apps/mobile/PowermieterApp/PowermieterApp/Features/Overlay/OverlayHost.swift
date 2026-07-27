@@ -1,36 +1,39 @@
 import SwiftUI
 
-/// Maps an `AppOverlay` case to its screen, so the tab shell only has to
-/// keep one piece of state.
+/// Bildet einen `AppOverlay`-Fall auf seinen Screen ab.
+///
+/// Zurück gehört seit dem Umbau der Navigationsleiste des Systems: Die Screens
+/// haben keinen eigenen Zurück-Knopf und kein `onBack` mehr. Wer selbst
+/// schließen muss (`StoerungsfallView` hat einen „Fertig"-Knopf), nimmt
+/// `\.dismiss`.
 struct OverlayHost: View {
     let overlay: AppOverlay
-    let onClose: () -> Void
 
     @ViewBuilder
     var body: some View {
         switch overlay {
         case .detailanalyse:
-            DetailanalyseView(onBack: onClose)
+            DetailanalyseView()
         case .monatsreport:
-            MonatsreportView(onBack: onClose)
+            MonatsreportView()
         case .sonnenstrompreis:
-            SonnenstrompreisView(onBack: onClose)
+            SonnenstrompreisView()
         case .assistent:
-            AssistentView(onBack: onClose)
+            AssistentView()
         case .energiebilanz:
-            EnergiebilanzView(onBack: onClose)
+            EnergiebilanzView()
         case .mitteilungen:
-            MitteilungenView(onBack: onClose)
+            MitteilungenView()
         case .rechnungen:
-            RechnungenView(onBack: onClose)
+            RechnungenView()
         case .rechnungsdetail(let month):
-            RechnungsdetailView(invoice: .named(month), onBack: onClose)
+            RechnungsdetailView(invoice: .named(month))
         case .messsystem:
-            MesssystemView(onBack: onClose)
+            MesssystemView()
         case .stoerungsfall:
-            StoerungsfallView(onBack: onClose)
+            StoerungsfallView()
         case .support:
-            SupportView(onBack: onClose)
+            SupportView()
         }
     }
 }

@@ -2,7 +2,6 @@ import SwiftUI
 
 /// Overlay "Mitteilungen" — priority inbox, split into Wichtig and Weitere.
 struct MitteilungenView: View {
-    let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
 
@@ -53,17 +52,6 @@ struct MitteilungenView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: "Mitteilungen", onBack: onBack) {
-                Button {
-                    readIDs = Set(items.map(\.id))
-                } label: {
-                    Text("Alle gelesen")
-                        .pmFont(12.5, weight: .bold)
-                        .foregroundStyle(Theme.acc)
-                }
-                .buttonStyle(.plain)
-            }
-
             ScrollView {
                 VStack(spacing: 12) {
                     if important.isEmpty && others.isEmpty {
@@ -102,6 +90,14 @@ struct MitteilungenView: View {
             .scrollIndicators(.hidden)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: "Mitteilungen")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Alle gelesen") { readIDs = Set(items.map(\.id)) }
+                    .pmFont(12.5, weight: .bold)
+                    .foregroundStyle(Theme.acc)
+            }
+        }
         .animation(.easeOut(duration: 0.22), value: cleared)
     }
 
@@ -190,5 +186,5 @@ struct MitteilungenView: View {
 }
 
 #Preview {
-    MitteilungenView(onBack: {})
+    MitteilungenView()
 }

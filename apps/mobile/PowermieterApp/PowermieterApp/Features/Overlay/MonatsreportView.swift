@@ -2,7 +2,6 @@ import SwiftUI
 
 /// Overlay "Monatsreport" — the June summary with recommendations.
 struct MonatsreportView: View {
-    let onBack: () -> Void
 
     @Environment(\.showToast) private var showToast
 
@@ -40,9 +39,6 @@ struct MonatsreportView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: isTenant ? "Monatsreport Juni" : "Monatsreport Gebäude · Juni",
-                          subtitle: isTenant ? "Wohnung 12 · 01.–30.06.2026" : "Friedrichsruher Str. 35 · 01.–30.06.2026",
-                          onBack: onBack)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -66,6 +62,7 @@ struct MonatsreportView: View {
             .scrollIndicators(.hidden)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: isTenant ? "Monatsreport Juni" : "Monatsreport Gebäude · Juni", subtitle: isTenant ? "Wohnung 12 · 01.–30.06.2026" : "Friedrichsruher Str. 35 · 01.–30.06.2026")
     }
 
     private var summaryCard: some View {
@@ -153,5 +150,5 @@ struct MonatsreportView: View {
 }
 
 #Preview {
-    MonatsreportView(onBack: {})
+    MonatsreportView()
 }

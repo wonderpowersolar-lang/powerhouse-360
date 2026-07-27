@@ -3,7 +3,6 @@ import SwiftUI
 /// Overlay "Hilfe & Support" — assistant shortcut, FAQ accordion, a report
 /// form, callback request and the user's own tickets.
 struct SupportView: View {
-    let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
     @Environment(\.showToast) private var showToast
@@ -32,7 +31,6 @@ struct SupportView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: "Hilfe & Support", onBack: onBack)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -55,6 +53,7 @@ struct SupportView: View {
             .scrollIndicators(.hidden)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: "Hilfe & Support")
     }
 
     // MARK: Assistant shortcut
@@ -282,5 +281,5 @@ struct SupportView: View {
 }
 
 #Preview {
-    SupportView(onBack: {})
+    SupportView()
 }

@@ -4,7 +4,6 @@ import SwiftUI
 /// a day switch and the cost breakdown underneath.
 struct DetailanalyseView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    let onBack: () -> Void
 
     @Environment(\.openOverlay) private var openOverlay
 
@@ -52,18 +51,18 @@ struct DetailanalyseView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: "Detailanalyse", onBack: onBack) {
-                SegmentedControl(options: [Day.heute, .gestern],
-                                 title: { $0 == .heute ? "Heute" : "Gestern" },
-                                 selection: $day,
-                                 height: 30,
-                                 fontSize: 11.5,
-                                 cornerRadius: 9)
-                    .frame(width: 126)
-            }
-
             ScrollView {
                 VStack(spacing: 12) {
+                    // Zeitraum- und Reihenfilter stehen beieinander im Inhalt.
+                    // In der Navigationsleiste teilte sich das Segment-Control
+                    // den Platz mit dem Titel und lief über den rechten Rand;
+                    // Filter gehören dort ohnehin nicht hin.
+                    SegmentedControl(options: [Day.heute, .gestern],
+                                     title: { $0 == .heute ? "Heute" : "Gestern" },
+                                     selection: $day,
+                                     height: 36,
+                                     fontSize: 12.5,
+                                     cornerRadius: 12)
                     seriesChips
                     chartCard
 
@@ -76,6 +75,7 @@ struct DetailanalyseView: View {
             .scrollIndicators(.hidden)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: "Detailanalyse")
         .onChange(of: day) { selected = nil }
     }
 
@@ -371,5 +371,5 @@ struct DetailanalyseView: View {
 }
 
 #Preview {
-    DetailanalyseView(onBack: {})
+    DetailanalyseView()
 }

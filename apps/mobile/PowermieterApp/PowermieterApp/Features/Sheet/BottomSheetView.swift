@@ -1,103 +1,78 @@
 import SwiftUI
 
-/// The bottom sheet (prototype `sheet`) — a scrim plus a rounded panel that
-/// explains a number, a flow node, a document or a settings entry.
+/// Der Inhalt des Bottom-Sheets — erklärt eine Zahl, einen Knoten im
+/// Energiefluss, ein Dokument oder einen Einstellungseintrag.
+///
+/// Scrim, Griff, Ecken, Wischen-zum-Schließen und die Sicherheitsbereiche
+/// kommen vom System (`.sheet` mit `presentationDetents`, siehe `SheetHost`).
+/// Vorher war das alles nachgebaut, und dem Nachbau fehlte genau das, was man
+/// bei einem Sheet als Erstes versucht: es nach unten wegzuziehen.
 struct BottomSheetView: View {
     let sheet: AppSheet
-    let onClose: () -> Void
 
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.openOverlay) private var openOverlay
     @Environment(\.showToast) private var showToast
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var content: SheetContent {
         SheetContent.resolve(sheet)
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Tapping the scrim dismisses; as a Button it is reachable by
-            // VoiceOver too, not just by touch.
-            Button(action: onClose) {
-                Rectangle().fill(.black.opacity(0.38))
-            }
-            .buttonStyle(.plain)
-            .ignoresSafeArea()
-            .accessibilityLabel("Schließen")
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                header
 
-            panel
-                .transition(reduceMotion ? .opacity : .move(edge: .bottom))
-        }
-    }
-
-    private var panel: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Capsule()
-                .fill(Theme.line2)
-                .frame(width: 38, height: 4)
-                .frame(maxWidth: .infinity)
-                .padding(.top, 12)
-                .padding(.bottom, 16)
-                .accessibilityHidden(true)
-
-            header
-
-            if let value = content.value {
-                Text(value)
-                    .pmFont(27, weight: .heavy)
-                    .tracking(-0.6)
-                    .foregroundStyle(Theme.tx)
-                    .monospacedDigit()
-                    .padding(.top, 8)
-            }
-
-            if let description = content.description {
-                Text(description)
-                    .pmFont(13)
-                    .foregroundStyle(Theme.tx2)
-                    .padding(.top, content.value == nil ? 6 : 8)
-            }
-
-            if !content.rows.isEmpty {
-                rowsCard
-                    .padding(.top, 16)
-            }
-
-            if let document = content.document {
-                documentActions(document)
-                    .padding(.top, 16)
-            }
-
-            if content.showsDetailCTA {
-                Button {
-                    onClose()
-                    openOverlay(.detailanalyse)
-                } label: {
-                    Text("Zur Detailanalyse")
-                        .pmFont(14, weight: .bold)
-                        .foregroundStyle(Theme.btnT)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
-                        .background(Theme.btn, in: .rect(cornerRadius: 14, style: .continuous))
+                if let value = content.value {
+                    Text(value)
+                        .pmFont(27, weight: .heavy)
+                        .tracking(-0.6)
+                        .foregroundStyle(Theme.tx)
+                        .monospacedDigit()
+                        .padding(.top, 8)
                 }
-                .buttonStyle(.pressable)
-                .padding(.top, 16)
+
+                if let description = content.description {
+                    Text(description)
+                        .pmFont(13)
+                        .foregroundStyle(Theme.tx2)
+                        .padding(.top, content.value == nil ? 6 : 8)
+                }
+
+                if !content.rows.isEmpty {
+                    rowsCard
+                        .padding(.top, 16)
+                }
+
+                if let document = content.document {
+                    documentActions(document)
+                        .padding(.top, 16)
+                }
+
+                if content.showsDetailCTA {
+                    Button {
+                        dismiss()
+                        openOverlay(.detailanalyse)
+                    } label: {
+                        Text("Zur Detailanalyse")
+                            .pmFont(14, weight: .bold)
+                            .foregroundStyle(Theme.btnT)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 48)
+                            .background(Theme.btn, in: .rect(cornerRadius: 14, style: .continuous))
+                    }
+                    .buttonStyle(.pressable)
+                    .padding(.top, 16)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            // Oben Platz für den Griff des Systems.
+            .padding(.top, 24)
+            .padding(.bottom, 32)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 20)
-        .padding(.bottom, 40)
-        .background(Theme.card, in: .rect(topLeadingRadius: 24, topTrailingRadius: 24, style: .continuous))
-        // The panel has to reach the screen edge, otherwise the content
-        // behind it shows through the home-indicator strip.
-        .ignoresSafeArea(edges: .bottom)
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(Theme.line2)
-                .frame(height: 1)
-        }
-        .shadow(color: Color(light: 0x060E1A, lightAlpha: 0.28, dark: 0x000000, darkAlpha: 0.55),
-                radius: 22, x: 0, y: -14)
+        // Kurze Inhalte sollen nicht federn, lange schon.
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     private var header: some View {
@@ -120,7 +95,9 @@ struct BottomSheetView: View {
 
             Spacer(minLength: 0)
 
-            Button(action: onClose) {
+            Button {
+                dismiss()
+            } label: {
                 Image(systemName: "xmark")
                     .pmFont(12, weight: .bold)
                     .foregroundStyle(Theme.tx2)
@@ -158,10 +135,11 @@ struct BottomSheetView: View {
     private func documentActions(_ document: DocumentItem) -> some View {
         HStack(spacing: 12) {
             Button {
-                onClose()
                 if let invoiceID = document.invoiceID {
+                    dismiss()
                     openOverlay(.rechnungsdetail(month: invoiceID))
                 } else if document.category == .bericht {
+                    dismiss()
                     openOverlay(.monatsreport)
                 } else {
                     showToast("Vorschau geöffnet (Demo-PDF).")
@@ -195,9 +173,10 @@ struct BottomSheetView: View {
         else if document.category == .bericht { "Report öffnen" }
         else { "Dokument öffnen" }
     }
-
 }
 
 #Preview {
-    BottomSheetView(sheet: .kpi("solar"), onClose: {})
+    Color.clear.sheet(isPresented: .constant(true)) {
+        SheetHost(sheet: .kpi("solar"), toast: nil)
+    }
 }

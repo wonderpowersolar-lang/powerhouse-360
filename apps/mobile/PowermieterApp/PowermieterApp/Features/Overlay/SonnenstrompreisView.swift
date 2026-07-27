@@ -3,7 +3,6 @@ import SwiftUI
 /// Overlay "Sonnenstrompreis" — the current dynamic price and the 24-hour
 /// forecast with the cheap window highlighted.
 struct SonnenstrompreisView: View {
-    let onBack: () -> Void
 
     @State private var remindMidday = false
     @State private var remindCheapest = false
@@ -24,9 +23,6 @@ struct SonnenstrompreisView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: "Sonnenstrompreis",
-                          subtitle: "Dynamischer Mieterstrom · Prognose",
-                          onBack: onBack)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -59,6 +55,7 @@ struct SonnenstrompreisView: View {
             .scrollIndicators(.hidden)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: "Sonnenstrompreis", subtitle: "Dynamischer Mieterstrom · Prognose")
     }
 
     // MARK: Current price
@@ -244,5 +241,5 @@ struct SonnenstrompreisView: View {
 }
 
 #Preview {
-    SonnenstrompreisView(onBack: {})
+    SonnenstrompreisView()
 }

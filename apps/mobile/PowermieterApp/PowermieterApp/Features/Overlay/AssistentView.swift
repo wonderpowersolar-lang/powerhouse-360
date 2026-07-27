@@ -3,7 +3,6 @@ import SwiftUI
 /// Overlay "Assistent" — demo chat that explains prices, storage and meter
 /// readings. Answers are canned; the typing pause is simulated.
 struct AssistentView: View {
-    let onBack: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -38,12 +37,6 @@ struct AssistentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            OverlayHeader(title: "Assistent",
-                          subtitle: "Erklärt Preise, Speicher & Messwerte",
-                          onBack: onBack) {
-                StatusPill(text: "Demo", color: Theme.tx2, background: Theme.elev)
-            }
-
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
@@ -91,6 +84,12 @@ struct AssistentView: View {
                 .padding(.bottom, 12)
         }
         .background(Theme.bg)
+        .pmOverlayChrome(title: "Assistent", subtitle: "Erklärt Preise, Speicher & Messwerte")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                StatusPill(text: "Demo", color: Theme.tx2, background: Theme.elev)
+            }
+        }
     }
 
     // MARK: Bubbles
@@ -216,5 +215,5 @@ struct AssistentView: View {
 }
 
 #Preview {
-    AssistentView(onBack: {})
+    AssistentView()
 }
