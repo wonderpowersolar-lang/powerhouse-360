@@ -13,7 +13,7 @@ struct DataStatusBanner: View {
     @State private var retrying = false
 
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .pmFont(14, weight: .semibold)
                 .foregroundStyle(Theme.warn)
@@ -52,7 +52,7 @@ struct DataStatusBanner: View {
                 .strokeBorder(Theme.warn.opacity(0.35), lineWidth: 1)
         }
         .shadow(color: .black.opacity(0.10), radius: 14, y: 4)
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .accessibilityElement(children: .contain)
         .onChange(of: message) { retrying = false }
     }

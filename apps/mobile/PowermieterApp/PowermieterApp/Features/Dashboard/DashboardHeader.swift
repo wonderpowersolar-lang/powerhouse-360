@@ -36,7 +36,7 @@ struct DashboardHeader: View {
             iconButton(symbol: "bell.fill", label: "Benachrichtigungen",
                        badge: unreadCount) { openOverlay(.mitteilungen) }
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 8)
         .padding(.bottom, 12)
         .background(

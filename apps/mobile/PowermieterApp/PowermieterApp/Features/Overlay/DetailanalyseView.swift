@@ -63,14 +63,14 @@ struct DetailanalyseView: View {
             }
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     seriesChips
                     chartCard
 
                     costCard
                     recommendationCard
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -118,7 +118,7 @@ struct DetailanalyseView: View {
     private func chipLabel<Dot: View>(_ title: String,
                                       @ViewBuilder dot: () -> Dot,
                                       on: Bool) -> some View {
-        HStack(spacing: 7) {
+        HStack(spacing: 8) {
             dot()
             Text(title)
                 .pmFont(12, weight: .semibold)
@@ -162,7 +162,7 @@ struct DetailanalyseView: View {
                     if label != "24" { Spacer(minLength: 0) }
                 }
             }
-            .padding(.top, 5)
+            .padding(.top, 6)
             .accessibilityHidden(true)
 
             if let selected {
@@ -180,12 +180,12 @@ struct DetailanalyseView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(Theme.card2, in: .rect(cornerRadius: 10, style: .continuous))
-                .padding(.top, 9)
+                .padding(.top, 8)
             }
 
             HintNote(symbol: "info.circle",
                      text: "05:00–07:00 Uhr: Zähler-Sync — Werte wurden nach Standardprofil geschätzt und später korrigiert.")
-                .padding(.top, 11)
+                .padding(.top, 12)
         }
         .padding(16)
         .pmCard()
@@ -337,13 +337,13 @@ struct DetailanalyseView: View {
                     .foregroundStyle(Theme.tx)
                     .monospacedDigit()
             }
-            .padding(.vertical, 11)
+            .padding(.vertical, 12)
         }
         .accessibilityElement(children: .combine)
     }
 
     private var recommendationCard: some View {
-        VStack(alignment: .leading, spacing: 11) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Empfehlung")
                 .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)

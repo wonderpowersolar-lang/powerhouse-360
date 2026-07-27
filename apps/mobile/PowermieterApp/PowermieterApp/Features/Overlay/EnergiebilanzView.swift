@@ -42,13 +42,13 @@ struct EnergiebilanzView: View {
                           onBack: onBack)
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     sankeyCard
                     hourlyMixCard
                     batteryOriginCard
                     reasoningCard
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -65,7 +65,7 @@ struct EnergiebilanzView: View {
                     .pmFont(14.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Spacer()
-                StatusPill(text: "Heute", color: Theme.tx2, background: Theme.elev, horizontalPadding: 9)
+                StatusPill(text: "Heute", color: Theme.tx2, background: Theme.elev, horizontalPadding: 8)
             }
 
             Canvas { context, size in
@@ -81,7 +81,7 @@ struct EnergiebilanzView: View {
                 nodeLegend(title: "Quellen", nodes: sources)
                 nodeLegend(title: "Verbraucher", nodes: sinks)
             }
-            .padding(.top, 14)
+            .padding(.top, 16)
 
             HintNote(symbol: "info.circle",
                      text: "Flüsse seit 0:00 Uhr. Erzeugung und Netz sind Messwerte, die Aufteilung des Speicherstroms ist berechnet.")
@@ -217,7 +217,7 @@ struct EnergiebilanzView: View {
                 }
             }
             .frame(height: 120)
-            .padding(.top, 10)
+            .padding(.top, 12)
             .accessibilityElement()
             .accessibilityLabel("Stündliche Zusammensetzung des verbrauchten Stroms")
             .accessibilityValue("Mittags fast vollständig Solar, abends Speicher und Netz")
@@ -230,20 +230,20 @@ struct EnergiebilanzView: View {
                     if label != "24" { Spacer(minLength: 0) }
                 }
             }
-            .padding(.top, 5)
+            .padding(.top, 6)
             .accessibilityHidden(true)
 
             Text("So setzte sich der verbrauchte Strom stündlich zusammen.")
                 .pmFont(11.5)
                 .foregroundStyle(Theme.tx3)
-                .padding(.top, 9)
+                .padding(.top, 8)
         }
         .padding(16)
         .pmCard()
     }
 
     private func mixLegend(_ label: String, _ color: Color) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 6) {
             Circle().fill(color).frame(width: 8, height: 8)
             Text(label)
                 .pmFont(11)
@@ -261,12 +261,12 @@ struct EnergiebilanzView: View {
                     .pmFont(14.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
                 Spacer()
-                StatusPill(text: "grün geladen", color: Theme.ok, background: Theme.okS, horizontalPadding: 9)
+                StatusPill(text: "grün geladen", color: Theme.ok, background: Theme.okS, horizontalPadding: 8)
             }
 
-            HStack(spacing: 3) {
+            HStack(spacing: 4) {
                 GeometryReader { geo in
-                    HStack(spacing: 3) {
+                    HStack(spacing: 4) {
                         Capsule().fill(Theme.pv)
                             .frame(width: max(0, (geo.size.width - 3) * 0.86))
                         Capsule().fill(Theme.grid)
@@ -322,7 +322,7 @@ struct EnergiebilanzView: View {
     private func reasonRow(color: Color, title: String, body: String, time: String) -> some View {
         VStack(spacing: 0) {
             Divider().overlay(Theme.line)
-            HStack(alignment: .top, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
                 Circle()
                     .fill(color)
                     .frame(width: 9, height: 9)

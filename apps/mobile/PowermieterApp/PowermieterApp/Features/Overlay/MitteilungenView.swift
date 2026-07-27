@@ -65,7 +65,7 @@ struct MitteilungenView: View {
             }
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     if important.isEmpty && others.isEmpty {
                         emptyState
                     } else {
@@ -84,7 +84,7 @@ struct MitteilungenView: View {
                                     .pmFont(13.5, weight: .bold)
                                     .foregroundStyle(Theme.tx2)
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: 46)
+                                    .frame(height: 48)
                                     .background(Theme.card, in: .rect(cornerRadius: 14, style: .continuous))
                                     .overlay {
                                         RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -92,11 +92,11 @@ struct MitteilungenView: View {
                                     }
                             }
                             .buttonStyle(.pressable)
-                            .padding(.top, 3)
+                            .padding(.top, 4)
                         }
                     }
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -111,7 +111,7 @@ struct MitteilungenView: View {
             .tracking(0.6)
             .foregroundStyle(Theme.tx3)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.top, 3)
+            .padding(.top, 4)
     }
 
     private func row(_ item: Item) -> some View {
@@ -131,7 +131,7 @@ struct MitteilungenView: View {
                     }
                     .accessibilityHidden(true)
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(item.title)
                         .pmFont(14, weight: .bold)
                         .foregroundStyle(Theme.tx)
@@ -161,7 +161,7 @@ struct MitteilungenView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 17, style: .continuous)
                 .fill(Theme.elev)
                 .frame(width: 52, height: 52)
@@ -184,7 +184,7 @@ struct MitteilungenView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
-        .padding(.vertical, 34)
+        .padding(.vertical, 36)
         .pmCard()
     }
 }

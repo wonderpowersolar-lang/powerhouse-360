@@ -12,7 +12,7 @@ struct RechnungenView: View {
             OverlayHeader(title: "Rechnungen & Abschlag", onBack: onBack)
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     abschlagCard
                     creditCard
 
@@ -20,11 +20,11 @@ struct RechnungenView: View {
                         .pmFont(14.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 3)
+                        .padding(.top, 4)
 
                     invoiceList
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -47,7 +47,7 @@ struct RechnungenView: View {
                     .pmFont(13, weight: .semibold)
                     .foregroundStyle(Theme.tx2)
             }
-            .padding(.top, 3)
+            .padding(.top, 4)
             .padding(.bottom, 6)
 
             infoRow("Nächste Abbuchung", "01.08.2026")
@@ -71,7 +71,7 @@ struct RechnungenView: View {
                     .pmFont(13, weight: .semibold)
                     .foregroundStyle(Theme.tx)
             }
-            .padding(.vertical, 11)
+            .padding(.vertical, 12)
         }
         .accessibilityElement(children: .combine)
     }
@@ -110,7 +110,7 @@ struct RechnungenView: View {
                 Button {
                     openOverlay(.rechnungsdetail(month: invoice.id))
                 } label: {
-                    HStack(spacing: 10) {
+                    HStack(spacing: 12) {
                         Text(invoice.shortTitle)
                             .pmFont(13.5, weight: .semibold)
                             .foregroundStyle(Theme.tx)
@@ -125,7 +125,7 @@ struct RechnungenView: View {
                             .foregroundStyle(Theme.tx3)
                             .accessibilityHidden(true)
                     }
-                    .padding(.vertical, 13)
+                    .padding(.vertical, 12)
                 }
                 .buttonStyle(.pressable)
                 .accessibilityElement(children: .combine)

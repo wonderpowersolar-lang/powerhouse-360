@@ -37,7 +37,7 @@ struct BottomSheetView: View {
                 .frame(width: 38, height: 4)
                 .frame(maxWidth: .infinity)
                 .padding(.top, 12)
-                .padding(.bottom, 14)
+                .padding(.bottom, 16)
                 .accessibilityHidden(true)
 
             header
@@ -60,12 +60,12 @@ struct BottomSheetView: View {
 
             if !content.rows.isEmpty {
                 rowsCard
-                    .padding(.top, 14)
+                    .padding(.top, 16)
             }
 
             if let document = content.document {
                 documentActions(document)
-                    .padding(.top, 14)
+                    .padding(.top, 16)
             }
 
             if content.showsDetailCTA {
@@ -81,7 +81,7 @@ struct BottomSheetView: View {
                         .background(Theme.btn, in: .rect(cornerRadius: 14, style: .continuous))
                 }
                 .buttonStyle(.pressable)
-                .padding(.top, 14)
+                .padding(.top, 16)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -101,7 +101,7 @@ struct BottomSheetView: View {
     }
 
     private var header: some View {
-        HStack(spacing: 9) {
+        HStack(spacing: 8) {
             if let dot = content.dot {
                 Circle()
                     .fill(dot)
@@ -115,7 +115,7 @@ struct BottomSheetView: View {
                 .accessibilityAddTraits(.isHeader)
 
             if let badge = content.badge {
-                StatusPill(text: badge, color: Theme.tx2, background: Theme.elev, horizontalPadding: 9)
+                StatusPill(text: badge, color: Theme.tx2, background: Theme.elev, horizontalPadding: 8)
             }
 
             Spacer(minLength: 0)
@@ -147,16 +147,16 @@ struct BottomSheetView: View {
                         .foregroundStyle(Theme.tx)
                         .multilineTextAlignment(.trailing)
                 }
-                .padding(.vertical, 10)
+                .padding(.vertical, 12)
                 .accessibilityElement(children: .combine)
             }
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .background(Theme.card2, in: .rect(cornerRadius: 14, style: .continuous))
     }
 
     private func documentActions(_ document: DocumentItem) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Button {
                 onClose()
                 if let invoiceID = document.invoiceID {

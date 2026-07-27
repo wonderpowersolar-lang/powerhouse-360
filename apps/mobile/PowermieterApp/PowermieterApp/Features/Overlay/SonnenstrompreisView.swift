@@ -29,7 +29,7 @@ struct SonnenstrompreisView: View {
                           onBack: onBack)
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     priceCard
                     forecastCard
 
@@ -37,7 +37,7 @@ struct SonnenstrompreisView: View {
                         .pmFont(14.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 3)
+                        .padding(.top, 4)
 
                     windowRow(title: "11:30 – 15:00 Uhr",
                               caption: "Sehr günstig · viel Sonne · Ø 24,1 ct",
@@ -53,7 +53,7 @@ struct SonnenstrompreisView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 4)
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -76,7 +76,7 @@ struct SonnenstrompreisView: View {
                     .foregroundStyle(Theme.tx3)
             }
 
-            HStack(alignment: .firstTextBaseline, spacing: 5) {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text("26,4")
                     .pmFont(36, weight: .heavy)
                     .tracking(-1)
@@ -97,7 +97,7 @@ struct SonnenstrompreisView: View {
                 sourcePrice("Solarstrom", "24,9 ct", Theme.pv)
                 sourcePrice("Netzstrom", "34,2 ct", Theme.grid)
             }
-            .padding(.top, 14)
+            .padding(.top, 16)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
@@ -105,7 +105,7 @@ struct SonnenstrompreisView: View {
     }
 
     private func sourcePrice(_ label: String, _ value: String, _ color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
                 Circle().fill(color).frame(width: 8, height: 8)
                 Text(label)
@@ -119,7 +119,7 @@ struct SonnenstrompreisView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.vertical, 12)
         .background(Theme.card2, in: .rect(cornerRadius: 12, style: .continuous))
         .accessibilityElement(children: .combine)
     }
@@ -175,7 +175,7 @@ struct SonnenstrompreisView: View {
                 }
             }
             .frame(height: 126)
-            .padding(.top, 10)
+            .padding(.top, 12)
             .accessibilityElement()
             .accessibilityLabel("Preisprognose für 24 Stunden")
             .accessibilityValue("Günstigstes Fenster zwischen 11:30 und 15:00 Uhr, Tief 23,1 Cent um 13 Uhr")
@@ -188,20 +188,20 @@ struct SonnenstrompreisView: View {
                     if label != "24" { Spacer(minLength: 0) }
                 }
             }
-            .padding(.top, 5)
+            .padding(.top, 6)
             .accessibilityHidden(true)
 
             HintNote(symbol: "sun.max",
                      text: "Zwischen 11:30 und 15:00 Uhr wird besonders viel Solarstrom erwartet — dann ist dein Strom am günstigsten.",
                      tint: Theme.pv)
-                .padding(.top, 11)
+                .padding(.top, 12)
         }
         .padding(16)
         .pmCard()
     }
 
     private func legendItem(_ label: String, _ color: Color) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 6) {
             Circle().fill(color).frame(width: 8, height: 8)
             Text(label)
                 .pmFont(11)

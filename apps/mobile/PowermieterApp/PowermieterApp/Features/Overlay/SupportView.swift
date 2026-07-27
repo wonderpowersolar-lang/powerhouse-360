@@ -35,7 +35,7 @@ struct SupportView: View {
             OverlayHeader(title: "Hilfe & Support", onBack: onBack)
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     assistantRow
                     faqCard
                     reportForm
@@ -45,11 +45,11 @@ struct SupportView: View {
                         .pmFont(14.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 3)
+                        .padding(.top, 4)
 
                     ticketList
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -90,7 +90,7 @@ struct SupportView: View {
                     .accessibilityHidden(true)
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 15)
+            .padding(.vertical, 16)
             .pmCard()
         }
         .buttonStyle(.pressable)
@@ -108,7 +108,7 @@ struct SupportView: View {
                 Button {
                     openQuestion = isOpen ? nil : index
                 } label: {
-                    HStack(spacing: 10) {
+                    HStack(spacing: 12) {
                         Text(entry.question)
                             .pmFont(13.5, weight: .semibold)
                             .foregroundStyle(Theme.tx)
@@ -120,7 +120,7 @@ struct SupportView: View {
                             .rotationEffect(.degrees(isOpen ? 180 : 0))
                             .accessibilityHidden(true)
                     }
-                    .padding(.vertical, 13)
+                    .padding(.vertical, 12)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(entry.question)
@@ -131,7 +131,7 @@ struct SupportView: View {
                         .pmFont(12.5)
                         .foregroundStyle(Theme.tx2)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.bottom, 13)
+                        .padding(.bottom, 12)
                 }
             }
         }
@@ -143,7 +143,7 @@ struct SupportView: View {
     // MARK: Report a problem
 
     private var reportForm: some View {
-        VStack(alignment: .leading, spacing: 11) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Problem melden")
                 .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
@@ -171,8 +171,8 @@ struct SupportView: View {
                         Text("Beschreibe kurz dein Anliegen …")
                             .pmFont(13.5)
                             .foregroundStyle(Theme.tx3)
-                            .padding(.horizontal, 13)
-                            .padding(.vertical, 14)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 16)
                             .allowsHitTesting(false)
                     }
                 }
@@ -190,7 +190,7 @@ struct SupportView: View {
                 }
                 .foregroundStyle(attached ? Theme.ok : Theme.tx2)
                 .frame(maxWidth: .infinity)
-                .frame(height: 42)
+                .frame(height: 44)
                 .background(Theme.card2, in: .rect(cornerRadius: 12, style: .continuous))
             }
             .buttonStyle(.pressable)
@@ -236,7 +236,7 @@ struct SupportView: View {
                 Text("Anfordern")
                     .pmFont(12.5, weight: .bold)
                     .foregroundStyle(Theme.tx)
-                    .padding(.horizontal, 13)
+                    .padding(.horizontal, 12)
                     .frame(height: 36)
                     .background(Theme.card2, in: .rect(cornerRadius: 11, style: .continuous))
             }
@@ -252,7 +252,7 @@ struct SupportView: View {
         VStack(spacing: 0) {
             ForEach(Array(tickets.enumerated()), id: \.offset) { index, ticket in
                 if index > 0 { Divider().overlay(Theme.line) }
-                HStack(spacing: 11) {
+                HStack(spacing: 12) {
                     Text(ticket.id)
                         .pmFont(12, weight: .bold)
                         .foregroundStyle(Theme.tx3)

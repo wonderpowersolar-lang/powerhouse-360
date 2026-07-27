@@ -24,7 +24,7 @@ struct EnergyFlowCard: View {
                 .dynamicTypeSize(...DynamicTypeSize.xLarge)
         }
         .padding(.horizontal, 16)
-        .padding(.top, 14)
+        .padding(.top, 16)
         .padding(.bottom, 12)
         .pmCard()
     }
@@ -32,7 +32,7 @@ struct EnergyFlowCard: View {
     // MARK: Header row
 
     private var header: some View {
-        HStack(spacing: 7) {
+        HStack(spacing: 8) {
             Text("Energiefluss")
                 .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
@@ -40,12 +40,12 @@ struct EnergyFlowCard: View {
             Text("Jetzt")
                 .pmFont(11, weight: .bold)
                 .foregroundStyle(Theme.acc)
-                .padding(.horizontal, 9).padding(.vertical, 4)
+                .padding(.horizontal, 8).padding(.vertical, 4)
                 .background(Theme.accS, in: .capsule)
             Text("Bilanz")
                 .pmFont(11, weight: .bold)
                 .foregroundStyle(Theme.btnT)
-                .padding(.horizontal, 10).padding(.vertical, 4)
+                .padding(.horizontal, 12).padding(.vertical, 4)
                 .background(Theme.btn, in: .capsule)
         }
     }
@@ -138,7 +138,7 @@ struct EnergyFlowCard: View {
             }
             .fixedSize()
         }
-            .padding(.horizontal, 11).padding(.vertical, 8)
+            .padding(.horizontal, 12).padding(.vertical, 8)
             .background(Theme.card2, in: .rect(cornerRadius: 14, style: .continuous))
             .overlay { RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.line2, lineWidth: 1) }
             .pmCardShadow()

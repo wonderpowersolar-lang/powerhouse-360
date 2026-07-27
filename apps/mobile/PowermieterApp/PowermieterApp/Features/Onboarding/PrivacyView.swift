@@ -15,7 +15,7 @@ struct PrivacyView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     title
-                        .padding(.top, 26)
+                        .padding(.top, 28)
 
                     VStack(spacing: 12) {
                         infoCard(icon: "chart.bar.fill", tint: Theme.grid, chip: Theme.gridS,
@@ -33,15 +33,15 @@ struct PrivacyView: View {
                     settingsCard
                         .padding(.top, 12)
                 }
-                .padding(.bottom, 22)
+                .padding(.bottom, 24)
             }
 
             PrimaryButton(title: "Zustimmen und fortfahren", action: onNext)
-                .padding(.top, 22)
+                .padding(.top, 24)
         }
-        .padding(.horizontal, 22)
+        .padding(.horizontal, 24)
         .padding(.top, 8)
-        .padding(.bottom, 30)
+        .padding(.bottom, 32)
         .background(Theme.bg.ignoresSafeArea())
         .foregroundStyle(Theme.tx)
     }
@@ -69,7 +69,7 @@ struct PrivacyView: View {
                 }
                 .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(head)
                     .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.tx)
@@ -80,7 +80,7 @@ struct PrivacyView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.vertical, 15)
+        .padding(.vertical, 16)
         .padding(.horizontal, 16)
         .pmCard(cornerRadius: 18)
     }
@@ -93,7 +93,7 @@ struct PrivacyView: View {
                     .pmFont(11, weight: .bold)
                     .foregroundStyle(Theme.tx3)
                     .padding(.vertical, 4)
-                    .padding(.horizontal, 9)
+                    .padding(.horizontal, 8)
                     .background(Theme.elev, in: .capsule)
             }
 

@@ -15,7 +15,7 @@ struct SolarTipCard: View {
                             .pmFont(18, weight: .semibold)
                             .foregroundStyle(Theme.pv)
                     }
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("Jetzt viel Solarstrom verfügbar")
                         .pmFont(15, weight: .bold)
                         .foregroundStyle(Theme.tx)
@@ -30,8 +30,8 @@ struct SolarTipCard: View {
                 Text("Details ansehen")
                     .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.btnT)
-                    .padding(.horizontal, 18)
-                    .frame(height: 42)
+                    .padding(.horizontal, 20)
+                    .frame(height: 44)
                     .background(Theme.btn, in: .rect(cornerRadius: 12, style: .continuous))
             }
             .buttonStyle(.pressable)

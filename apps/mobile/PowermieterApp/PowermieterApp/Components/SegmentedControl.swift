@@ -37,7 +37,7 @@ struct SegmentedControl<Value: Hashable>: View {
                 .accessibilityAddTraits(active ? [.isSelected, .isButton] : .isButton)
             }
         }
-        .padding(3)
+        .padding(4)
         .pmCard(cornerRadius: cornerRadius + 3)
     }
 }

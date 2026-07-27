@@ -20,7 +20,7 @@ struct DokumenteView: View {
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     if let filter {
                         listHeader(for: filter)
                         if filtered.isEmpty {
@@ -35,7 +35,7 @@ struct DokumenteView: View {
                         categoryGrid
                     }
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.top, 104)
                 .padding(.bottom, 108)
             }
@@ -68,7 +68,7 @@ struct DokumenteView: View {
                             .pmFont(13, weight: .semibold)
                             .foregroundStyle(Theme.tx2)
                     }
-                    .padding(.top, 3)
+                    .padding(.top, 4)
 
                     Text("Offene Beträge: 0,00 € · nächste Abbuchung 01.08.")
                         .pmFont(11.5)
@@ -130,7 +130,7 @@ struct DokumenteView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .topLeading)
-                    .padding(15)
+                    .padding(16)
                     // Min height applied after the padding, matching the
                     // prototype's `box-sizing: border-box` tile.
                     .frame(minHeight: 118, alignment: .topLeading)
@@ -153,7 +153,7 @@ struct DokumenteView: View {
     // MARK: Drilled-down list
 
     private func listHeader(for category: DocumentCategory) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Button {
                 filter = nil
             } label: {
@@ -214,8 +214,8 @@ struct DokumenteView: View {
                            color: document.status.color,
                            background: document.status.background)
             }
-            .padding(.horizontal, 15)
-            .padding(.vertical, 13)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
             .pmCard(cornerRadius: Theme.radiusTile)
         }
         .buttonStyle(.pressable)
@@ -223,7 +223,7 @@ struct DokumenteView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 17, style: .continuous)
                 .fill(Theme.elev)
                 .frame(width: 52, height: 52)
@@ -246,7 +246,7 @@ struct DokumenteView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
-        .padding(.vertical, 34)
+        .padding(.vertical, 36)
         .pmCard()
     }
 }

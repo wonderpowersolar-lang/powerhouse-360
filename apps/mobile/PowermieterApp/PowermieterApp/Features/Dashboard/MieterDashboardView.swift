@@ -12,7 +12,7 @@ struct MieterDashboardView: View {
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     liveRow
                     EnergyFlowCard()
                     kpiGrid
@@ -20,7 +20,7 @@ struct MieterDashboardView: View {
                     DayCurveCard()
                     MonthReportRow()
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.top, 104)
                 .padding(.bottom, 108)
             }
@@ -152,7 +152,7 @@ struct MieterDashboardView: View {
     private var kpiGrid: some View {
         LazyVGrid(columns: columns, spacing: 12) {
             KPITile(accessibilityText: powerAccessibilityText, sheet: .kpi("verb")) {
-                VStack(alignment: .leading, spacing: 7) {
+                VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 6) {
                         Text(powerCaption).pmFont(12).foregroundStyle(Theme.tx2)
                         PulseDot(size: 6)
@@ -164,7 +164,7 @@ struct MieterDashboardView: View {
             }
 
             KPITile(accessibilityText: "PV-Erzeugung heute 132 Kilowattstunden", sheet: .kpi("pvT")) {
-                VStack(alignment: .leading, spacing: 7) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("PV-Erzeugung heute").pmFont(12).foregroundStyle(Theme.tx2)
                     value("132", unit: "kWh")
                     MiniBars(values: [0.28, 0.44, 0.62, 0.8, 0.95, 0.86, 0.66], color: Theme.pv)
@@ -189,7 +189,7 @@ struct MieterDashboardView: View {
             }
 
             KPITile(accessibilityText: "Kosten heute \(todayCostText)", sheet: .kpi("kosten")) {
-                VStack(alignment: .leading, spacing: 7) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Kosten heute").pmFont(12).foregroundStyle(Theme.tx2)
                     value(todayCostText, unit: nil)
                     Text("Ø 27,2 ct/kWh · Messwert").pmFont(11).foregroundStyle(Theme.tx3)
@@ -197,19 +197,19 @@ struct MieterDashboardView: View {
             }
 
             KPITile(accessibilityText: "Ersparnis im Juli 18,45 Euro, plus 24 Prozent gegenüber Vorjahr", sheet: .kpi("ersp")) {
-                VStack(alignment: .leading, spacing: 7) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Ersparnis im Juli").pmFont(12).foregroundStyle(Theme.tx2)
                     value("18,45 €", unit: nil, color: Theme.acc)
                     Text("+24 % vs. Vorjahr")
                         .pmFont(11, weight: .bold)
                         .foregroundStyle(Theme.ok)
-                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .padding(.horizontal, 8).padding(.vertical, 4)
                         .background(Theme.okS, in: .capsule)
                 }
             }
 
             KPITile(accessibilityText: "CO2 vermieden 12,6 Kilogramm im Juli", sheet: .kpi("co2")) {
-                VStack(alignment: .leading, spacing: 7) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("CO₂ vermieden").pmFont(12).foregroundStyle(Theme.tx2)
                     value("12,6", unit: "kg")
                     Text("≈ 63 Pkw-km · im Juli").pmFont(11).foregroundStyle(Theme.tx3)

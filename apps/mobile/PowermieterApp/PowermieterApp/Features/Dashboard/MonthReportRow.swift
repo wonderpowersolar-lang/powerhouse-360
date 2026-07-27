@@ -29,7 +29,7 @@ struct MonthReportRow: View {
                     .foregroundStyle(Theme.tx3)
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 15)
+            .padding(.vertical, 16)
             .pmCard()
         }
         .buttonStyle(.pressable)

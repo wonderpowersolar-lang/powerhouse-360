@@ -16,8 +16,8 @@ struct KPITile<Content: View>: View {
         } label: {
             content()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 13)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
                 .pmCard(cornerRadius: Theme.radiusTile)
         }
         .buttonStyle(.pressable)

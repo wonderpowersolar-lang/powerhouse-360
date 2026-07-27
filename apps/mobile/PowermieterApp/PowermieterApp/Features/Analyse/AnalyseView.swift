@@ -10,7 +10,7 @@ struct AnalyseView: View {
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     periodPicker
 
                     if period == .eigene {
@@ -26,7 +26,7 @@ struct AnalyseView: View {
                     outlineActions
                     solarPriceRow
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.top, 104)
                 .padding(.bottom, 108)
             }
@@ -69,7 +69,7 @@ struct AnalyseView: View {
                 .accessibilityAddTraits(active ? [.isSelected, .isButton] : .isButton)
             }
         }
-        .padding(3)
+        .padding(4)
         .pmCard(cornerRadius: 13)
     }
 
@@ -77,9 +77,9 @@ struct AnalyseView: View {
 
     private var kpiChips: some View {
         ScrollView(.horizontal) {
-            HStack(spacing: 9) {
+            HStack(spacing: 8) {
                 ForEach(chips, id: \.label) { chip in
-                    VStack(alignment: .leading, spacing: 3) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(chip.label)
                             .pmFont(11)
                             .foregroundStyle(Theme.tx2)
@@ -90,13 +90,13 @@ struct AnalyseView: View {
                     }
                     .lineLimit(1)
                     .frame(minWidth: 96, alignment: .leading)
-                    .padding(.horizontal, 13)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 12)
                     .pmCard(cornerRadius: 14)
                     .accessibilityElement(children: .combine)
                 }
             }
-            .padding(.horizontal, 18)
+            .padding(.horizontal, 20)
             .padding(.vertical, 2)
         }
         .scrollIndicators(.hidden)
@@ -116,12 +116,12 @@ struct AnalyseView: View {
                 .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 11)
-                .padding(.bottom, 5)
+                .padding(.top, 12)
+                .padding(.bottom, 6)
 
             ForEach(period.comparisonRows, id: \.label) { row in
                 Divider().overlay(Theme.line)
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     Text(row.label)
                         .pmFont(13)
                         .foregroundStyle(Theme.tx2)
@@ -130,7 +130,7 @@ struct AnalyseView: View {
                                color: row.isGood ? Theme.ok : Theme.warn,
                                background: row.isGood ? Theme.okS : Theme.warnS)
                 }
-                .padding(.vertical, 10)
+                .padding(.vertical, 12)
                 .accessibilityElement(children: .combine)
             }
         }
@@ -141,7 +141,7 @@ struct AnalyseView: View {
     // MARK: Empty state for a custom range
 
     private var emptyState: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 17, style: .continuous)
                 .fill(Theme.elev)
                 .frame(width: 52, height: 52)
@@ -169,7 +169,7 @@ struct AnalyseView: View {
                     .pmFont(13.5, weight: .bold)
                     .foregroundStyle(Theme.btnT)
                     .padding(.horizontal, 20)
-                    .frame(height: 42)
+                    .frame(height: 44)
                     .background(Theme.btn, in: .rect(cornerRadius: 12, style: .continuous))
             }
             .buttonStyle(.pressable)
@@ -177,7 +177,7 @@ struct AnalyseView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
-        .padding(.vertical, 34)
+        .padding(.vertical, 36)
         .pmCard()
     }
 
@@ -189,7 +189,7 @@ struct AnalyseView: View {
                 .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
 
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 comparisonBar(label: "Meine Wohnung (Juni)", value: "196 kWh",
                               fraction: 0.74, color: Theme.home)
                 comparisonBar(label: "Ø Gebäude (anonymisiert)", value: "231 kWh",
@@ -197,7 +197,7 @@ struct AnalyseView: View {
             }
             .padding(.top, 12)
 
-            HStack(alignment: .top, spacing: 9) {
+            HStack(alignment: .top, spacing: 8) {
                 Image(systemName: "checkmark.shield")
                     .pmFont(13, weight: .semibold)
                     .foregroundStyle(Theme.tx3)
@@ -207,7 +207,7 @@ struct AnalyseView: View {
                     .foregroundStyle(Theme.tx3)
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 11)
+            .padding(.vertical, 12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Theme.card2, in: .rect(cornerRadius: 12, style: .continuous))
             .padding(.top, 12)
@@ -218,7 +218,7 @@ struct AnalyseView: View {
 
     private func comparisonBar(label: String, value: String,
                                fraction: CGFloat, color: Color) -> some View {
-        VStack(spacing: 5) {
+        VStack(spacing: 6) {
             HStack {
                 Text(label)
                     .pmFont(12)
@@ -247,7 +247,7 @@ struct AnalyseView: View {
 
 
     private var outlineActions: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             outlineButton("Detailanalyse", target: .detailanalyse)
             outlineButton("Energiebilanz", target: .energiebilanz)
         }
@@ -298,7 +298,7 @@ struct AnalyseView: View {
                     .accessibilityHidden(true)
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 15)
+            .padding(.vertical, 16)
             .pmCard()
         }
         .buttonStyle(.pressable)

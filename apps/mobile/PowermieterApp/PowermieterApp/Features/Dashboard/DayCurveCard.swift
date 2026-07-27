@@ -67,7 +67,7 @@ struct DayCurveCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Text("Tagesverlauf")
                     .pmFont(14.5, weight: .bold)
@@ -250,7 +250,7 @@ struct DayCurveCard: View {
     }
 
     private func legendDot(color: Color, label: String) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 6) {
             Circle().fill(color).frame(width: 8, height: 8)
             Text(label).pmFont(11).foregroundStyle(Theme.tx2)
         }

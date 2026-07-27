@@ -32,13 +32,13 @@ struct MesssystemView: View {
                           onBack: onBack)
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     statusPills
                     warningCard
                     deviceList
                     glossaryCard
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -47,7 +47,7 @@ struct MesssystemView: View {
     }
 
     private var statusPills: some View {
-        HStack(spacing: 9) {
+        HStack(spacing: 8) {
             countTile("27", "online", Theme.ok, Theme.okS)
             countTile("1", "verzögert", Theme.warn, Theme.warnS)
             countTile("0", "offline", Theme.tx2, Theme.elev)
@@ -66,13 +66,13 @@ struct MesssystemView: View {
                 .foregroundStyle(Theme.tx2)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 13)
+        .padding(.vertical, 12)
         .background(background, in: .rect(cornerRadius: Theme.radiusTile, style: .continuous))
         .accessibilityElement(children: .combine)
     }
 
     private var warningCard: some View {
-        VStack(alignment: .leading, spacing: 13) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: 12) {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(Theme.warnS)
@@ -84,7 +84,7 @@ struct MesssystemView: View {
                     }
                     .accessibilityHidden(true)
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("Wohnungszähler WE 07 verzögert")
                         .pmFont(14, weight: .bold)
                         .foregroundStyle(Theme.tx)
@@ -116,7 +116,7 @@ struct MesssystemView: View {
         VStack(spacing: 0) {
             ForEach(Array(devices.enumerated()), id: \.offset) { index, device in
                 if index > 0 { Divider().overlay(Theme.line) }
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     Circle()
                         .fill(device.color)
                         .frame(width: 9, height: 9)
@@ -138,7 +138,7 @@ struct MesssystemView: View {
     }
 
     private var glossaryCard: some View {
-        VStack(alignment: .leading, spacing: 9) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Was bedeuten die Zustände?")
                 .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)

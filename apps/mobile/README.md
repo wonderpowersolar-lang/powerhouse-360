@@ -160,6 +160,33 @@ Aus dem iOS-Design-Review sind vier Befunde umgesetzt:
 Ausprobieren: `xcrun simctl ui booted content_size accessibility-medium`,
 Fehlerpfad mit `SIMCTL_CHILD_PM_API_BASE_URL=http://127.0.0.1:9`.
 
+### Abstandsraster
+
+**4 pt, mit 2-pt-Halbschritten unter 8 pt** — also 0, 2, 4, 6 und dann
+Vielfache von 4. Vorher lagen 28 verschiedene Padding- und 16 Spacing-Werte im
+Code (3, 5, 11, 13, 14, 18 …), direkt aus den Pixelwerten des HTML-Prototyps
+übernommen. 245 Werte sind auf den nächsten Rasterwert gezogen, bei exakter
+Mitte aufgerundet.
+
+Ein reines 4-pt-Raster wäre am unteren Ende zu grob: Zwischen Titel und
+Untertitel braucht es 2 pt, nicht 0 oder 4. Deshalb die Halbschritte darunter.
+
+Sichtbarste Folge: Der Seitenrand ist von 18 auf 20 pt gewachsen, die
+Kartenpolsterung liegt einheitlich bei 16.
+
+Knopfhöhen sind bei der Gelegenheit von fünf Werten (42/46/48/50/54) auf drei
+vereinheitlicht: **44 / 48 / 56**. Die drei 42-pt-Knöpfe lagen zusätzlich unter
+der HIG-Trefferfläche.
+
+```sh
+python3 apps/mobile/PowermieterApp/Scripts/check-spacing.py
+```
+
+Das Skript prüft Paddings, Spacings und `minLength`. Feste `.frame`-Größen
+prüft es bewusst nicht — darunter fallen Symbolkacheln, Chart-Zeichenflächen
+und Haarlinien, und eine Haarlinie *muss* 1 pt hoch sein. Nicht in CI
+eingehängt.
+
 ### Noch offen (nicht im Slice)
 
 Die restlichen Views lesen weiterhin Festwerte; echte Instrument-Sans-Schrift

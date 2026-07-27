@@ -20,7 +20,7 @@ struct EinstellungenView: View {
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     profileCard
                     appearanceCard
                     notificationsCard
@@ -29,7 +29,7 @@ struct EinstellungenView: View {
                     logoutButton
                     footer
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.top, 104)
                 .padding(.bottom, 108)
             }
@@ -45,7 +45,7 @@ struct EinstellungenView: View {
     // MARK: Profile
 
     private var profileCard: some View {
-        HStack(spacing: 13) {
+        HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Theme.accS)
                 .frame(width: 48, height: 48)
@@ -85,12 +85,12 @@ struct EinstellungenView: View {
                 appearanceOption("Hell", .light, isActive: colorScheme == .light)
                 appearanceOption("Dunkel", .dark, isActive: colorScheme == .dark)
             }
-            .padding(3)
+            .padding(4)
             .background(Theme.card2, in: .rect(cornerRadius: 12, style: .continuous))
-            .padding(.top, 10)
+            .padding(.top, 12)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.vertical, 16)
         .pmCard()
     }
 
@@ -121,8 +121,8 @@ struct EinstellungenView: View {
     private var notificationsCard: some View {
         VStack(spacing: 0) {
             sectionTitle("Benachrichtigungen")
-                .padding(.top, 11)
-                .padding(.bottom, 5)
+                .padding(.top, 12)
+                .padding(.bottom, 6)
 
             toggleRow("Solar-Hinweise", "Wenn viel Sonnenstrom verfügbar ist", $notifySolar)
             toggleRow("Rechnungen & Dokumente", "Neue Rechnung, Report, Vertrag", $notifyBilling)
@@ -135,8 +135,8 @@ struct EinstellungenView: View {
     private var sharingCard: some View {
         VStack(spacing: 0) {
             sectionTitle("Datenfreigaben")
-                .padding(.top, 11)
-                .padding(.bottom, 5)
+                .padding(.top, 12)
+                .padding(.bottom, 6)
 
             toggleRow("Anonyme Vergleichswerte", "Für den Gebäude-Durchschnitt", $shareAnonymous)
             toggleRow("Spartipps", "Persönliche Empfehlungen", $shareTips)
@@ -148,7 +148,7 @@ struct EinstellungenView: View {
     private func toggleRow(_ title: String, _ caption: String,
                            _ binding: Binding<Bool>) -> some View {
         Toggle(isOn: binding) {
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .pmFont(13.5, weight: .semibold)
                     .foregroundStyle(Theme.tx)
@@ -158,7 +158,7 @@ struct EinstellungenView: View {
             }
         }
         .tint(Theme.acc)
-        .padding(.vertical, 11)
+        .padding(.vertical, 12)
         .overlay(alignment: .top) { Divider().overlay(Theme.line) }
     }
 
@@ -185,7 +185,7 @@ struct EinstellungenView: View {
             if let target { openOverlay(target) }
             if let sheet { openSheet(sheet) }
         } label: {
-            HStack(spacing: 11) {
+            HStack(spacing: 12) {
                 Text(title)
                     .pmFont(14, weight: .semibold)
                     .foregroundStyle(Theme.tx)
@@ -200,7 +200,7 @@ struct EinstellungenView: View {
                     .foregroundStyle(Theme.tx3)
                     .accessibilityHidden(true)
             }
-            .padding(.vertical, 13)
+            .padding(.vertical, 12)
             .overlay(alignment: .top) {
                 if showsDivider { Divider().overlay(Theme.line) }
             }
@@ -228,16 +228,16 @@ struct EinstellungenView: View {
     }
 
     private var footer: some View {
-        VStack(spacing: 9) {
+        VStack(spacing: 8) {
             Text("Powermieter 1.0 · Teil von Powerhouse 360")
                 .pmFont(11)
                 .foregroundStyle(Theme.tx3)
 
-            HStack(spacing: 7) {
+            HStack(spacing: 8) {
                 StatusPill(text: "Powermieter · aktiv", color: Theme.acc, background: Theme.accS)
                 StatusPill(text: "Heatmieter · bald", color: Theme.tx3, background: Theme.elev)
             }
-            HStack(spacing: 7) {
+            HStack(spacing: 8) {
                 StatusPill(text: "Chargemieter · bald", color: Theme.tx3, background: Theme.elev)
                 StatusPill(text: "Smokemieter · bald", color: Theme.tx3, background: Theme.elev)
             }

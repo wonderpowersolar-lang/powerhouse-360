@@ -45,14 +45,14 @@ struct MonatsreportView: View {
                           onBack: onBack)
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     summaryCard
 
                     Text("Empfehlungen")
                         .pmFont(14.5, weight: .bold)
                         .foregroundStyle(Theme.tx)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 3)
+                        .padding(.top, 4)
 
                     ForEach(Array(recommendations.enumerated()), id: \.offset) { _, item in
                         recommendationCard(item)
@@ -60,7 +60,7 @@ struct MonatsreportView: View {
 
                     downloadButton
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -72,7 +72,7 @@ struct MonatsreportView: View {
         VStack(spacing: 0) {
             ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
                 if index > 0 { Divider().overlay(Theme.line) }
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(row.label)
                             .pmFont(12.5)
@@ -118,7 +118,7 @@ struct MonatsreportView: View {
                 }
                 .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(item.title)
                     .pmFont(14, weight: .bold)
                     .foregroundStyle(Theme.tx)
@@ -144,7 +144,7 @@ struct MonatsreportView: View {
             }
             .foregroundStyle(Theme.btnT)
             .frame(maxWidth: .infinity)
-            .frame(height: 50)
+            .frame(height: 48)
             .background(Theme.btn, in: .rect(cornerRadius: Theme.radiusButton))
         }
         .buttonStyle(.pressable)

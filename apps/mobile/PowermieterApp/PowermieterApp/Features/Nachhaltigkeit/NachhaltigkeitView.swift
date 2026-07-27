@@ -14,14 +14,14 @@ struct NachhaltigkeitView: View {
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     co2HeroCard
                     equivalentTiles
                     localShareCard
                     buildingTotalCard
                     reportRow
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.top, 104)
                 .padding(.bottom, 108)
             }
@@ -37,7 +37,7 @@ struct NachhaltigkeitView: View {
     // MARK: CO₂ hero
 
     private var co2HeroCard: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 16) {
             RingGauge(fraction: 0.76, color: Theme.acc, lineWidth: 8)
                 .frame(width: 72, height: 72)
                 .overlay {
@@ -60,7 +60,7 @@ struct NachhaltigkeitView: View {
                     .padding(.top, 2)
 
                 Button { openSheet(.info("naeh")) } label: {
-                    HStack(spacing: 5) {
+                    HStack(spacing: 6) {
                         Text("Näherungswert")
                             .pmFont(11, weight: .bold)
                         Image(systemName: "info.circle")
@@ -68,17 +68,17 @@ struct NachhaltigkeitView: View {
                             .accessibilityHidden(true)
                     }
                     .foregroundStyle(Theme.tx2)
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, 12)
                     .padding(.vertical, 4)
                     .background(Theme.elev, in: .capsule)
                 }
                 .buttonStyle(.pressable)
-                .padding(.top, 5)
+                .padding(.top, 6)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 18)
+        .padding(.vertical, 20)
         .background {
             // Clipped to the card radius so the tint can't bleed past the corners.
             LinearGradient(colors: [Theme.accS, .clear],
@@ -118,7 +118,7 @@ struct NachhaltigkeitView: View {
                 .foregroundStyle(Theme.tx2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
+        .padding(16)
         .pmCard(cornerRadius: Theme.radiusTile)
         .accessibilityElement(children: .combine)
     }
@@ -156,7 +156,7 @@ struct NachhaltigkeitView: View {
             .padding(.top, 12)
             .accessibilityElement(children: .combine)
 
-            HStack(alignment: .bottom, spacing: 10) {
+            HStack(alignment: .bottom, spacing: 12) {
                 ForEach(monthShare, id: \.month) { entry in
                     VStack(spacing: 4) {
                         RoundedRectangle(cornerRadius: 5, style: .continuous)
@@ -170,7 +170,7 @@ struct NachhaltigkeitView: View {
                 }
             }
             .frame(height: 56, alignment: .bottom)
-            .padding(.top, 14)
+            .padding(.top, 16)
             .accessibilityElement()
             .accessibilityLabel("Verlauf lokaler Energieanteil")
             .accessibilityValue("Februar bis Juli, steigend auf 76 Prozent")
@@ -196,7 +196,7 @@ struct NachhaltigkeitView: View {
                     .pmFont(12.5)
                     .foregroundStyle(Theme.tx2)
             }
-            .padding(.top, 10)
+            .padding(.top, 12)
 
             Text("Entspricht etwa 15.500 Pkw-Kilometern oder der Jahresbindung von 250 Bäumen.")
                 .pmFont(12.5)
@@ -210,7 +210,7 @@ struct NachhaltigkeitView: View {
                     .underline()
             }
             .buttonStyle(.plain)
-            .padding(.top, 10)
+            .padding(.top, 12)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
@@ -248,7 +248,7 @@ struct NachhaltigkeitView: View {
                     .accessibilityHidden(true)
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 15)
+            .padding(.vertical, 16)
             .pmCard()
         }
         .buttonStyle(.pressable)

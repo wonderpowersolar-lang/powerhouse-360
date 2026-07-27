@@ -46,7 +46,7 @@ struct AssistentView: View {
 
             ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 12) {
                         assistantBubble("Hallo\(greeting)! Ich erkläre dir, was in eurem Gebäude gerade passiert – frag mich zum Beispiel:")
 
                         ForEach(messages) { message in
@@ -64,7 +64,7 @@ struct AssistentView: View {
                         Color.clear.frame(height: 1).id("bottom")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 18)
+                    .padding(.horizontal, 20)
                     .padding(.top, 4)
                     .padding(.bottom, 12)
                 }
@@ -99,8 +99,8 @@ struct AssistentView: View {
         Text(text)
             .pmFont(13.5)
             .foregroundStyle(Theme.tx)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 11)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
             .background(Theme.card, in: .rect(cornerRadius: 16, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -113,23 +113,23 @@ struct AssistentView: View {
         Text(text)
             .pmFont(13.5, weight: .semibold)
             .foregroundStyle(Theme.accT)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 11)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
             .background(Theme.acc, in: .rect(cornerRadius: 16, style: .continuous))
             .frame(maxWidth: 300, alignment: .trailing)
             .frame(maxWidth: .infinity, alignment: .trailing)
     }
 
     private var typingIndicator: some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 6) {
             ForEach(0..<3, id: \.self) { _ in
                 Circle()
                     .fill(Theme.tx3)
                     .frame(width: 6, height: 6)
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 13)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
         .background(Theme.card, in: .rect(cornerRadius: 16, style: .continuous))
         .accessibilityLabel("Assistent schreibt")
     }
@@ -147,7 +147,7 @@ struct AssistentView: View {
                             .pmFont(12.5, weight: .semibold)
                             .foregroundStyle(Theme.tx2)
                             .lineLimit(1)
-                            .padding(.horizontal, 13)
+                            .padding(.horizontal, 12)
                             .frame(height: 36)
                             .background(Theme.card, in: .capsule)
                             .overlay {
@@ -157,19 +157,19 @@ struct AssistentView: View {
                     .buttonStyle(.pressable)
                 }
             }
-            .padding(.horizontal, 18)
+            .padding(.horizontal, 20)
             .padding(.vertical, 2)
         }
         .scrollIndicators(.hidden)
     }
 
     private var inputBar: some View {
-        HStack(spacing: 9) {
+        HStack(spacing: 8) {
             TextField("Eigene Frage stellen …", text: $input)
                 .pmFont(13.5)
                 .foregroundStyle(Theme.tx)
-                .padding(.horizontal, 14)
-                .frame(height: 46)
+                .padding(.horizontal, 16)
+                .frame(height: 48)
                 .background(Theme.card, in: .rect(cornerRadius: 14, style: .continuous))
                 .overlay {
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -191,8 +191,8 @@ struct AssistentView: View {
             .buttonStyle(.pressable)
             .accessibilityLabel("Senden")
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 10)
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
     }
 
     // MARK: Behaviour

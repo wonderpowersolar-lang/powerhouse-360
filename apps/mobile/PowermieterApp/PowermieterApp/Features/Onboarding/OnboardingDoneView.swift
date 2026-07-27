@@ -12,7 +12,7 @@ struct OnboardingDoneView: View {
     var body: some View {
         VStack(spacing: 0) {
             successBadge
-                .padding(.top, 34)
+                .padding(.top, 36)
 
             Text("Alles startklar!")
                 .pmFont(27, weight: .heavy)
@@ -20,7 +20,7 @@ struct OnboardingDoneView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Theme.tx)
                 .frame(maxWidth: .infinity)
-                .padding(.top, 22)
+                .padding(.top, 24)
                 .accessibilityAddTraits(.isHeader)
 
             Text("Dein Gebäude ist verbunden und liefert Daten.")
@@ -37,9 +37,9 @@ struct OnboardingDoneView: View {
 
             PrimaryButton(title: "Zur Übersicht", action: onEnter)
         }
-        .padding(.horizontal, 22)
+        .padding(.horizontal, 24)
         .padding(.top, 48)
-        .padding(.bottom, 30)
+        .padding(.bottom, 32)
         .background(Theme.bg.ignoresSafeArea())
         .onAppear {
             if reduceMotion {
@@ -89,7 +89,7 @@ struct OnboardingDoneView: View {
                 trailing: "live · vor 1 Min"
             )
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .pmCard()
     }
 
@@ -111,7 +111,7 @@ struct OnboardingDoneView: View {
                 .pmFont(12.5)
                 .foregroundStyle(Theme.tx2)
         }
-        .padding(.vertical, 13)
+        .padding(.vertical, 12)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title): \(trailing)")
     }

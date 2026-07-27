@@ -15,7 +15,7 @@ struct StoerungsfallView: View {
                           onBack: onBack)
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     if submitted {
                         confirmation
                     } else {
@@ -25,7 +25,7 @@ struct StoerungsfallView: View {
                         submitButton
                     }
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -70,7 +70,7 @@ struct StoerungsfallView: View {
             Text("Verlauf")
                 .pmFont(14.5, weight: .bold)
                 .foregroundStyle(Theme.tx)
-                .padding(.bottom, 10)
+                .padding(.bottom, 12)
 
             timelineRow(color: Theme.tx3, time: "04:12 Uhr", text: "letzte Daten empfangen")
             timelineRow(color: Theme.warn, time: "06:30 Uhr",
@@ -84,11 +84,11 @@ struct StoerungsfallView: View {
     }
 
     private func timelineRow(color: Color, time: String, text: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
+        HStack(alignment: .top, spacing: 12) {
             Circle()
                 .fill(color)
                 .frame(width: 8, height: 8)
-                .padding(.top, 5)
+                .padding(.top, 6)
                 .accessibilityHidden(true)
 
             Group {
@@ -99,7 +99,7 @@ struct StoerungsfallView: View {
             .foregroundStyle(Theme.tx2)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.vertical, 5)
+        .padding(.vertical, 6)
         .accessibilityElement(children: .combine)
     }
 
@@ -114,7 +114,7 @@ struct StoerungsfallView: View {
                     .pmFont(12.5, weight: .semibold)
                     .foregroundStyle(Theme.tx)
             }
-            .padding(.bottom, 11)
+            .padding(.bottom, 12)
             .accessibilityElement(children: .combine)
 
             Divider().overlay(Theme.line)
@@ -122,7 +122,7 @@ struct StoerungsfallView: View {
             Text("Wohnungszähler WE 07 liefert seit 04:12 Uhr keine Daten. Reconnect über Gateway erfolglos. Bitte Funkstrecke bzw. Zähler vor Ort prüfen.")
                 .pmFont(12.5)
                 .foregroundStyle(Theme.tx2)
-                .padding(.top, 11)
+                .padding(.top, 12)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
@@ -138,7 +138,7 @@ struct StoerungsfallView: View {
     // MARK: Confirmation
 
     private var confirmation: some View {
-        VStack(spacing: 11) {
+        VStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(Theme.okS)
                 .frame(width: 64, height: 64)
@@ -168,7 +168,7 @@ struct StoerungsfallView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 20)
-        .padding(.vertical, 30)
+        .padding(.vertical, 32)
         .pmCard()
     }
 }

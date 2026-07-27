@@ -9,7 +9,7 @@ struct OverlayHeader<Trailing: View>: View {
     @ViewBuilder var trailing: Trailing
 
     var body: some View {
-        HStack(spacing: 11) {
+        HStack(spacing: 12) {
             Button(action: onBack) {
                 Image(systemName: "arrow.left")
                     .pmFont(16, weight: .semibold)
@@ -25,7 +25,7 @@ struct OverlayHeader<Trailing: View>: View {
             .buttonStyle(.pressable)
             .accessibilityLabel("Zurück")
 
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .pmFont(17, weight: .heavy)
                     .tracking(-0.2)
@@ -41,9 +41,9 @@ struct OverlayHeader<Trailing: View>: View {
 
             trailing
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 8)
-        .padding(.bottom, 10)
+        .padding(.bottom, 12)
     }
 }
 

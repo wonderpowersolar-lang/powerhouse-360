@@ -13,14 +13,14 @@ struct RechnungsdetailView: View {
             OverlayHeader(title: invoice.title, subtitle: invoice.period, onBack: onBack)
 
             ScrollView {
-                VStack(spacing: 13) {
+                VStack(spacing: 12) {
                     amountCard
                     lineItemsCard
                     comparisonCard
                     actions
                     legalNote
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
             .scrollIndicators(.hidden)
@@ -48,9 +48,9 @@ struct RechnungsdetailView: View {
                 .padding(.top, 4)
 
             // Solar / grid split of the billed kilowatt-hours.
-            HStack(spacing: 3) {
+            HStack(spacing: 4) {
                 GeometryReader { geo in
-                    HStack(spacing: 3) {
+                    HStack(spacing: 4) {
                         Capsule()
                             .fill(Theme.pv)
                             .frame(width: max(0, (geo.size.width - 3) * invoice.solarShare))
@@ -60,7 +60,7 @@ struct RechnungsdetailView: View {
                 }
             }
             .frame(height: 10)
-            .padding(.top, 14)
+            .padding(.top, 16)
 
             HStack(spacing: 12) {
                 legendItem("Solar \(Int((invoice.solarShare * 100).rounded())) %", Theme.pv)
@@ -80,7 +80,7 @@ struct RechnungsdetailView: View {
     }
 
     private func legendItem(_ label: String, _ color: Color) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 6) {
             Circle().fill(color).frame(width: 8, height: 8)
             Text(label)
                 .pmFont(11.5)
@@ -94,7 +94,7 @@ struct RechnungsdetailView: View {
         VStack(spacing: 0) {
             ForEach(Array(invoice.rows.enumerated()), id: \.offset) { index, row in
                 if index > 0 { Divider().overlay(Theme.line) }
-                HStack(alignment: .top, spacing: 10) {
+                HStack(alignment: .top, spacing: 12) {
                     Text(row.key)
                         .pmFont(12.5)
                         .foregroundStyle(Theme.tx2)
@@ -104,7 +104,7 @@ struct RechnungsdetailView: View {
                         .foregroundStyle(Theme.tx)
                         .monospacedDigit()
                 }
-                .padding(.vertical, 11)
+                .padding(.vertical, 12)
                 .accessibilityElement(children: .combine)
             }
 
@@ -142,7 +142,7 @@ struct RechnungsdetailView: View {
                     .monospacedDigit()
                     .strikethrough()
             }
-            .padding(.vertical, 11)
+            .padding(.vertical, 12)
             .accessibilityElement(children: .combine)
 
             Divider().overlay(Theme.line)
@@ -167,7 +167,7 @@ struct RechnungsdetailView: View {
     // MARK: Actions
 
     private var actions: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Button { showToast("PDF wird geöffnet … (Demo)") } label: {
                 Text("PDF öffnen")
                     .pmFont(14, weight: .bold)

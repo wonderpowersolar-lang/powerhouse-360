@@ -5,7 +5,7 @@ struct ToastView: View {
     let message: String
 
     var body: some View {
-        HStack(spacing: 9) {
+        HStack(spacing: 8) {
             Image(systemName: "checkmark")
                 .pmFont(12, weight: .bold)
                 .accessibilityHidden(true)

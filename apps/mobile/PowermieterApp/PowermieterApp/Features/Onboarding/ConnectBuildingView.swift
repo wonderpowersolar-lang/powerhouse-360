@@ -26,7 +26,7 @@ struct ConnectBuildingView: View {
                         .tracking(-0.4)
                         .foregroundStyle(Theme.tx)
                         .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 26)
+                        .padding(.top, 28)
 
                     Text("Wir haben deine Daten aus dem Einladungslink übernommen.")
                         .pmFont(14)
@@ -36,7 +36,7 @@ struct ConnectBuildingView: View {
                         .padding(.top, 8)
 
                     infoCard
-                        .padding(.top, 22)
+                        .padding(.top, 24)
 
                     if phase == .connecting || phase == .connected {
                         busyCard
@@ -49,10 +49,10 @@ struct ConnectBuildingView: View {
             .scrollIndicators(.hidden)
 
             bottomButton
-                .padding(.top, 22)
+                .padding(.top, 24)
         }
-        .padding(.horizontal, 22)
-        .padding(.bottom, 30)
+        .padding(.horizontal, 24)
+        .padding(.bottom, 32)
         .background(Theme.bg.ignoresSafeArea())
     }
 
@@ -69,22 +69,22 @@ struct ConnectBuildingView: View {
             scanButton
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(18)
+        .padding(20)
         .pmCard()
     }
 
     private func labelledField(_ label: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 7) {
+        VStack(alignment: .leading, spacing: 8) {
             fieldLabel(label)
             valueBox { Text(value) }
         }
     }
 
     private var invitationField: some View {
-        VStack(alignment: .leading, spacing: 7) {
+        VStack(alignment: .leading, spacing: 8) {
             fieldLabel("Einladungscode")
             valueBox {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     Text("PWM-8H4T-2026")
                         .pmFont(15, weight: .semibold, design: .monospaced)
                     Spacer(minLength: 8)
@@ -92,7 +92,7 @@ struct ConnectBuildingView: View {
                         .pmFont(11, weight: .bold)
                         .foregroundStyle(Theme.ok)
                         .padding(.vertical, 4)
-                        .padding(.horizontal, 9)
+                        .padding(.horizontal, 8)
                         .background(Theme.okS, in: .capsule)
                 }
             }
@@ -101,7 +101,7 @@ struct ConnectBuildingView: View {
 
     private var scanButton: some View {
         Button(action: {}) {
-            HStack(spacing: 9) {
+            HStack(spacing: 8) {
                 Image(systemName: "qrcode.viewfinder")
                     .accessibilityHidden(true)
                 Text("Stattdessen QR-Code scannen")
@@ -132,8 +132,8 @@ struct ConnectBuildingView: View {
             .pmFont(15, weight: .semibold)
             .foregroundStyle(Theme.tx)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 13)
-            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
             .background(Theme.card2, in: .rect(cornerRadius: 12, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -144,7 +144,7 @@ struct ConnectBuildingView: View {
     // MARK: - Connection simulation
 
     private var busyCard: some View {
-        VStack(alignment: .leading, spacing: 11) {
+        VStack(alignment: .leading, spacing: 12) {
             checkRow(index: 0, label: "Gateway erreichbar")
             checkRow(index: 1, label: "Zählpunkt zugeordnet")
             checkRow(index: 2, label: "Vertrag gefunden")
@@ -155,7 +155,7 @@ struct ConnectBuildingView: View {
     }
 
     private func checkRow(index: Int, label: String) -> some View {
-        HStack(spacing: 9) {
+        HStack(spacing: 8) {
             statusDot(index)
             Text(label)
                 .pmFont(13.5)
@@ -201,7 +201,7 @@ struct ConnectBuildingView: View {
     }
 
     private var connectingButton: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             ProgressView()
                 .tint(.white)
             Text("Verbinde …")
@@ -209,7 +209,7 @@ struct ConnectBuildingView: View {
                 .foregroundStyle(Theme.btnT)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 54)
+        .frame(height: 56)
         .background(Theme.btn.opacity(0.7), in: .rect(cornerRadius: Theme.radiusButton))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Verbinde")

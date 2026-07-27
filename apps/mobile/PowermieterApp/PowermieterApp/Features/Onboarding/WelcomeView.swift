@@ -26,7 +26,7 @@ struct WelcomeView: View {
                         .frame(maxWidth: 300, alignment: .leading)
                         .padding(.top, 16)
 
-                    VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 16) {
                         featureRow(icon: "sun.max.fill", tint: Theme.pv, chip: Theme.pvS,
                                    text: "Live-Energiefluss deines Hauses")
                         featureRow(icon: "chart.bar.fill", tint: Theme.acc, chip: Theme.accS,
@@ -34,7 +34,7 @@ struct WelcomeView: View {
                         featureRow(icon: "checkmark.shield.fill", tint: Theme.grid, chip: Theme.gridS,
                                    text: "Nur du siehst deine Verbrauchsdaten")
                     }
-                    .padding(.top, 30)
+                    .padding(.top, 32)
 
                     Spacer(minLength: 40)
 
@@ -46,16 +46,16 @@ struct WelcomeView: View {
                         .foregroundStyle(Theme.tx2)
                         .frame(maxWidth: .infinity)
                         .frame(height: 34)
-                        .padding(.top, 14)
+                        .padding(.top, 16)
 
                     Text("POWERHOUSE 360 · GANZHEITLICHE ENERGIESYSTEME")
                         .pmFont(11, weight: .medium)
                         .tracking(1.4)
                         .foregroundStyle(Theme.tx3)
                         .frame(maxWidth: .infinity)
-                        .padding(.top, 14)
+                        .padding(.top, 16)
                 }
-                .padding(.horizontal, 26)
+                .padding(.horizontal, 28)
                 .padding(.bottom, 28)
                 .frame(minHeight: heroMinHeight, alignment: .top)
             }
@@ -66,7 +66,7 @@ struct WelcomeView: View {
     // MARK: - Pieces
 
     private var brandRow: some View {
-        HStack(spacing: 11) {
+        HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 11, style: .continuous)
                 .fill(Theme.acc)
                 .frame(width: 40, height: 40)

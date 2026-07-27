@@ -11,7 +11,7 @@ struct PrimaryButton: View {
                 .pmFont(16.5, weight: .bold)
                 .foregroundStyle(Theme.btnT)
                 .frame(maxWidth: .infinity)
-                .frame(height: 54)
+                .frame(height: 56)
                 .background(Theme.btn, in: .rect(cornerRadius: Theme.radiusButton))
         }
         .buttonStyle(.pressable)

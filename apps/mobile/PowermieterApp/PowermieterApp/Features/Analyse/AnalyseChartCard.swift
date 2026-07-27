@@ -23,10 +23,10 @@ struct AnalyseChartCard: View {
                 tapColumns
             }
             .frame(height: chartHeight)
-            .padding(.top, 10)
+            .padding(.top, 12)
 
             axisLabels
-                .padding(.top, 5)
+                .padding(.top, 6)
 
             if let selected, let readout = readout(for: selected) {
                 Text(readout)
@@ -37,7 +37,7 @@ struct AnalyseChartCard: View {
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(Theme.card2, in: .rect(cornerRadius: 10, style: .continuous))
-                    .padding(.top, 9)
+                    .padding(.top, 8)
             }
         }
         .padding(16)
@@ -63,7 +63,7 @@ struct AnalyseChartCard: View {
     }
 
     private func legendItem(_ label: String, _ color: Color) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 6) {
             Circle()
                 .fill(color)
                 .frame(width: 8, height: 8)
