@@ -129,3 +129,17 @@ Branch: `feat/platform-foundation`. Stack bestätigt durch Ausführungsauftrag (
 **Nächster Schritt:** WP-APP-1 (Messkern + Ingestion + Hub-Simulator) gemäß Programmplan; parallel PO-Punkte (Pilotdatenliste, Apple-Account, VPS/DNS, Git-Remote).
 
 ---
+
+## 2026-08-05 — Founding-Spec-Rebaseline + Phasen-Neuschnitt (ADR-012)
+
+**Getan:**
+- `docs/FOUNDING-SPEC-v2.0.md` aufgenommen (Gründungsdokument v2.0, 2026-08-02, als Markdown; wortverlustfrei geprüft) + `docs/FOUNDING-SPEC-ABGLEICH.md` (Konflikte K-01…K-10 gegen Masterplan/ADRs).
+- **ADR-012** (PO 2026-08-05): Bauabfolge Commercial-first — Commercial-Durchstich (Lead → Angebot → Vertrag → Projekt → Provisionierung → Operations) vor Powermieter-Pilot.
+- **Masterplan v2.0 → v2.1:** §1-Priorisierung auf Commercial-Durchstich; §10 neu geschnitten (2 Commercial Core · 3 Konfigurator & Vertrag · 4 Contract-to-Delivery · 5 Provisionierung · 6/7 Hub/PWA · 8 Powermieter+Pilot · 9 Smokemieter · 10/11 Heat/Charge · 12 Agenten) inkl. Mapping alt→neu; §12: F-17 neu gefasst, F-22/F-23/F-24 neu; §13: E-08/E-09, R-18 neu, R-17 hochgestuft, Fristen umgehängt; §5 um ForecastItem/CostModel/ApprovalRequest/DeliverableTemplate/Provisionierungs-Entitäten ergänzt; GoCardless als SEPA-Provider (Spec §25).
+- **EXECUTION_ROADMAP** vollständig auf die neue Reihenfolge umgestellt (Schrittinhalte der alten Phasen übernommen); WP-1.2 als abgeschlossen nachgeführt (IssuingEntity-Stammtabelle als offenes Delta nach WP-1.3 verschoben — im Schema nicht vorhanden, verifiziert).
+- ADR-002/005/008: Umsetzungs-Phasenvermerke auf neue Nummern angepasst (mit Alt-Vermerk).
+
+**Getestet:** interne Markdown-Links aller geänderten Dokumente per Skript geprüft (0 defekt); keine Codeänderung.
+**Nicht getestet / offen:** PO-Punkte E-08 (Pilot-Zwischenstand), E-09 (K-02/K-03/K-06/K-07 + ADR-012-Begründung); Spec v2.1 (Korrekturen K-02/K-03/K-04) steht aus.
+**Restrisiko:** R-18 — Pilot-/Realdaten-Verifikation und Hardware-Risiken rücken nach hinten; Gegensteuer: Phasen 6/7 bei Kapazität parallelisieren.
+**Nächster Schritt:** WP-1.3-Rest (kritischer Pfad zu Phase 2, F-03); PO-Parallel-Track gemäß Roadmap.

@@ -47,15 +47,15 @@ Aus der Spec ableitbar:
 - **Der Pilot Christinenstraße verschiebt sich deutlich.** Er war das P1-Abschlussziel und der einzige geplante Nachweis an Realdaten (21 Messstellen, echte Teilnehmer). Bis er läuft, bleibt die gesamte Kette Messkonzept → Zählerstände → Billing Readiness → Abrechnung unverifiziert. Das ist der reale Preis dieser Entscheidung.
 - **Hub-/Device-Registry (Phase 4) und Monteur-PWA (Phase 5) rücken nach hinten.** Damit verzögert sich auch die Klärung der Hardware-nahen Risiken — Offline-First-Konfliktauflösung (R-11), Hub-Credentials und Revocation —, die technisch die unsichersten Teile des Systems sind. Risiken spät zu klären macht sie nicht kleiner.
 - **Die native Bewohner-App wartet länger.** `apps/mobile` ist mit 5 Tabs und 11 Detailscreens weitgehend gebaut, ihr Backend (WP-APP-1/2) ist es nicht. Die App hängt am Powermieter-Betrieb und rückt mit ihm nach hinten — fertige Oberfläche ohne Datenquelle, auf unbestimmte Zeit.
-- **Masterplan und EXECUTION_ROADMAP sind ab sofort in ihrer Phasenreihenfolge überholt.** Bis zur Anpassung (siehe unten) beschreiben sie einen Plan, der nicht mehr gilt. Wer sie liest, ohne diese ADR zu kennen, arbeitet nach der falschen Reihenfolge.
+- ~~**Masterplan und EXECUTION_ROADMAP sind ab sofort in ihrer Phasenreihenfolge überholt.**~~ **Behoben 2026-08-05:** beide Dokumente sind auf die neue Reihenfolge umgestellt (Masterplan v2.1 §10 mit Mapping alt→neu).
 
 ## Offene Punkte
 
 Diese ADR entscheidet die Reihenfolge, nicht deren Ausgestaltung. Ungeklärt bleibt:
 
 1. **Was passiert mit dem Pilot in der Zwischenzeit?** Ausgesetzt, oder mit reduziertem Umfang parallel weiterbetrieben? Gibt es eine vertragliche oder terminliche Bindung gegenüber der Christinenstraße?
-2. **Wie werden die Masterplan-Phasen 2–7 neu geschnitten?** Die Spec-Phasen 1–5 sind gröber als die zehn Masterplan-Phasen; eine reine Umsortierung genügt nicht.
-3. **Gilt der 12-Wochen-Startplan der Spec (§30) als Terminplan** oder nur als Reihenfolge-Vorgabe? Er unterstellt einen Stand, der Teile von Woche 1–4 (Repo, Identity/Tenant, Lead Intake, Account/Contact) bereits erledigt hat.
+2. ~~**Wie werden die Masterplan-Phasen 2–7 neu geschnitten?**~~ **Erledigt 2026-08-05:** Neuschnitt in Masterplan §10 (v2.1) + EXECUTION_ROADMAP — neue Phasen 2 Commercial Core · 3 Konfigurator & Vertrag · 4 Contract-to-Delivery · 5 Provisionierung · 6/7 Hub/PWA · 8 Powermieter+Pilot · 9–11 Module · 12 Agenten; Gates F-22/F-23/F-24 ergänzt, F-17 neu gefasst.
+3. ~~**Gilt der 12-Wochen-Startplan der Spec (§30) als Terminplan?**~~ **Festgelegt 2026-08-05 (Masterplan §10):** Reihenfolge-Vorgabe, keine Kalendervorgabe — Woche 1–4 sind durch Phase 0/1 teilweise erledigt.
 4. **Wann kommt „Agents & Automation" dazu?** Mehrere Agenten der Spec (Lead, Sales, Proposal, Approval) sitzen im jetzt vorgezogenen Bereich — siehe [Abgleich K-07](../FOUNDING-SPEC-ABGLEICH.md).
 
 ## Revision

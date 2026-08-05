@@ -168,7 +168,7 @@ Die Spec fordert in §35 selbst „verbindliche Namenskonventionen für Marken, 
 
 Aus diesem Abgleich folgt Arbeit, die hier bewusst **nicht** erledigt wurde:
 
-1. **Masterplan §7/§10 und EXECUTION_ROADMAP auf die neue Bauabfolge umstellen** (aus K-01/ADR-012). Betrifft die Phasen 2–7 vollständig sowie Masterplan §14 „Nächste verbindliche Schritte". Der größte Brocken.
+1. ~~**Masterplan §7/§10 und EXECUTION_ROADMAP auf die neue Bauabfolge umstellen**~~ ✅ **Erledigt 2026-08-05:** Masterplan v2.1 (§1/§10/§12/§13/§14 + Mapping alt→neu) und EXECUTION_ROADMAP komplett neu geschnitten; ADR-002/005/008-Umsetzungsvermerke angepasst; neue Gates F-22/F-23/F-24.
 2. **PO-Freigabe für K-02 und K-03** einholen — beides sind Vorschläge, keine Entscheidungen.
 3. **K-06 (PowerWRX) und K-07 (Agentensystem) entscheiden** — ohne diese Entscheidungen bleibt das Modul- und Kontextraster unvollständig.
 4. **Spec v2.1 vorbereiten** mit den Korrekturen aus K-02, K-03, K-04 (die Spec selbst verlangt in §32 versionierte Änderung mit Anlass, Konsequenzen und Entscheidungsträger).

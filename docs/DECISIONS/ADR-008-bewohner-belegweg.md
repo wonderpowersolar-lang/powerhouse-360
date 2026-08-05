@@ -1,6 +1,6 @@
 # ADR-008 — Bewohner-Belegweg: Lexoffice vs. interner Belegpfad
 
-Status: **ENTWURF — Entscheidung vor Phase 6 (Billing-Engine-Bau)** (2026-07-12)
+Status: **ENTWURF — Entscheidung vor Phase 8 (Billing-Engine-Bau; vormals Phase 6, Neuschnitt 2026-08-05 [ADR-012](ADR-012-bauabfolge-commercial-first.md))** (2026-07-12)
 
 ## Frage
 Werden **Bewohner-Einzelrechnungen** (Powermieter-Stromrechnungen, später Lade-/Serviceabrechnungen) über Lexoffice ausgestellt oder über einen internen Belegpfad (eigene Rechnungsnummernkreise je `IssuingEntity`, PDF über die eigene Pipeline aus ADR-003, revisionssichere Ablage)?
@@ -18,7 +18,7 @@ Werden **Bewohner-Einzelrechnungen** (Powermieter-Stromrechnungen, später Lade-
 5. Mahnwesen/Zahlungsabgleich (SEPA-Einzug) — wo läuft er natürlicher?
 
 ## Tendenz (unverbindlich, im Entwurf)
-Pilot: Bewohnerbelege **über Lexoffice (AKL-Konto)** — geringstes Umsetzungsrisiko, GoBD erledigt; parallele Bewertung der Kriterien 1–3. Interner Belegpfad wird erst gebaut, wenn Volumen/Kosten es erzwingen (dann eigenes Arbeitspaket in Phase 7+).
+Pilot: Bewohnerbelege **über Lexoffice (AKL-Konto)** — geringstes Umsetzungsrisiko, GoBD erledigt; parallele Bewertung der Kriterien 1–3. Interner Belegpfad wird erst gebaut, wenn Volumen/Kosten es erzwingen (dann eigenes Arbeitspaket nach Phase 8).
 
 ## Konsequenz der Offenheit
-Die Billing-Engine (Phase 6) erzeugt in jedem Fall `InvoiceRequest`-Objekte mit `IssuingEntity`; der Belegweg ist dahinter austauschbar (Adapter-Grenze) — die Entscheidung blockiert den Engine-Bau nicht.
+Die Billing-Engine (Phase 8) erzeugt in jedem Fall `InvoiceRequest`-Objekte mit `IssuingEntity`; der Belegweg ist dahinter austauschbar (Adapter-Grenze) — die Entscheidung blockiert den Engine-Bau nicht.
