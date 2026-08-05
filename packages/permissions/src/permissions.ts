@@ -9,6 +9,10 @@ export const PERMISSIONS = [
   "member.remove",
   "organization.read",
   "object.read",
+  "lead.qualify",
+  "customer.read",
+  "object.import",
+  "accessscope.manage",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];

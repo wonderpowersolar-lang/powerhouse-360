@@ -24,7 +24,8 @@
     "platform:dev": "pnpm --filter @ph360/platform dev",
     "website:dev": "pnpm --filter @ph360/website dev",
     "worker:dev": "pnpm --filter @ph360/worker dev",
-    "ph360:create-admin": "tsx scripts/create-admin.ts"
+    "ph360:create-admin": "tsx scripts/create-admin.ts",
+    "ph360:import-objects": "tsx scripts/import-objects.ts"
   },
   "devDependencies": {
     "@types/pg": "^8.11.10",
