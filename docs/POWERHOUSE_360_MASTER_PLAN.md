@@ -236,7 +236,7 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 | WP-1.0 Repo-/Deploy-Fundament | Monorepo ✅, docker-compose ✅, Prod-Images verifiziert ✅; **offen:** Git-Remote (R-02), CI, VPS-Rollout ([DEPLOYMENT.md](DEPLOYMENT.md), beim PO), Website-Route-Sweep (F-21-Rest) | 🟣 |
 | WP-1.1 Lead-Persistenz | Lead-Kette komplett, F-01 🟢 dev; Prod nach Rollout | 🟢 dev |
 | WP-1.2 Auth/Rollen/Mandanten | better-auth (Auth) + eigene RBAC (OrganizationMembership/Invitation/SystemRole), Guards/Audit, Login/Invite/Accept/Members/Audit-UI, Bootstrap-Admin; ersetzt Interim-Basic-Auth (ADR-010). Tasks 1–13 committet, Suite grün (F-02/F-19/F-20) | 🟢 |
-| WP-1.3 Immobilien + CRM | **Kern (Objektbaum+Seed+Lesesicht) ✅ 2026-07** — Property/Building/Entrance/Unit/Address + AccessScope-Datenmodell-Stub (Migration `immobilien_kern`), idempotenter Pilotstruktur-Seed (ADR-006: 1 Property, 2 Gebäude, 21 Units), Permission `object.read`, `/admin/objects`-Lesesicht; **entblockt WP-APP-1** (Spec §8). **Rest offen:** CRM/CSV-Import (Pilotdaten!)/Zoho/AccessScope-Guards/Lead-Qualifizierung/IssuingEntity-Pflicht — F-03 bleibt offen | 🟡 |
+| WP-1.3 Immobilien + CRM | **Kern (Objektbaum+Seed+Lesesicht) ✅ 2026-07** — Property/Building/Entrance/Unit/Address + AccessScope-Datenmodell-Stub (Migration `immobilien_kern`), idempotenter Pilotstruktur-Seed (ADR-006: 1 Property, 2 Gebäude, 21 Units), Permission `object.read`, `/admin/objects`-Lesesicht; **entblockt WP-APP-1** (Spec §8). **Rest ✅ 2026-08-06** (`bd12531`…): CRM-Kern (Customer=Kunden-Org/Contact/Opportunity/Note/Task), Lead-Qualifizierung `qualifyLead` (F-03 🟢), AccessScope-Guard-Integration (PROPERTY/BUILDING-Teilbaum, Grant/Revoke auditiert), IssuingEntity-Stammdaten geseedet, CSV-Import-Werkzeug (`ph360:import-objects`, Probelauf/Fehlerbericht/Audit), Admin-UI `/admin/customers` + Qualifizieren-Aktion + `/admin/access-scopes`, Room/TechnicalRoom/GridConnection + `managedByOrganizationId`. **[!] beim PO (E-06):** Zoho-Adapter (kein Export) + Pilotdaten-Realimport; IssuingEntity-**Pflichtfeld** folgt mit Offer/Contract (Phase 3) | 🟢 ([!]-Posten E-06) |
 | WP-1.4 Events/Worker-Ausbau | pg-boss-Dauerdienst, `EventHandlerExecution`, Notification-Grundgerüst, Logger-Redaction, Idempotenz-/Berechtigungs-Testsuite (F-19/F-20) | 🟡 (Outbox+Dispatcher stehen) |
 | WP-1.5 Projekt-/Modul-/Dokumentstruktur | Project-Kern, Document-Objekt (MinIO), ModuleSubscription/-Activation-Gerüst, **P3-Datenmodell-Stubs (Heat/Charge)** | ⚪ |
 
@@ -264,7 +264,7 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 |---|---|---|---|
 | F-01 | Lead-Eingang: Funnel → API → DB → CRM sichtbar → Benachrichtigung | 1 | 🟢 2026-07-11 (dev) |
 | F-02 | Mandant & Rollen inkl. Cross-Tenant-Negativtest | 1 | 🟢 (WP-1.2: Guard requirePermission+assertOrgScope; Cross-Tenant→AuthzError+Audit; itest) |
-| F-03 | Lead → Kunde/Objekt ohne Doppelerfassung | 1 | ⚪ |
+| F-03 | Lead → Kunde/Objekt ohne Doppelerfassung | 1 | 🟢 (2026-08-06 dev: qualifyLead-Transaktion, E-Mail-Dublette, Audit+Outbox; Browser-E2E + itest) |
 | F-04 | Onboarding generisch (Template→Instanz→Schritte→Blocked/Exception→Ready) | 4 | ⚪ |
 | F-05 | Vertragsprozess Documenso inkl. Webhook-Duplikat-Replay | 3 | ⚪ |
 | F-06 | Vertrags-Fehlerpfad (declined/expired → Task → Neustart) | 3 | ⚪ |
@@ -331,7 +331,7 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 |---|---|
 | Masterplan & Pflichtdoku (V2-Struktur) | 🟢 (2026-07-12) |
 | Monorepo-/Deploy-Fundament | 🟣 (Images verifiziert; Rollout/Remote offen) |
-| 1 CRM — Lead-Kern | 🟢 dev (F-01); Qualifizierung ⚪ (WP-1.3) |
+| 1 CRM — Lead-Kern | 🟢 dev (F-01); Qualifizierung 🟢 dev (F-03, 2026-08-06) |
 | 17 Audit · 16 Notifications · Events/Outbox | 🟣 (Lead-Pfad live; Ausbau WP-1.4) |
 | 18 Identity/Rollen/Mandanten | 🟢 (Permissions + better-auth + Memberships/Invitations + Audit-UI; F-02/F-19/F-20 grün) |
 | 2 Konfigurator · 3 Portal · 4 Onboarding · 5 Hubs · 6 Registry · 7 PWA · 8 Documenso · 9 Lexoffice · 10 Powermieter · 14 Service · 15 DMS | ⚪ (konzipiert 🔵 in §3–§9) |
@@ -341,8 +341,8 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 **Nächste verbindliche Schritte (Reihenfolge, Stand 2026-08-05):**
 1. **PO:** VPS-Rollout gemäß [DEPLOYMENT.md](DEPLOYMENT.md) (+ Secrets) → schließt R-01 prod; **Git-Remote** anlegen/pushen → schließt R-02, ermöglicht CI.
 2. **PO:** ADR-007 freigeben (E-01) · **E-05 PDF-Pipeline** (rückt vor: jetzt Phase-3-Blocker, R-17) · **E-06 Zoho-Export** (Phase-2-Blocker) + Pilotdatenliste · **E-08 Pilot-Zwischenstand** · **E-09 Abgleich-Entscheidungen** (K-02 vor Phase 3).
-3. **Umsetzung: WP-1.3-Rest** — CRM-Qualifizierung, AccessScope-Guards, CSV-/Zoho-Import, IssuingEntity-Pflicht (F-03) — **kritischer Pfad zu Phase 2**.
-4. WP-1.4 → WP-1.5 → **Phase 2 Commercial Core (F-22)** → Phase 3 (§10-Tabelle).
+3. ~~WP-1.3-Rest~~ **✅ 2026-08-06** (F-03 🟢; Zoho + Pilotdaten-Realimport als [!] bei E-06).
+4. **Umsetzung: WP-1.4** (pg-boss, packages/events/notifications/observability, eslint-boundaries) → WP-1.5 → **Phase 2 Commercial Core (F-22)** → Phase 3 (§10-Tabelle).
 5. Parallel ohne Implementierung: E-07/O-P1…P4-Klärungen terminieren (Frist jetzt „vor Phase 8", R-04); Phasen 6/7 bei freier Kapazität vorziehen (R-18).
 
 ## 15. Änderungsverlauf

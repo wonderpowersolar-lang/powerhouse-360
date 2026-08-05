@@ -22,7 +22,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <nav className="admin-nav">
         <strong>Powerhouse 360</strong>
         <Link href="/admin/leads">Leads</Link>
+        <Link href="/admin/customers">Kunden</Link>
         <Link href="/admin/objects">Objekte</Link>
+        <Link href="/admin/access-scopes">Zugriffe</Link>
         <Link href="/admin/members">Mitglieder</Link>
         <Link href="/admin/audit">Audit</Link>
         <span className="spacer" />

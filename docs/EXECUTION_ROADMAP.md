@@ -38,7 +38,7 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 ## PHASE 1 — Core & Datenmigration  🟡 (aktiv)
 
 **Ziel:** tragfähiges Fundament — Auth, Mandanten, Rollen, Immobilienstruktur, CRM-Qualifizierung, Events/Worker, Projekt-/Modulgerüst, Testmandant.
-**Gates:** F-02 🟢 · F-19 🟢 · F-20 🟢 · **offen: F-03** (F-01, F-21 bereits erreicht).
+**Gates:** F-02 🟢 · F-03 🟢 · F-19 🟢 · F-20 🟢 (F-01 bereits erreicht; F-21-Rest offen).
 
 ### WP-1.2 — Auth, Rollen & Mandanten  🟢 (2026-07 abgeschlossen)
 > Detailplan `docs/superpowers/plans/2026-07-11-wp-1.2-auth-rollen-mandanten.md`; Details im [IMPLEMENTATION_LOG](IMPLEMENTATION_LOG.md).
@@ -46,19 +46,18 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 - [ ] **Rest-Delta:** `IssuingEntity`-Stammtabelle (Wonderpower GmbH, AKL Powerhouse 360 GmbH — Masterplan §4) ist **noch nicht migriert** → wandert in WP-1.3 („IssuingEntity-Pflicht")
 - **Gate erreicht:** F-02 🟢 · F-19 🟢 · F-20 🟢
 
-### WP-1.3 — Immobilienstruktur & CRM-Qualifizierung  🟡  ← **kritischer Pfad (ADR-012)**
-> **Voraussetzung:** WP-1.2 ✅. [PO]: Pilotdaten + Zoho-Export (E-06).
-> **Kern erledigt 2026-07 (WP-1.3-Kern, `b5d5a80`…`20bbf11`):** Property/Building/Entrance/Unit/Address + AccessScope-Tabelle (Stub, ohne Guard-Integration) + idempotenter Pilotstruktur-Seed (Testmandant ADR-006: 1 Property, 2 Gebäude, 21 Units) — WP-APP-1 damit entblockt. Offen: `Floor`/`Room`/`TechnicalRoom`/`GridConnection`, `Property.managedByOrganizationId`, Guard-Integration.
-- [ ] Prisma: Immobilien-Domäne (`Property`, `Building`, `Floor`, `Unit`, `Room`, `TechnicalRoom`, `GridConnection`, `Address`) + Migration; `Property.managedByOrganizationId` (HV) + Eigentümer-Org — *Kern erledigt: Property/Building/Entrance/Unit/Address + AccessScope-Tabelle; Rest offen*
-- [ ] Prisma: CRM-Ausbau (`Customer`, `CustomerContact`, `Opportunity`, `Note`, `Task`) + Migration
-- [ ] `AccessScope`-Modell + Auflösung (Property-/Building-/Projekt-Scope) in Guards integrieren — Cross-Tenant der HV auditierbar
-- [ ] `IssuingEntity`-Stammtabelle + **Pflichtfeld** auf Außenwirkungs-Entitäten vorbereiten (Offer/Contract/InvoiceRequest/Document — soweit vorhanden)
-- [ ] Domain-Service: Lead **qualifizieren** → `Customer` + `Property` erzeugen (Daten wandern mit, kein Doppel; `Lead.convertedToCustomerId`)
-- [ ] CSV-Import-Werkzeug Property→Building→Unit (idempotent, Probelauf, Fehlerbericht, Audit) — **Pilotdaten Christinenstraße als erster Realimport**
-- [ ] Admin-UI: Kunden-/Objektliste + Lead-Qualifizierungs-Aktion; AccessScope-Verwaltung (Basis) — *Objektliste (Lesesicht `/admin/objects` hinter `object.read`) ✅*
-- [ ] Zoho-Import-Adapter (Kontakte/Leads) — sofern Export vorliegt; sonst als [!] parken
-- [ ] Tests: F-03 (Lead→Kunde/Objekt ohne Doppelerfassung + Audit) + Scope-Negativtests
-- **Gate:** F-03 🟢 · Pilotobjekt-Struktur importiert
+### WP-1.3 — Immobilienstruktur & CRM-Qualifizierung  🟢 (Rest 2026-08-06; zwei [!]-Posten beim PO)
+> **Kern 2026-07 (`b5d5a80`…`20bbf11`):** Objektbaum + AccessScope-Stub + Pilotstruktur-Seed. **Rest 2026-08-06 (`bd12531`…):** Migrationen `wp13_rest_crm_issuing_immobilien` + `lead_activity_actor_text`.
+- [x] Prisma: Immobilien-Domäne vervollständigt — `Room`/`TechnicalRoom`/`GridConnection` + `Property.managedByOrganizationId` (HV); **bewusst keine `Floor`-Tabelle** (`Unit.floor` bleibt einzige Etagen-Wahrheit, im Schema dokumentiert)
+- [x] Prisma: CRM-Ausbau (`Customer` [Kunde = Organization, Masterplan §4 Nr. 2], `CustomerContact`, `Opportunity`, `Note`, `Task`) + `Lead.convertedToCustomerId`
+- [x] `AccessScope`-Auflösung in der Sichtbarkeit (`resolvePropertyVisibility`: PROPERTY-/BUILDING-Teilbaum; Projekt-Scope folgt mit Project-Modell in WP-1.5) + Grant/Revoke-Service auditiert (`accessscope.granted/revoked`)
+- [x] `IssuingEntity`-Stammtabelle + idempotenter Seed (WONDERPOWER, AKL_POWERHOUSE); Pflichtfeld folgt mit den Außenwirkungs-Entitäten (Phase 3+)
+- [x] Domain-Service `qualifyLead`: Lead → Kunden-Org + Customer + Kontakt + optional Property, transaktional; E-Mail-Dublette nutzt Bestandskunden; idempotent; Audit + Outbox `lead.qualified`
+- [x] CSV-Import-Werkzeug (`pnpm ph360:import-objects`): idempotent, `--dry-run`-Probelauf mit Rollback, Fehlerbericht je Zeile, Audit je Lauf — [!] **Pilotdaten-Realimport wartet auf Liste (E-06, PO)**
+- [x] Admin-UI: `/admin/customers` (Kundenliste), Lead-Qualifizierungs-Aktion auf `/admin/leads`, `/admin/access-scopes` (Basis: Gewähren/Entziehen)
+- [!] Zoho-Import-Adapter — **geparkt: kein Export (E-06, PO)**; CSV-Werkzeug existiert als Grundlage
+- [x] Tests: F-03-Kette + Scope-Negativtests + Guard-Matrix (Suite: 14 Unit + 51 Integration grün)
+- **Gate:** F-03 🟢 (2026-08-06 dev: Browser-E2E Login → Qualifizieren → Kunde/Objekt/Audit/Outbox + itest) · Pilotstruktur per Seed importiert; Realdaten-Import [!] E-06
 
 ### WP-1.4 — Events, Worker-Dauerdienst & Testabsicherung  🟡
 > **Voraussetzung:** WP-1.2 ✅. Läuft teils parallel zu 1.3.
@@ -257,7 +256,7 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 
 | Phase | Gates | Aktueller Status |
 |---|---|---|
-| 1 | F-01, F-02, F-03, F-19, F-20, F-21 | F-01/F-02/F-19/F-20 🟢 · F-21 🟣 · F-03 ⚪ |
+| 1 | F-01, F-02, F-03, F-19, F-20, F-21 | F-01/F-02/F-03/F-19/F-20 🟢 · F-21 🟣 |
 | 2 🆕 | F-22 | ⚪ |
 | 3 | F-17, F-05, F-06 | ⚪ |
 | 4 | F-04, F-23, F-18 | ⚪ |
