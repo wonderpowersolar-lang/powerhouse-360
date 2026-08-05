@@ -4,6 +4,8 @@
 > Status je Schritt: `- [ ]` offen · `- [x]` erledigt · `- [~]` in Arbeit · `- [!]` blockiert (Grund dahinter).
 > Reihenfolge ist der kritische Pfad zum P1-Ziel (Powermieter-Pilot Christinenstraße). **P2/P3 erst nach P1-Aktivierung** (Masterplan §1).
 
+> ⚠️ **Die Phasenreihenfolge dieses Dokuments ist seit 2026-08-05 überholt.** [ADR-012](DECISIONS/ADR-012-bauabfolge-commercial-first.md) stellt auf **Commercial Core zuerst** um (Founding Spec §29/§30); der Powermieter-Pilot ist nicht mehr das nächste Abschlussziel. Der Neuschnitt der Phasen 2–7 steht aus — bis dahin gilt für die Reihenfolge die ADR, nicht diese Datei. Die Inhalte der einzelnen Schritte bleiben gültig.
+
 ## Wie du das abarbeitest
 
 1. **Immer oben anfangen.** Ein Schritt wird erst begonnen, wenn seine „Voraussetzung" erfüllt ist.

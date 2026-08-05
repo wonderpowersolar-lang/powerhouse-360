@@ -5,6 +5,8 @@
 > Pflichtdokumente: dieser Masterplan · [IMPLEMENTATION_LOG.md](IMPLEMENTATION_LOG.md) (append-only) · [DECISIONS/](DECISIONS/) (ADRs). Ausgelagert mit Verweis: [DEPLOYMENT.md](DEPLOYMENT.md) (Betriebs-Runbook mit Serverdaten).
 > Statusmodell: ⚪ Nicht begonnen · 🔵 Analysiert · 🟡 In Arbeit · 🟠 Blockiert · 🟣 Implementiert, nicht verifiziert · 🟢 End-to-End verifiziert · 🔴 Fehlerhaft/zurückgerollt. 🟢 nur nach tatsächlich durchlaufenem Nutzerfluss (§12).
 
+> ⚠️ **Teilweise überholt seit 2026-08-05.** Die [Founding Specification v2.0](FOUNDING-SPEC-v2.0.md) ist seit 2026-08-05 die übergeordnete Produktverfassung und Zielarchitektur. Betroffen ist vor allem **§7/§10/§14: die Bauabfolge** — [ADR-012](DECISIONS/ADR-012-bauabfolge-commercial-first.md) stellt auf **Commercial Core zuerst** um, der Powermieter-Pilot ist nicht mehr das nächste Abschlussziel. Der Neuschnitt der Phasen steht aus. Sämtliche Abweichungen zwischen Spec und diesem Dokument sind in [FOUNDING-SPEC-ABGLEICH.md](FOUNDING-SPEC-ABGLEICH.md) einzeln aufgeführt; fachliche Inhalte (§4–§9, §11–§13) bleiben gültig.
+
 ---
 
 ## 1. Vision, Zielbild und kommerzielle Priorisierung
