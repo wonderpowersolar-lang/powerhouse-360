@@ -237,7 +237,7 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 | WP-1.1 Lead-Persistenz | Lead-Kette komplett, F-01 🟢 dev; Prod nach Rollout | 🟢 dev |
 | WP-1.2 Auth/Rollen/Mandanten | better-auth (Auth) + eigene RBAC (OrganizationMembership/Invitation/SystemRole), Guards/Audit, Login/Invite/Accept/Members/Audit-UI, Bootstrap-Admin; ersetzt Interim-Basic-Auth (ADR-010). Tasks 1–13 committet, Suite grün (F-02/F-19/F-20) | 🟢 |
 | WP-1.3 Immobilien + CRM | **Kern (Objektbaum+Seed+Lesesicht) ✅ 2026-07** — Property/Building/Entrance/Unit/Address + AccessScope-Datenmodell-Stub (Migration `immobilien_kern`), idempotenter Pilotstruktur-Seed (ADR-006: 1 Property, 2 Gebäude, 21 Units), Permission `object.read`, `/admin/objects`-Lesesicht; **entblockt WP-APP-1** (Spec §8). **Rest ✅ 2026-08-06** (`bd12531`…): CRM-Kern (Customer=Kunden-Org/Contact/Opportunity/Note/Task), Lead-Qualifizierung `qualifyLead` (F-03 🟢), AccessScope-Guard-Integration (PROPERTY/BUILDING-Teilbaum, Grant/Revoke auditiert), IssuingEntity-Stammdaten geseedet, CSV-Import-Werkzeug (`ph360:import-objects`, Probelauf/Fehlerbericht/Audit), Admin-UI `/admin/customers` + Qualifizieren-Aktion + `/admin/access-scopes`, Room/TechnicalRoom/GridConnection + `managedByOrganizationId`. **[!] beim PO (E-06):** Zoho-Adapter (kein Export) + Pilotdaten-Realimport; IssuingEntity-**Pflichtfeld** folgt mit Offer/Contract (Phase 3) | 🟢 ([!]-Posten E-06) |
-| WP-1.4 Events/Worker-Ausbau | pg-boss-Dauerdienst, `EventHandlerExecution`, Notification-Grundgerüst, Logger-Redaction, Idempotenz-/Berechtigungs-Testsuite (F-19/F-20) | 🟡 (Outbox+Dispatcher stehen) |
+| WP-1.4 Events/Worker-Ausbau | **✅ 2026-08-06:** pg-boss-Dauerdienst (Outbox-Relay, Retry/Backoff, DEAD + auditierter Requeue; live verifiziert), `EventHandlerExecution`-Idempotenz, `packages/events` (Katalog/Publisher/Executor, Envelope +version/actor), `packages/notifications` (Zustellstatus, duplikatfrei), `packages/observability` (Logger-Redaction), Boundaries-Matrix (Lint + Test), CI-Workflow aktiv (R-02 zu) | 🟢 |
 | WP-1.5 Projekt-/Modul-/Dokumentstruktur | Project-Kern, Document-Objekt (MinIO), ModuleSubscription/-Activation-Gerüst, **P3-Datenmodell-Stubs (Heat/Charge)** | ⚪ |
 
 ## 11. Definition of Done
@@ -307,7 +307,7 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 | ID | Risiko | W'keit×Ausw. | Gegenmaßnahme | Status |
 |---|---|---|---|---|
 | R-01 | Lead-Verlust in Prod (alter console.log-Pfad live) | sicher×H | WP-1.1 ✅ dev; **schließt erst mit VPS-Rollout** | 🟡 dev behoben, Prod offen |
-| R-02 | Kein Git-Remote → kein Repo-Backup, keine CI | M×H | privates Remote + Push (PO-Freigabe) | 🔴 offen |
+| R-02 | Kein Git-Remote → kein Repo-Backup, keine CI | M×H | privates Remote + Push (PO-Freigabe) | 🟢 geschlossen 2026-08-06 (origin github.com/wonderpowersolar-lang/powerhouse-360; CI-Workflow im Repo — Restpunkt: lokale Commits regelmäßig pushen) |
 | R-03 | Greenfield-Verzettelung über Module | H×H | **V2-P1-Regel (§1)**, DoD je Phase, kein Modul-Hopping | mitigiert durch V2 |
 | R-04 | Powermieter-Regulatorik erzwingt Umbauten | M×H | §6-Klärungen vor Phase 8 (E-07, O-P1…P4), Messkonzept flexibel | offen |
 | R-05 | Documenso-Betrieb (SPOF Vertrieb): Updates, Zustellbarkeit | M×M | Betriebskonzept = Phase-3-Gate (§8), Staging zuerst, Version gepinnt | offen |
@@ -332,17 +332,17 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 | Masterplan & Pflichtdoku (V2-Struktur) | 🟢 (2026-07-12) |
 | Monorepo-/Deploy-Fundament | 🟣 (Images verifiziert; Rollout/Remote offen) |
 | 1 CRM — Lead-Kern | 🟢 dev (F-01); Qualifizierung 🟢 dev (F-03, 2026-08-06) |
-| 17 Audit · 16 Notifications · Events/Outbox | 🟣 (Lead-Pfad live; Ausbau WP-1.4) |
+| 17 Audit · 16 Notifications · Events/Outbox | 🟢 (WP-1.4 2026-08-06: pg-boss, Idempotenz, Zustellstatus, Redaction; live verifiziert) |
 | 18 Identity/Rollen/Mandanten | 🟢 (Permissions + better-auth + Memberships/Invitations + Audit-UI; F-02/F-19/F-20 grün) |
 | 2 Konfigurator · 3 Portal · 4 Onboarding · 5 Hubs · 6 Registry · 7 PWA · 8 Documenso · 9 Lexoffice · 10 Powermieter · 14 Service · 15 DMS | ⚪ (konzipiert 🔵 in §3–§9) |
 | 11 Smokemieter (P2) · 12/13 Heat/Charge (P3) | ⚪ (P3: nur Datenmodell in WP-1.5) |
 | Marketing-Site + Funnels | 🟢 produktiv (Lead-Zustellung prod: nach Rollout) |
 
 **Nächste verbindliche Schritte (Reihenfolge, Stand 2026-08-05):**
-1. **PO:** VPS-Rollout gemäß [DEPLOYMENT.md](DEPLOYMENT.md) (+ Secrets) → schließt R-01 prod; **Git-Remote** anlegen/pushen → schließt R-02, ermöglicht CI.
+1. **PO:** VPS-Rollout gemäß [DEPLOYMENT.md](DEPLOYMENT.md) (+ Secrets) → schließt R-01 prod; lokale Commits **pushen** (Remote existiert, R-02 zu — CI läuft ab dem ersten Push).
 2. **PO:** ADR-007 freigeben (E-01) · **E-05 PDF-Pipeline** (rückt vor: jetzt Phase-3-Blocker, R-17) · **E-06 Zoho-Export** (Phase-2-Blocker) + Pilotdatenliste · **E-08 Pilot-Zwischenstand** · **E-09 Abgleich-Entscheidungen** (K-02 vor Phase 3).
-3. ~~WP-1.3-Rest~~ **✅ 2026-08-06** (F-03 🟢; Zoho + Pilotdaten-Realimport als [!] bei E-06).
-4. **Umsetzung: WP-1.4** (pg-boss, packages/events/notifications/observability, eslint-boundaries) → WP-1.5 → **Phase 2 Commercial Core (F-22)** → Phase 3 (§10-Tabelle).
+3. ~~WP-1.3-Rest~~ **✅ 2026-08-06** (F-03 🟢) · ~~WP-1.4~~ **✅ 2026-08-06** (pg-boss/Idempotenz/Notifications/Redaction/Boundaries/CI).
+4. **Umsetzung: WP-1.5** (Projekt-/Dokument-/Modulgerüst + P3-Stubs) → **Phase 2 Commercial Core (F-22)** → Phase 3 (§10-Tabelle).
 5. Parallel ohne Implementierung: E-07/O-P1…P4-Klärungen terminieren (Frist jetzt „vor Phase 8", R-04); Phasen 6/7 bei freier Kapazität vorziehen (R-18).
 
 ## 15. Änderungsverlauf

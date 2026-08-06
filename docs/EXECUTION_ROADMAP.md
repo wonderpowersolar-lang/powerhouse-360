@@ -22,7 +22,7 @@
 Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge nach Dringlichkeit (Neuschnitt hat PDF-Pipeline/Documenso/Zoho nach vorn gezogen):
 
 - [ ] **VPS-Rollout** gemäß [DEPLOYMENT.md](DEPLOYMENT.md) (Secrets in Server-`.env`, `git archive|scp`, `docker compose … up -d`, Domains umhängen). → schließt **R-01 in Prod** (Lead-Verlust) · *blockiert: produktiver Lead-Eingang*
-- [ ] **Git-Remote** anlegen + pushen (privat). → schließt **R-02**, ermöglicht CI · *blockiert: CI-Gate der Teststrategie*
+- [x] **Git-Remote** ✅ (github.com/wonderpowersolar-lang/powerhouse-360) — R-02 zu; CI-Workflow liegt im Repo und läuft ab dem nächsten Push. *Offen bleibt nur der Push-Rhythmus (lokale Commits regelmäßig pushen).*
 - [ ] **Datenexporte:** Zoho-Altbestand (CRM), Reonic (PV/Installation) — Zugang + Format klären (E-06). · *blockiert: WP-1.3-Migration + Phase-2-Import*
 - [ ] **PDF-Pipeline übergeben** (Repo/Code/Zugang der externen WeasyPrint-Pipeline). [ADR-003](DECISIONS/ADR-003-dokumentenerzeugung-vs-signatur.md), R-17 (**Dringlichkeit ↑** — Phase 3 liegt jetzt früh) · *blockiert: Phase 3*
 - [ ] **Documenso-Betriebsentscheidung:** gefundenes `documenso-powermieter`-Setup sichten — weiterverwenden oder frisch aufsetzen? · *blockiert: Phase 3*
@@ -59,16 +59,16 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 - [x] Tests: F-03-Kette + Scope-Negativtests + Guard-Matrix (Suite: 14 Unit + 51 Integration grün)
 - **Gate:** F-03 🟢 (2026-08-06 dev: Browser-E2E Login → Qualifizieren → Kunde/Objekt/Audit/Outbox + itest) · Pilotstruktur per Seed importiert; Realdaten-Import [!] E-06
 
-### WP-1.4 — Events, Worker-Dauerdienst & Testabsicherung  🟡
-> **Voraussetzung:** WP-1.2 ✅. Läuft teils parallel zu 1.3.
-- [ ] Outbox-Dispatcher auf **pg-boss** umstellen (ADR-001) + `EventHandlerExecution`-Unique (Idempotenz) — als Dauerdienst-Container
-- [ ] `packages/events` — Event-Envelope + Zod-Schemata je `eventType` (Masterplan §3-Katalog inkl. neuer `opportunity.*`/`handoff.*`/`activation.*`), Publisher, Handler-Registry
-- [ ] `packages/notifications` — E-Mail/Portal-Templates, Zustellstatus
-- [ ] `packages/observability` — Logger mit **Redaction** (IBAN, E-Mail, Tokens, Namen), Request-Kontext
-- [ ] eslint-boundaries-Regeln aktivieren (Fachmodule importieren nie einander; Adapter-Grenzen)
-- [ ] Idempotenz-Tests: doppeltes Event / doppelter Job → genau eine Wirkung
-- [ ] CI-Pipeline-Datei (lint→typecheck→unit→integration→build→e2e) — **aktiv, sobald Git-Remote existiert** ([PO]/R-02), sonst als Vorlage ablegen
-- **Gate:** Idempotenz- + Berechtigungs-Suite grün; F-19/F-20 dauerhaft abgesichert
+### WP-1.4 — Events, Worker-Dauerdienst & Testabsicherung  🟢 (2026-08-06)
+> Migration `events_worker_ausbau` (DomainEvent +version/actorId, EventHandlerExecution, Notification).
+- [x] Outbox-Dispatcher auf **pg-boss** umgestellt (ADR-001): Poll-Relay Outbox → Queue `domain-events` (singletonKey dedupliziert), pg-boss-Retry/Backoff; `EventHandlerExecution`-Unique = Idempotenz-Garantie; ab MAX_HANDLER_ATTEMPTS wird das Event DEAD; **auditierter manueller Retry** via `requeueDeadEvent` — Dauerdienst live verifiziert (4 Events dispatcht → Handler → PROCESSED, sauberer SIGTERM-Shutdown)
+- [x] `packages/events` — Envelope vervollständigt (version/actor, Masterplan §3), Katalog mit Zod-Schemata (bekannte Typen konkret, §3-Mindestbestand inkl. `opportunity.*`/`handoff.*`/`activation.*` registriert), strikter Publisher (unbekannte Typen abgelehnt), Executor, Requeue; Producer (leads/crm/auth-Mails) auf `publishEvent` umgestellt
+- [x] `packages/notifications` — Vorlagen (lead.created.notify, auth.*), SMTP-Transport (aus Worker gezogen), `Notification`-Zustellstatus PENDING/SENT/FAILED; Unique (Event, Vorlage, Empfänger) = keine Doppelzustellung bei Retries
+- [x] `packages/observability` — JSON-Zeilen-Logger mit **zentraler Redaction** (Tokens/IBAN/SEPA voll, E-Mail/Name/Telefon partiell, Muster in freien Strings); Worker läuft komplett darüber
+- [x] Boundaries aktiviert — *dokumentierte Abweichung:* statt eslint-plugin-boundaries eine `no-restricted-imports`-Matrix in `eslint-config/base.mjs` **plus** harte Matrix-Prüfung `packages/testing/src/boundaries.test.ts` (Deps + echte Imports; Apps importieren nie Apps); gleiche Wirkung, weniger Maschinerie — Fachmodul-Regeln werden bei Entstehung von `module-*` ergänzt
+- [x] Idempotenz-Tests: doppelte Zustellung → genau eine Wirkung; Fehlversuche → DEAD; finalize erst wenn alle Handler grün; Requeue auditiert (events.itest) + Notification-Duplikatfreiheit (notifications.itest)
+- [x] CI-Pipeline `.github/workflows/ci.yml` — **aktiv** (Remote existiert, R-02 zu): lint→typecheck→unit→integration (Postgres-Service, echte Migrationen)→build; e2e-Job folgt mit erster automatisierter Journey
+- **Gate erreicht:** Suite 27 Unit + 54 Integration grün; F-19/F-20 dauerhaft abgesichert (Guard-/Idempotenz-Suite in CI)
 
 ### WP-1.5 — Projekt-, Dokument- & Modulgerüst + P3-Stubs  ⚪
 > **Voraussetzung:** WP-1.3.
