@@ -85,7 +85,7 @@ function splitCsvLine(line: string): string[] {
 /** Parst CSV-Text; Zeilennummern sind 1-basiert inkl. Header (Zeile 1). */
 export function parseObjectCsv(text: string): { rows: ImportRow[]; errors: RowError[] } {
   const lines = text
-    .replace(/^﻿/, "") // BOM (Excel)
+    .replace(/^\uFEFF/, "") // BOM (Excel)
     .split(/\r?\n/)
     .filter((l, idx) => idx === 0 || l.trim() !== "");
   const errors: RowError[] = [];

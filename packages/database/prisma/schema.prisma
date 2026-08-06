@@ -53,6 +53,7 @@ model Organization {
   opportunities     Opportunity[]
   crmNotes          Note[]
   crmTasks          Task[]
+  notifications     Notification[]
 
   @@map("organization")
 }
@@ -195,13 +196,18 @@ enum DomainEventStatus {
 }
 
 /// Transactional outbox. Written in the same transaction as the state change;
-/// drained by apps/worker. See docs/POWERHOUSE_360_MASTER_PLAN.md §3 + ADR-001.
+/// drained by apps/worker (WP-1.4: pg-boss-Dispatcher + EventHandlerExecution).
+/// See docs/POWERHOUSE_360_MASTER_PLAN.md §3 + ADR-001.
 model DomainEvent {
   id            String            @id @default(uuid()) @db.Uuid
   eventType     String // e.g. "lead.created"
   aggregateType String // e.g. "Lead"
   aggregateId   String
   organizationId String?          @db.Uuid
+  // WP-1.4: Envelope-Vervollständigung (Masterplan §3) — Schema-Version des
+  // Event-Payloads + auslösender Akteur (better-auth-ID oder null für SYSTEM).
+  version       Int               @default(1)
+  actorId       String?
   payload       Json
   status        DomainEventStatus @default(PENDING)
   attempts      Int               @default(0)
@@ -212,8 +218,74 @@ model DomainEvent {
   causationId   String?
   createdAt     DateTime          @default(now())
 
+  handlerExecutions EventHandlerExecution[]
+  notifications     Notification[]
+
   @@index([status, availableAt])
   @@map("domain_event")
+}
+
+enum HandlerExecutionStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+/// WP-1.4 (ADR-001): genau eine Wirkung je (Event, Handler) — der Unique-
+/// Constraint ist die Idempotenz-Garantie bei at-least-once-Zustellung.
+/// `attempts` zählt echte Ausführungsversuche; ab MAX_ATTEMPTS wird das
+/// Event DEAD (Dead-Letter sichtbar, manueller Retry auditiert).
+model EventHandlerExecution {
+  id          String                 @id @default(uuid()) @db.Uuid
+  eventId     String                 @db.Uuid
+  event       DomainEvent            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  handlerName String
+  status      HandlerExecutionStatus @default(RUNNING)
+  attempts    Int                    @default(0)
+  lastError   String?
+  completedAt DateTime?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  @@unique([eventId, handlerName])
+  @@index([status])
+  @@map("event_handler_execution")
+}
+
+enum NotificationChannel {
+  EMAIL
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+/// WP-1.4: Benachrichtigung mit Zustellstatus (packages/notifications).
+/// Unique (eventId, templateKey, recipient): ein Event erzeugt je Empfänger
+/// und Vorlage höchstens eine Benachrichtigung — Handler-Retries erzeugen
+/// keine Duplikate, sondern stellen die bestehende Zeile erneut zu.
+model Notification {
+  id             String              @id @default(uuid()) @db.Uuid
+  organizationId String?             @db.Uuid
+  organization   Organization?       @relation(fields: [organizationId], references: [id])
+  eventId        String?             @db.Uuid
+  event          DomainEvent?        @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  channel        NotificationChannel @default(EMAIL)
+  recipient      String
+  templateKey    String
+  payload        Json?
+  subject        String?
+  status         NotificationStatus  @default(PENDING)
+  error          String?
+  sentAt         DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@unique([eventId, templateKey, recipient])
+  @@index([status, createdAt])
+  @@map("notification")
 }
 
 // ---------------------------------------------------------------------------

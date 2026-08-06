@@ -14,7 +14,8 @@
   "dependencies": {
     "@ph360/database": "workspace:*",
     "@ph360/permissions": "workspace:*",
-    "better-auth": "^1.6.23"
+    "better-auth": "^1.6.23",
+    "@ph360/events": "workspace:*"
   },
   "devDependencies": {
     "@ph360/eslint-config": "workspace:*",

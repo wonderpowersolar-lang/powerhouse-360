@@ -1,26 +1,22 @@
 {
-  "name": "@ph360/worker",
+  "name": "@ph360/events",
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint"
   },
   "dependencies": {
     "@ph360/database": "workspace:*",
-    "@ph360/events": "workspace:*",
-    "@ph360/notifications": "workspace:*",
-    "@ph360/observability": "workspace:*",
-    "pg-boss": "^10.3.2"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@ph360/eslint-config": "workspace:*",
-    "@types/node": "^20",
     "eslint": "^9",
-    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }

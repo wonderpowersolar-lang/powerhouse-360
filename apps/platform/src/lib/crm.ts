@@ -2,6 +2,7 @@ import { z } from "zod";
 import { prisma, Prisma, type OrganizationType } from "@ph360/database";
 import { requirePermission, recordAudit } from "@ph360/auth";
 import type { AuthContext } from "@ph360/auth";
+import { publishEvent } from "@ph360/events";
 
 /**
  * Lead-Qualifizierung (WP-1.3-Rest, Gate F-03): überführt einen Lead ohne
@@ -139,14 +140,13 @@ export async function qualifyLead(
       before: { status: lead.status },
       after: { status: "CONVERTED", customerId, propertyId, createdCustomer },
     });
-    await tx.domainEvent.create({
-      data: {
-        eventType: "lead.qualified",
-        aggregateType: "Lead",
-        aggregateId: lead.id,
-        organizationId: lead.organizationId,
-        payload: { leadId: lead.id, customerId, propertyId } as Prisma.InputJsonValue,
-      },
+    await publishEvent(tx, {
+      eventType: "lead.qualified",
+      aggregateType: "Lead",
+      aggregateId: lead.id,
+      organizationId: lead.organizationId,
+      actorId: auth.userId,
+      payload: { leadId: lead.id, customerId, propertyId },
     });
 
     return { customerId, propertyId, createdCustomer };

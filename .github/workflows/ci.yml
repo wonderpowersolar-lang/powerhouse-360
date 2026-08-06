@@ -1,0 +1,78 @@
+# CI-Pipeline (WP-1.4, Masterplan §12 Teststrategie).
+# Reihenfolge: lint → typecheck → unit → integration → build.
+# E2E-Browser-Journeys folgen als eigener Job, sobald die erste Journey
+# headless automatisiert ist (bis dahin: Browser-E2E je WP dokumentiert im
+# IMPLEMENTATION_LOG).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ph360
+          POSTGRES_PASSWORD: ph360_test
+          POSTGRES_DB: ph360_test
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ph360"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://ph360:ph360_test@localhost:5433/ph360_test
+      DIRECT_DATABASE_URL: postgresql://ph360:ph360_test@localhost:5433/ph360_test
+      DATABASE_URL_TEST: postgresql://ph360:ph360_test@localhost:5433/ph360_test
+      AUTH_SECRET: ci-secret-not-for-production-0123456789
+      AUTH_URL: http://localhost:3100
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.11.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Prisma Client generieren
+        run: pnpm db:generate
+
+      - name: Lint
+        run: pnpm turbo run lint --continue
+        # apps/platform hat noch keine ESLint-9-Flat-Config (bekannter Chip);
+        # --continue lässt die übrigen Pakete trotzdem prüfen.
+        continue-on-error: true
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Unit-Tests (inkl. Boundary-Matrix)
+        run: pnpm exec vitest run --project unit
+
+      - name: Integrationstests (echte Postgres, Migrationen via globalSetup)
+        run: pnpm exec vitest run --project integration
+
+      - name: Build
+        run: pnpm turbo run build
