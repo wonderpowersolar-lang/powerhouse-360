@@ -1,0 +1,67 @@
+/* design-sync Utility-Safelist (Tailwind v4 @source inline).
+ *
+ * Warum: Das DS-Bundle für claude.ai/design shifft das KOMPILIERTE Tailwind-CSS
+ * der Website. Tailwind emittiert nur in Quellen gefundene Klassen — der
+ * Design-Agent (und die Preview-Wrapper) brauchen aber ein verlässliches
+ * Layout-/Token-Grundvokabular. Diese Liste ist kuratiert und token-treu:
+ * nur Familien, die es im @theme der Website gibt. Neue Utilities hier
+ * ergänzen, nie in globals.css der App.
+ */
+
+/* Layout / Flex / Grid */
+@source inline("{flex,inline-flex,grid,block,inline-block,hidden,relative,absolute,inset-0,overflow-hidden}");
+@source inline("flex-{row,col,wrap,1}");
+@source inline("items-{start,center,end,baseline,stretch}");
+@source inline("justify-{start,center,end,between,around}");
+@source inline("grid-cols-{1,2,3,4,6,12}");
+@source inline("col-span-{1,2,3,4,6}");
+
+/* Spacing (Padding/Margin/Gap) */
+@source inline("{p,px,py,pt,pr,pb,pl}-{0,1,1.5,2,2.5,3,4,5,6,8,10,12,16}");
+@source inline("{m,mx,my,mt,mr,mb,ml}-{0,1,2,3,4,5,6,8,10,12,16,auto}");
+@source inline("gap-{0,1,1.5,2,2.5,3,4,5,6,8,10,12}");
+@source inline("space-y-{1,2,3,4,6,8}");
+
+/* Größen */
+@source inline("w-{4,5,6,8,10,12,16,24,32,40,48,56,64,72,80,96,auto,full,fit}");
+@source inline("h-{4,5,6,8,9,10,11,12,16,24,32,40,48,64,auto,full}");
+@source inline("max-w-{xs,sm,md,lg,xl,2xl,3xl,4xl,full}");
+@source inline("min-h-{0,full,screen}");
+
+/* Radius / Border / Ring */
+@source inline("rounded{,-sm,-md,-lg,-xl,-2xl,-3xl,-full}");
+@source inline("border{,-0,-2,-t,-r,-b,-l}");
+
+/* Typografie */
+@source inline("text-{xs,sm,base,lg,xl,2xl,3xl,4xl,5xl}");
+@source inline("font-{light,normal,medium,semibold,bold,extrabold}");
+@source inline("tracking-{tight,normal,wide,widest}");
+@source inline("leading-{none,tight,snug,normal,relaxed}");
+@source inline("text-{left,center,right}");
+@source inline("{uppercase,capitalize,normal-case,tabular-nums,whitespace-nowrap,truncate}");
+
+/* Marken-Tokens: Flächen, Text, Border (aus @theme in globals.css) */
+@source inline("bg-navy-{600,700,800,900}");
+@source inline("bg-{gold,gold-soft,gold-deep,brand-teal,brand-green,brand-aqua,warm-light,warm-amber}");
+@source inline("bg-mod-{power,heat,charge,smoke}");
+@source inline("bg-{white,black,transparent}");
+@source inline("bg-white/{5,10,15,20}");
+@source inline("bg-black/{20,30,40,60,80}");
+@source inline("text-{ink,ink-dim,ink-faint}");
+@source inline("text-navy-{600,700,800,900}");
+@source inline("text-{gold,gold-soft,gold-deep,white,black}");
+@source inline("text-mod-{power,heat,charge,smoke}");
+@source inline("text-white/{40,60,70,80}");
+@source inline("border-{ink,ink-faint,gold,transparent}");
+@source inline("border-navy-{600,700,800}");
+@source inline("border-white/{10,15,20,35}");
+@source inline("border-mod-{power,heat,charge,smoke}");
+
+/* Verläufe (Logo-Verlauf: from-gold-deep via-gold to-gold-soft) */
+@source inline("bg-gradient-to-{r,l,t,b,br,tr}");
+@source inline("from-{gold,gold-deep,brand-teal,navy-900,transparent}");
+@source inline("via-{gold,brand-teal,transparent}");
+@source inline("to-{gold,gold-soft,brand-green,navy-900,transparent}");
+
+/* Effekte / Sonstiges */
+@source inline("{shadow,shadow-md,shadow-lg,shadow-xl,backdrop-blur-sm,backdrop-blur,opacity-0,opacity-50,opacity-100,transition-all,transition-opacity,duration-200,duration-300,pointer-events-none,select-none,cursor-pointer}");

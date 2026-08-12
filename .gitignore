@@ -60,3 +60,10 @@ POWERHOUSE 360 logo mit text.png
 POWERHOUSE 360.jpg
 POWERHOUSE 360.svg
 Powerhouse 360.png
+
+# design-sync (staged scripts, build output, machine state)
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules

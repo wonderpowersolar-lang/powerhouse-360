@@ -1,0 +1,26 @@
+{
+  "projectId": "00ce5fa7-a1d2-4e9e-b3d3-43c1ffb37463",
+  "pkg": "@ph360/website",
+  "globalName": "PH360",
+  "shape": "package",
+  "srcDir": "src/components/ui",
+  "tsconfig": "tsconfig.json",
+  "buildCmd": "bash .design-sync/prep.sh",
+  "cssEntry": "styles/tailwind.css",
+  "componentSrcMap": {
+    "Button": "src/components/ui/Button.tsx",
+    "ButtonLink": null,
+    "LogoLockup": "src/components/ui/Logo.tsx",
+    "LogoMark": "src/components/ui/Logo.tsx",
+    "MetricCard": "src/components/ui/MetricCard.tsx"
+  },
+  "extraFonts": ["fonts/sora.css"],
+  "extraEntries": ["./ds-process-shim.mjs"],
+  "readmeHeader": ".design-sync/conventions.md",
+  "dtsPropsFor": {
+    "Button": "/** \"primary\" = Teal-Marken-CTA (einer pro View), \"secondary\" = Glass-Pill. Default: \"primary\". */\nvariant?: \"primary\" | \"secondary\";\nchildren?: React.ReactNode;\nclassName?: string;\ndisabled?: boolean;\ntype?: \"button\" | \"submit\" | \"reset\";\nonClick?: React.MouseEventHandler<HTMLButtonElement>;",
+    "LogoLockup": "/** Höhe über Utility-Klasse steuern: Nav h-11, Footer h-8 (immer mit w-auto). Nur auf dunklem Grund einsetzen. */\nclassName?: string;\n/** Bild-Ladepriorität (fetchPriority=high), für Above-the-fold-Einbau. */\npriority?: boolean;",
+    "LogoMark": "/** Kantenlänge in px (üblich 40 oder 64). */\nsize?: number;\nclassName?: string;",
+    "MetricCard": "/** KPI-Beschriftung, wird uppercase gesetzt (z. B. \"Auslastung\"). */\nlabel: string;\n/** Anzeigewert als String (z. B. \"62 %\", \"48,2 kWh\"). */\nvalue: string;\n/** Optionaler Mini-Balken, Füllstand 0–1. */\nbar?: number;\n/** Optionale Zeile unter dem Wert (z. B. Trend \"+12 % ggü. Vortag\"). */\nsub?: string;\n/** Akzentfarbe des Balkens, CSS-Farbe/Var (Default var(--color-brand-teal)). */\naccent?: string;\n/** \"dark\" = Glass-Chip auf dunklem Panel (Default), \"light\" = heller App-Ground. */\ntone?: \"dark\" | \"light\";"
+  }
+}
