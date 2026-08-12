@@ -41,7 +41,10 @@ export function MetricCard({
       </p>
       <p
         className={`mt-0.5 text-base font-bold tabular-nums ${
-          light ? "text-navy-900" : "text-ink"
+          // fester Hexwert statt text-navy-900: navy-900 flippt im
+          // .theme-light-Scope auf hell — der Wert wäre dort unlesbar
+          // (gleiches Muster wie Button tone="light").
+          light ? "text-[#16243a]" : "text-ink"
         }`}
       >
         {value}
