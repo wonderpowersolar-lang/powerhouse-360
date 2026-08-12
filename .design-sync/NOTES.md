@@ -31,6 +31,9 @@ node .ds-sync/resync.mjs --config .design-sync/config.json \
 - **Button `tone="light"`** nutzt bewusst FESTE Hexwerte (#16243a-Alpha): scope-unabhängiger Override für helle Artboards ohne Wrapper. Im theme-light-Scope braucht secondary KEIN tone (flippt automatisch) — deshalb keine eigene tone-light-Story.
 - Neue Utilities in globals.css: `brand-gradient-bg`, `brand-gradient-animate` (+keyframes brand-gradient-shift), `hairline-gradient`, `brand-glow`; Light-Overrides für `card-surface`/`text-legible`. Button `variant="gradient"` = permanenter Logo-Verlauf.
 
+- **Duo-Preview-Muster** (Impeccable-Pass 2026-08-12): jede Komponente zeigt Dark+Light in EINEM Dokument (ModiDuo-Story, Noir-Panel | theme-light-Panel mit Mode-Kickern). Duo-Dokumente sind breiter als Grid-Zellen → `cfg.overrides.{Button,LogoLockup,MetricCard}: cardMode "column"` (LogoMark passt ohne).
+- **MetricCard tone="light" nutzt festen Hexwert** (`text-[#16243a]`) für den Wert — `text-navy-900` flippt im theme-light-Scope auf hell (gleiches Muster wie Button tone light). Bei neuen tone-light-Pfaden immer feste Hexwerte statt navy-900-Utilities.
+
 ## Known render warns
 
 - (keine — 4/4 clean, 0 thin, 0 variantsIdentical)

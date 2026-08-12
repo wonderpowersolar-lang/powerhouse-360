@@ -15,6 +15,11 @@
     "MetricCard": "src/components/ui/MetricCard.tsx"
   },
   "extraFonts": ["fonts/sora.css"],
+  "overrides": {
+    "Button": { "cardMode": "column" },
+    "LogoLockup": { "cardMode": "column" },
+    "MetricCard": { "cardMode": "column" }
+  },
   "extraEntries": ["./ds-process-shim.mjs"],
   "readmeHeader": ".design-sync/conventions.md",
   "dtsPropsFor": {

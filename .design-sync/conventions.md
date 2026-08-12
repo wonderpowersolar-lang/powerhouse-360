@@ -20,7 +20,7 @@ Marketing = noir; Produkt-/App-Screens sind hell. Aktivierung per Wrapper-Klasse
 <div className="theme-light min-h-screen bg-navy-900 text-ink p-16">…</div>
 ```
 
-Im Scope gilt: `bg-navy-900` = heller Ground, `bg-navy-800` = weiße Karte, `bg-navy-700` = vertiefte Fläche, `border-navy-600` = Linie; `text-ink` = Marken-Navy, `text-ink-dim`/`-faint` = graublaue Stufen. Markenakzente (`gold`, `mod-*`) bleiben identisch. **Glass-Rezepte im Scope über `ink` schreiben** (`bg-ink/5`, `border-ink/15` — flippen mit), NICHT über `white`-Literale. Komponenten: `MetricCard tone="light"`; `Button variant="secondary"` flippt im Scope automatisch mit — `tone="light"` ist der Override für helle Artboards OHNE `theme-light`-Wrapper (primary/gradient brauchen nie ein tone).
+Beide Modi können in EINEM Dokument nebeneinander leben — der Scope ist ein Wrapper, kein Seiten-Schalter (Split-Screens, Vorher/Nachher, Marketing-Sektion neben App-Preview). Im Scope gilt: `bg-navy-900` = heller Ground, `bg-navy-800` = weiße Karte, `bg-navy-700` = vertiefte Fläche, `border-navy-600` = Linie; `text-ink` = Marken-Navy, `text-ink-dim`/`-faint` = graublaue Stufen. Markenakzente (`gold`, `mod-*`) bleiben identisch. **Glass-Rezepte im Scope über `ink` schreiben** (`bg-ink/5`, `border-ink/15` — flippen mit), NICHT über `white`-Literale. Komponenten: `MetricCard tone="light"`; `Button variant="secondary"` flippt im Scope automatisch mit — `tone="light"` ist der Override für helle Artboards OHNE `theme-light`-Wrapper (primary/gradient brauchen nie ein tone).
 
 ## Verlauf & Bewegung (der Markenübergang Blau → Teal → Grün)
 
