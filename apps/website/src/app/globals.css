@@ -69,6 +69,34 @@
   --foreground: #f4f0e8;
 }
 
+/* ── Light-Mode (App-Welt) ────────────────────────────────────────────────
+   Die Marketing-Site bleibt noir; helle Flächen gehören zur Produkt-/App-Welt
+   (Plattform-Dashboards, Bewohner-App — Palette aus dem Powermieter-Prototyp,
+   apps/mobile/design-reference/design-tokens.css). Aktivierung per Wrapper:
+   <div class="theme-light"> … oder data-theme="light". Es flippen nur die
+   semantischen Ground-/Text-Tokens — dieselben Utility-Klassen (bg-navy-900,
+   text-ink, …) rendern im Scope hell; Markenakzente bleiben identisch. */
+[data-theme="light"],
+.theme-light {
+  --color-navy-900: #eef1f2; /* heller Seiten-Ground */
+  --color-navy-800: #ffffff; /* Karte / Panel */
+  --color-navy-700: #f4f6f7; /* vertiefte Fläche */
+  --color-navy-600: #e4eaeb; /* Elevation / Linien */
+  --color-ink: #16243a; /* Text: Marken-Navy */
+  --color-ink-dim: #5e6d82;
+  --color-ink-faint: #97a4b4;
+}
+/* Dunkle Glass-Rezepte neutralisieren, wo sie im Light-Scope nicht tragen. */
+[data-theme="light"] .card-surface,
+.theme-light .card-surface {
+  background: #ffffff;
+  border-color: rgba(23, 43, 67, 0.08);
+}
+[data-theme="light"] .text-legible,
+.theme-light .text-legible {
+  text-shadow: none;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -209,6 +237,51 @@ html.lenis body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Marken-Verlauf als Fläche — für Verlaufs-CTAs, Akzent-Chips und
+   Hero-Momente. Gleiche Token-Stufen wie der Button-Hover-Verlauf. */
+.brand-gradient-bg {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-gold-deep) 0%,
+    var(--color-gold) 55%,
+    var(--color-gold-soft) 100%
+  );
+}
+
+/* Animierter Verlauf: sanftes Wandern (Übergang Blau→Teal→Grün und zurück).
+   Unter prefers-reduced-motion global stillgelegt (siehe oben). */
+@keyframes brand-gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+.brand-gradient-animate {
+  background-size: 220% 220%;
+  animation: brand-gradient-shift 6s var(--ease-calm) infinite;
+}
+
+/* Voll-Verlaufs-Hairline (Blau→Teal→Grün), Gegenstück zur goldenen .hairline. */
+.hairline-gradient {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gold-deep) 20%,
+    var(--color-gold) 50%,
+    var(--color-gold-soft) 80%,
+    transparent
+  );
+}
+
+/* Teal-Marken-Glow — die Schattenformel des Primär-CTAs als Utility. */
+.brand-glow {
+  box-shadow: 0 8px 30px -8px rgba(43, 182, 176, 0.55);
 }
 
 /* ChargeMieter-Wortzug — Logo-Verlauf Cyan → Grün als Text. */
