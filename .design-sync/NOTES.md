@@ -24,6 +24,13 @@ node .ds-sync/resync.mjs --config .design-sync/config.json \
 - **Preview-Wrapper**: Karten rendern auf Weiß — authored Previews wrappen in `bg-navy-900`-Ground (Komponenten sind für Off-Black designt).
 - Button-Hover-Verlauf (GradientHover) ist reiner Hover-Zustand → nicht statisch renderbar, bewusst keine Story.
 
+## Light-Mode & Verlauf (Erweiterung 2026-08-12)
+
+- **Light-Mode = Token-Flip-Scope** (`.theme-light` / `[data-theme="light"]` in globals.css): flippt nur navy-600–900 + ink-Stufen; Palette aus dem Powermieter-Prototyp (apps/mobile/design-reference/design-tokens.css). Marketing-Site nutzt den Scope nirgends — er gehört der App-Welt/dem Design-Agenten.
+- **Glass-Rezepte im Scope über `ink`-Alpha schreiben** (bg-ink/5, border-ink/20), nie über white-Literale — white flippt nicht. Button secondary wurde deshalb von white- auf ink-Token umgestellt (Site-Optik quasi identisch, minimal wärmer; Smoke-Test ok).
+- **Button `tone="light"`** nutzt bewusst FESTE Hexwerte (#16243a-Alpha): scope-unabhängiger Override für helle Artboards ohne Wrapper. Im theme-light-Scope braucht secondary KEIN tone (flippt automatisch) — deshalb keine eigene tone-light-Story.
+- Neue Utilities in globals.css: `brand-gradient-bg`, `brand-gradient-animate` (+keyframes brand-gradient-shift), `hairline-gradient`, `brand-glow`; Light-Overrides für `card-surface`/`text-legible`. Button `variant="gradient"` = permanenter Logo-Verlauf.
+
 ## Known render warns
 
 - (keine — 4/4 clean, 0 thin, 0 variantsIdentical)

@@ -57,6 +57,13 @@
 @source inline("border-white/{10,15,20,35}");
 @source inline("border-mod-{power,heat,charge,smoke}");
 
+/* Navy-Alpha (Light-Mode-Glass: Borders/Flächen auf hellem Grund) */
+@source inline("{bg,border,text}-navy-900/{5,10,15,30}");
+
+/* Ink-Alpha (theme-reaktives Glass: warmweiß auf noir, Navy im Light-Scope) */
+@source inline("{bg,border}-ink/{5,10,15,20,35}");
+@source inline("text-ink/{60,80}");
+
 /* Verläufe (Logo-Verlauf: from-gold-deep via-gold to-gold-soft) */
 @source inline("bg-gradient-to-{r,l,t,b,br,tr}");
 @source inline("from-{gold,gold-deep,brand-teal,navy-900,transparent}");

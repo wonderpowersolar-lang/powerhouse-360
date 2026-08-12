@@ -12,6 +12,27 @@ Es gibt keinen Theme-Provider. Aber: **Alle Komponenten sind für dunklen Grund 
 
 Schrift ist Sora (mitgeliefert via `@font-face`); sie greift automatisch über `--font-sans`. Ohne dunklen Wrapper sind warmweiße Texte (`text-ink`) unsichtbar.
 
+## Light Mode (App-Welt: Dashboards, Produkt-UI)
+
+Marketing = noir; Produkt-/App-Screens sind hell. Aktivierung per Wrapper-Klasse `theme-light` (oder `data-theme="light"`) — **dieselben Klassennamen**, die Ground-/Text-Tokens flippen im Scope:
+
+```tsx
+<div className="theme-light min-h-screen bg-navy-900 text-ink p-16">…</div>
+```
+
+Im Scope gilt: `bg-navy-900` = heller Ground, `bg-navy-800` = weiße Karte, `bg-navy-700` = vertiefte Fläche, `border-navy-600` = Linie; `text-ink` = Marken-Navy, `text-ink-dim`/`-faint` = graublaue Stufen. Markenakzente (`gold`, `mod-*`) bleiben identisch. **Glass-Rezepte im Scope über `ink` schreiben** (`bg-ink/5`, `border-ink/15` — flippen mit), NICHT über `white`-Literale. Komponenten: `MetricCard tone="light"`; `Button variant="secondary"` flippt im Scope automatisch mit — `tone="light"` ist der Override für helle Artboards OHNE `theme-light`-Wrapper (primary/gradient brauchen nie ein tone).
+
+## Verlauf & Bewegung (der Markenübergang Blau → Teal → Grün)
+
+Der Logo-Verlauf ist das zentrale Akzentmittel — gezielt einsetzen, ein starker Moment pro View:
+
+- **Text**: `brand-gradient-text` (z. B. das „360", Zahlen, ein Schlüsselwort der Headline).
+- **Fläche/CTA**: `brand-gradient-bg` oder direkt `<Button variant="gradient">`; dazu `brand-glow` für den Teal-Schein.
+- **Animiert**: `brand-gradient-bg brand-gradient-animate` — sanft wandernder Verlauf (6 s, `--ease-calm`), für Hero-CTAs und Live-/Energie-Momente.
+- **Trennlinien**: `hairline` (goldene, an den Enden auflösende Linie) und `hairline-gradient` (voller Verlauf) — als Section-Übergang unter Kickern/Headlines.
+- **Karten**: `card-surface` — Graphit-Karte, deren Border bei Hover weich auf Teal übergeht.
+- **Übergänge**: `transition-all duration-200`/`duration-300`, Easing via `var(--ease-calm)`; Hover-Lift-Idiom des Systems: `hover:-translate-y-0.5`. Der Primary-Button blendet seinen Verlauf erst bei Hover ein — dieses Ein-/Ausblenden (Opacity statt background-image) ist das Übergangs-Muster des Systems.
+
 ## Styling-Idiom: Token-Utilities — und NUR kompilierte Klassen
 
 `styles.css` ist **kompiliertes** Tailwind: Es existieren nur Klassen, die die Website nutzt oder die Safelist deklariert. Eine nicht enthaltene Klasse (z. B. `p-14`, `bg-red-500`) rendert **stumm gar nichts**. Bleib in diesem Vokabular:
@@ -32,7 +53,7 @@ Historie: Die `gold-*`-Tokennamen tragen die **Logo-Farben** (deep=Blau, gold=Te
 
 ## Komponenten (window.PH360)
 
-- **`Button`** — `variant="primary"` (Teal-Pill, EIN CTA pro View) | `"secondary"` (Glass). Native button-Props (`disabled`, `onClick`, `type`).
+- **`Button`** — `variant="primary"` (Teal-Pill, Verlauf blendet bei Hover ein) | `"secondary"` (Glass) | `"gradient"` (permanenter Logo-Verlauf, der EINE Hero-CTA — nicht mit primary mischen). `tone="light"` für secondary auf hellem Grund. Native button-Props (`disabled`, `onClick`, `type`).
 - **`ButtonLink` NICHT verwenden** — Next-Router-gebunden, rendert außerhalb der Website nicht. Für Navigations-Optik: `Button` mit `onClick`.
 - **`LogoLockup`** — Icon + Wortmarke; Größe über Höhenklasse: Nav `className="h-11 w-auto"`, Footer `h-8`. Nur auf dunklem Grund.
 - **`LogoMark`** — Icon solo, `size={40|64}`.

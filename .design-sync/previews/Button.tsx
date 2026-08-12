@@ -50,3 +50,30 @@ export function Deaktiviert() {
     </div>
   );
 }
+
+export function Gradient() {
+  return (
+    <div className="w-80 rounded-2xl bg-navy-900 p-8">
+      <Button variant="gradient" type="button">
+        Jetzt starten
+      </Button>
+      <div className="hairline-gradient mt-6" />
+    </div>
+  );
+}
+
+export function HellerGrund() {
+  // theme-light-Scope: secondary flippt AUTOMATISCH mit (ink-Token), kein
+  // tone nötig. tone="light" ist der scope-lose Artboard-Override (feste
+  // Hexwerte, optisch identisch) — bewusst ohne eigene Story.
+  return (
+    <div className="theme-light inline-flex items-center gap-3 rounded-2xl bg-navy-900 p-8">
+      <Button variant="secondary" type="button">
+        Mehr erfahren
+      </Button>
+      <Button variant="primary" type="button">
+        Beratung anfragen
+      </Button>
+    </div>
+  );
+}

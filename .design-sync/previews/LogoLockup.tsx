@@ -21,3 +21,13 @@ export function Footer() {
     </div>
   );
 }
+
+export function HellerGrund() {
+  // theme-light flippt die Ground-/Text-Tokens: bg-navy-900 rendert hell,
+  // die Wortmarke wechselt auf Marken-Navy — gleiche Klassennamen.
+  return (
+    <div className="theme-light inline-flex rounded-2xl border border-navy-900/15 bg-navy-900 px-8 py-6">
+      <LogoLockup className="h-9 w-auto" />
+    </div>
+  );
+}
