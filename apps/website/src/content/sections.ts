@@ -139,7 +139,7 @@ export const SECTIONS: SectionDef[] = [
     cta: [
       {
         label: "Mehr zu Powermieter",
-        href: "https://powermieter.de",
+        href: "/powermieter",
         variant: "secondary",
       },
     ],
@@ -335,7 +335,7 @@ export const MODULES = [
     domain: "Strom",
     desc: "Mieterstrom, Energieflüsse und digitale Stromprozesse",
     accent: "power" as Accent,
-    url: "https://powermieter.de",
+    url: "/powermieter",
   },
   {
     num: "02",
