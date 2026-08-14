@@ -176,3 +176,17 @@ Branch: `feat/platform-foundation`. Stack bestätigt durch Ausführungsauftrag (
 **Nicht getestet / offen:** pg-boss-Verhalten unter Last/Mehrinstanz (eine Worker-Instanz = Ist-Zustand) · echter DEAD→Requeue-Durchlauf nur itest-seitig (live nur Erfolgspfad) · Lint-Lücke apps/platform (bekannter Chip) · Log-Redaction ist im Worker aktiv, Platform-Routen folgen.
 **Restrisiko:** gering — Fallback bei pg-boss-Problemen wäre der alte Poll-Executor (Git-Historie). CI läuft erst ab dem nächsten Push (PO).
 **Nächster Schritt:** WP-1.5 (Projekt-/Dokument-/Modulgerüst + P3-Stubs) → Phase 2 Commercial Core (F-22).
+
+## 2026-08-14 — WP-1.5: Projekt-/Dokument-/Modulgerüst + P3-Stubs — Phase 1 abgeschlossen
+
+**Getan:**
+- Migrationen `wp15_projekt_dokument_module_p3stubs` + `wp15_access_scope_project_shape` (getrennt: Postgres erlaubt neuen Enum-Wert und seine Verwendung nicht in einer Transaktion): Project/ProjectPhase/ProjectMilestone/WorkOrder (Grundgerüst, Tenant-Anker = Kunden-Org wie Property), Document (Metadaten+sha256+storageKey; Blob im Objektspeicher), ModuleSubscription/ModuleActivation/ModuleConfiguration (Gerüst ohne Fachlogik), P3-Stubs Heat (HeatProject, ReadingSchedule, OccupancyChange, HeatStatement, AllocationKey) + Charge (ChargingProject, ChargePoint, ChargingSession numeric(14,3), LoadManagementPlan, ChargingAuthorization, FundingCase) — null Fachlogik/UI/Adapter; AccessScope um PROJECT-Scope erweitert (Shape-CHECK + partieller Unique fortgeschrieben; Sichtbarkeits-Auflösung folgt mit erster Projekt-Lesesicht).
+- `packages/documents`: ObjectStorage-Abstraktion (MinIO-Impl mit ensureBucket + MemoryStorage für Tests), `storeDocumentContent` (sha256, storageKey ohne Dateinamen/PII, Blob-Rollback bei Insert-Fehler), `loadDocumentContent` mit Integritätsprüfung; in Boundary-Matrix registriert (documents → database).
+- Permissions: `project.read/create`, `document.read/upload` (+ Rollen SALES/OPERATIONS/SERVICE, Matrix-Unit-Test).
+- Platform-Services: `createProject` (Guard project.create im POWERHOUSE-Mandanten, Default-Phasen, Audit + Outbox `project.created` — wird in Phase 4 von der automatischen Projekterzeugung F-23 genutzt), `listProjects`, `uploadDocument`/`readDocument` (Guards, Audit `document.uploaded`, Storage injizierbar).
+- Dev-DB-Drift behoben: `access_scope_propertyId_idx`/`buildingId_idx`/`unit_entranceId_idx` fehlten in der Dev-DB (Migrationshistorie hatte sie) — direkt nachgezogen und alle FK-Indexe jetzt im Schema deklariert (`prisma migrate diff` = leer; künftig kein Drift/Prompt mehr).
+
+**Getestet:** Suite grün — 32 Unit + 63 Integration (Projekt-Anlage inkl. Phasen/Milestone/WorkOrder + Guard-Negativ + Unique; Dokument-Upload mit Hash/Audit/Roundtrip/Integritätsfehler/Blob-Rollback + Guard-Negativ; Modul-Gerüst-Uniques; P3-Stubs anlegbar; PROJECT-Scope-Shape positiv/negativ). **MinIO live verifiziert** (ph360-minio: store→load-Roundtrip, sha256 identisch, Bucket auto-angelegt).
+**Nicht getestet / offen:** PROJECT-Scope-Sichtbarkeit (kommt mit erster Projekt-Lesesicht) · Virenprüfung vor Fremd-Uploads (vor Portal-Uploads) · MinIO-Betrieb (Backup der Buckets) gehört zum NFR-Backup-Konzept (ADR-007-Freigabe).
+**Restrisiko:** gering; Dev-DB enthält ein Verifikationsdokument (wp15-verify.txt im POWERHOUSE-Mandanten).
+**Nächster Schritt:** **Phase 1 ist abgeschlossen** (F-01/02/03/19/20 🟢; Restposten: F-21-Route-Sweep + VPS-Rollout beim PO) → **Phase 2 Commercial Core (F-22)**.

@@ -216,7 +216,7 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 | Phase | Inhalt (Kurz) | Gates (§12) | Status |
 |---|---|---|---|
 | **0 — Bestandsaufnahme & Masterplan** | Audit + Plan V1 (2026-07-11); **WP-0.2 V2-Rebaseline** (2026-07-12: dieses Dokument, ADR-001…008, Doku-Konsolidierung); **Founding-Spec-Rebaseline + Phasen-Neuschnitt** (2026-08-05: Spec v2.0, ADR-012, Abgleich) | — | 🟢 |
-| **1 — Core & Datenmigration** | s. WP-Tabelle unten: Identity/Mandanten/IssuingEntity, Immobilien, Projekte-Kern, Audit, Outbox, Testmandant, P3-Stubs | F-01/F-02/F-19/F-20 🟢 · F-03/F-21 offen | 🟡 |
+| **1 — Core & Datenmigration** | s. WP-Tabelle unten: Identity/Mandanten/IssuingEntity, Immobilien, Projekte-Kern, Audit, Outbox, Testmandant, P3-Stubs | F-01/F-02/F-03/F-19/F-20 🟢 · F-21 🟣 (Route-Sweep offen) | 🟢 (2026-08-14; Restposten: F-21-Rest, [PO] VPS-Rollout) |
 | **2 — Commercial Core (CRM)** | Opportunities, konfigurierbare Pipeline mit Stufenkriterien, Aktivitäten-/Kommunikations-Timeline, Next Best Action (regelbasiert), Forecast (historisiert), zentrale Inbox + Dubletten, Zoho-Import | F-22 | ⚪ |
 | **3 — Angebotskonfigurator & Vertrag** | Produktkatalog/Preisbücher/Kostenmodelle, deklarative Regel-Engine (erklärt jede Regel), Varianten, Freigabematrix, Quote-Versionierung (Snapshot), PDF-Pipeline (ADR-003), Documenso self-hosted + **Betriebskonzept (Gate!)**, Signaturniveaus je ContractType, idempotente Webhooks, Portal-Annahme, DeliverableTemplates + Activation-Manifest-Entwurf | F-17, F-05, F-06 | ⚪ |
 | **4 — Contract-to-Delivery** | Onboarding-Engine (Templates+Versionierung, Schritt-Typen, Statusmodell, Aktivierungsbedingungen), Won-Deal-Handoff (Handoff-Packet + Acceptance), Customer-Success-Record, automatische Projektgenerierung aus Quote, Change Requests, GoCardless-SEPA (Spec §11), Rechnungsanforderungen + Lexoffice-Sync mit **Zwei-Konten-Routing je IssuingEntity** | F-04, F-23, F-18 | ⚪ |
@@ -238,7 +238,7 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 | WP-1.2 Auth/Rollen/Mandanten | better-auth (Auth) + eigene RBAC (OrganizationMembership/Invitation/SystemRole), Guards/Audit, Login/Invite/Accept/Members/Audit-UI, Bootstrap-Admin; ersetzt Interim-Basic-Auth (ADR-010). Tasks 1–13 committet, Suite grün (F-02/F-19/F-20) | 🟢 |
 | WP-1.3 Immobilien + CRM | **Kern (Objektbaum+Seed+Lesesicht) ✅ 2026-07** — Property/Building/Entrance/Unit/Address + AccessScope-Datenmodell-Stub (Migration `immobilien_kern`), idempotenter Pilotstruktur-Seed (ADR-006: 1 Property, 2 Gebäude, 21 Units), Permission `object.read`, `/admin/objects`-Lesesicht; **entblockt WP-APP-1** (Spec §8). **Rest ✅ 2026-08-06** (`bd12531`…): CRM-Kern (Customer=Kunden-Org/Contact/Opportunity/Note/Task), Lead-Qualifizierung `qualifyLead` (F-03 🟢), AccessScope-Guard-Integration (PROPERTY/BUILDING-Teilbaum, Grant/Revoke auditiert), IssuingEntity-Stammdaten geseedet, CSV-Import-Werkzeug (`ph360:import-objects`, Probelauf/Fehlerbericht/Audit), Admin-UI `/admin/customers` + Qualifizieren-Aktion + `/admin/access-scopes`, Room/TechnicalRoom/GridConnection + `managedByOrganizationId`. **[!] beim PO (E-06):** Zoho-Adapter (kein Export) + Pilotdaten-Realimport; IssuingEntity-**Pflichtfeld** folgt mit Offer/Contract (Phase 3) | 🟢 ([!]-Posten E-06) |
 | WP-1.4 Events/Worker-Ausbau | **✅ 2026-08-06:** pg-boss-Dauerdienst (Outbox-Relay, Retry/Backoff, DEAD + auditierter Requeue; live verifiziert), `EventHandlerExecution`-Idempotenz, `packages/events` (Katalog/Publisher/Executor, Envelope +version/actor), `packages/notifications` (Zustellstatus, duplikatfrei), `packages/observability` (Logger-Redaction), Boundaries-Matrix (Lint + Test), CI-Workflow aktiv (R-02 zu) | 🟢 |
-| WP-1.5 Projekt-/Modul-/Dokumentstruktur | Project-Kern, Document-Objekt (MinIO), ModuleSubscription/-Activation-Gerüst, **P3-Datenmodell-Stubs (Heat/Charge)** | ⚪ |
+| WP-1.5 Projekt-/Modul-/Dokumentstruktur | **✅ 2026-08-14:** Project-Kern (+`createProject` mit Audit/Outbox, Basis für F-23), Document + `packages/documents` (MinIO, sha256, Blob-Rollback; live verifiziert), Modul-Gerüst, **P3-Stubs (Heat/Charge)**, AccessScope-PROJECT-Scope, Permissions project.*/document.* | 🟢 |
 
 ## 11. Definition of Done
 
@@ -341,8 +341,8 @@ Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §2
 **Nächste verbindliche Schritte (Reihenfolge, Stand 2026-08-05):**
 1. **PO:** VPS-Rollout gemäß [DEPLOYMENT.md](DEPLOYMENT.md) (+ Secrets) → schließt R-01 prod; lokale Commits **pushen** (Remote existiert, R-02 zu — CI läuft ab dem ersten Push).
 2. **PO:** ADR-007 freigeben (E-01) · **E-05 PDF-Pipeline** (rückt vor: jetzt Phase-3-Blocker, R-17) · **E-06 Zoho-Export** (Phase-2-Blocker) + Pilotdatenliste · **E-08 Pilot-Zwischenstand** · **E-09 Abgleich-Entscheidungen** (K-02 vor Phase 3).
-3. ~~WP-1.3-Rest~~ **✅ 2026-08-06** (F-03 🟢) · ~~WP-1.4~~ **✅ 2026-08-06** (pg-boss/Idempotenz/Notifications/Redaction/Boundaries/CI).
-4. **Umsetzung: WP-1.5** (Projekt-/Dokument-/Modulgerüst + P3-Stubs) → **Phase 2 Commercial Core (F-22)** → Phase 3 (§10-Tabelle).
+3. ~~WP-1.3-Rest~~ ✅ · ~~WP-1.4~~ ✅ · ~~WP-1.5~~ **✅ 2026-08-14** — **Phase 1 abgeschlossen** (F-01/02/03/19/20 🟢).
+4. **Umsetzung: Phase 2 Commercial Core (F-22)** — Opportunities/Pipeline/Forecast/Zoho-Import (Roadmap-Phase 2) → danach Phase 3 Konfigurator & Vertrag (§10-Tabelle; [PO]-Blocker E-05/E-06 beachten).
 5. Parallel ohne Implementierung: E-07/O-P1…P4-Klärungen terminieren (Frist jetzt „vor Phase 8", R-04); Phasen 6/7 bei freier Kapazität vorziehen (R-18).
 
 ## 15. Änderungsverlauf

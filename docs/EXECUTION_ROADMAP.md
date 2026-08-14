@@ -35,10 +35,10 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 
 ---
 
-## PHASE 1 — Core & Datenmigration  🟡 (aktiv)
+## PHASE 1 — Core & Datenmigration  🟢 (abgeschlossen 2026-08-14)
 
 **Ziel:** tragfähiges Fundament — Auth, Mandanten, Rollen, Immobilienstruktur, CRM-Qualifizierung, Events/Worker, Projekt-/Modulgerüst, Testmandant.
-**Gates:** F-02 🟢 · F-03 🟢 · F-19 🟢 · F-20 🟢 (F-01 bereits erreicht; F-21-Rest offen).
+**Gates:** F-01/F-02/F-03/F-19/F-20 🟢 · Restposten: F-21-Route-Sweep (🟣, WP-1.0) + [PO] VPS-Rollout.
 
 ### WP-1.2 — Auth, Rollen & Mandanten  🟢 (2026-07 abgeschlossen)
 > Detailplan `docs/superpowers/plans/2026-07-11-wp-1.2-auth-rollen-mandanten.md`; Details im [IMPLEMENTATION_LOG](IMPLEMENTATION_LOG.md).
@@ -70,16 +70,17 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 - [x] CI-Pipeline `.github/workflows/ci.yml` — **aktiv** (Remote existiert, R-02 zu): lint→typecheck→unit→integration (Postgres-Service, echte Migrationen)→build; e2e-Job folgt mit erster automatisierter Journey
 - **Gate erreicht:** Suite 27 Unit + 54 Integration grün; F-19/F-20 dauerhaft abgesichert (Guard-/Idempotenz-Suite in CI)
 
-### WP-1.5 — Projekt-, Dokument- & Modulgerüst + P3-Stubs  ⚪
-> **Voraussetzung:** WP-1.3.
-- [ ] Prisma: `Project`, `ProjectPhase`, `ProjectMilestone`, `WorkOrder` (Grundgerüst) + Migration
-- [ ] `Document`-Objekt + Storage-Abstraktion gegen **MinIO** (Upload, Hash, Berechtigungskontext)
-- [ ] `ModuleSubscription` / `ModuleActivation` / `ModuleConfiguration` / `ModuleStatus` (Gerüst, ohne Fachlogik)
-- [ ] **P3-Datenmodell-Stubs**: Heat- & Chargemieter-Entitäten (Masterplan §5) als Migration — **null Fachlogik/UI/Adapter**
-- [ ] Tests: Projekt-Anlage + Dokument-Upload mit Berechtigung
-- **Gate:** Projekt/Document/Module-Gerüst nutzbar; P3-Schema migriert
+### WP-1.5 — Projekt-, Dokument- & Modulgerüst + P3-Stubs  🟢 (2026-08-14)
+> Migrationen `wp15_projekt_dokument_module_p3stubs` + `wp15_access_scope_project_shape`.
+- [x] Prisma: `Project`/`ProjectPhase`/`ProjectMilestone`/`WorkOrder` (Grundgerüst; Tenant-Anker = Kunden-Org) + `createProject`-Service (Guard `project.create`, Audit + Outbox `project.created` — Basis für die automatische Projekterzeugung in Phase 4/F-23)
+- [x] `Document` + Storage-Abstraktion gegen **MinIO** (`packages/documents`: sha256, storageKey ohne PII, Blob-Rollback, Integritätsprüfung beim Lesen; MemoryStorage für Tests) — **live gegen ph360-minio verifiziert**
+- [x] `ModuleSubscription`/`ModuleActivation`/`ModuleConfiguration` (Gerüst ohne Fachlogik; Status als Enums)
+- [x] **P3-Stubs** Heat (HeatProject/ReadingSchedule/OccupancyChange/HeatStatement/AllocationKey) + Charge (ChargingProject/ChargePoint/ChargingSession numeric(14,3)/LoadManagementPlan/ChargingAuthorization/FundingCase) — null Fachlogik/UI/Adapter
+- [x] Bonus: AccessScope **PROJECT-Scope** (Datenmodell + Shape-CHECK; Sichtbarkeit folgt mit erster Projekt-Lesesicht) · Permissions `project.read/create`, `document.read/upload` · Dev-DB-Index-Drift behoben (FK-Indexe jetzt im Schema deklariert)
+- [x] Tests: Projekt-Anlage + Dokument-Upload mit Berechtigung (Suite: 32 Unit + 63 Integration grün)
+- **Gate erreicht:** Projekt/Document/Module-Gerüst nutzbar · P3-Schema migriert
 
-**➡️ Phase-1-Abschluss:** F-02, F-03, F-19, F-20 🟢 · Fundament trägt alle Folgephasen.
+**➡️ Phase-1-Abschluss erreicht (2026-08-14):** F-01/F-02/F-03/F-19/F-20 🟢 · Fundament trägt alle Folgephasen. Restposten außerhalb des kritischen Pfads: F-21-Route-Sweep (🟣) + VPS-Rollout/ADR-007 beim PO (Parallel-Track). **Weiter mit PHASE 2 — Commercial Core (F-22).**
 
 ---
 
