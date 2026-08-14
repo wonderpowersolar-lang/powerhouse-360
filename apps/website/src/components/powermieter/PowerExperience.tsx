@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ButtonLink } from "@/components/ui/Button";
+// Relative Imports (statt @/-Alias): die Datei wird zusätzlich vom
+// design-sync-Bundle außerhalb der Next-Runtime aufgelöst.
+import { ButtonLink } from "../ui/Button";
 import {
   PM_SCENES,
   PM_CTA_SUPPORT,
@@ -15,7 +17,7 @@ import {
   PM_IMAGE,
   PM_VIDEO,
   type PmScene,
-} from "@/content/powermieter";
+} from "../../content/powermieter";
 
 /**
  * /powermieter — die asset-leichte Modul-Journey (Brief 2026-08-14):
@@ -366,7 +368,7 @@ function HeroMedia({ dim }: { dim: number }) {
   );
 }
 
-export default function PowerExperience() {
+export function PowerExperience() {
   return (
     <div className="bg-navy-900 text-ink">
       {PM_SCENES.map((scene) => (
@@ -375,3 +377,7 @@ export default function PowerExperience() {
     </div>
   );
 }
+
+// Named + Default: named für `export *`-Bundles (design-sync),
+// Default für den bestehenden Page-Import.
+export default PowerExperience;
