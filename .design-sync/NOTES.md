@@ -47,9 +47,11 @@ node .ds-sync/resync.mjs --config .design-sync/config.json \
 - Nur Erst-Sync-Scope verifiziert (4 Komponenten). Weitere Website-Komponenten (Nav, Footer, SectionPanel …) sind bewusst NICHT im Sync — bei Aufnahme: srcDir-Zuschnitt prüfen (viele hängen an gsap/three → vermutlich eigene Shims nötig).
 - Node 25 + pnpm 11 verwendet; `engines` verlangt nur >=20.
 
-## PowerExperience-Sync (2026-08-14)
+## PowerExperience-Sync (2026-08-14) — WIEDER ENTFERNT (PO-Entscheid, gleicher Tag)
 
-- Die /powermieter-Seite ist als Komponente `PowerExperience` (Gruppe »powermieter«, cardMode column) im Sync: via `extraEntries[1]` gebündelt + `componentSrcMap`-Pin. Die [EXPORT_COLLISION]-Warnung ist ein Pin-Artefakt — nur der extraEntry trägt das Binding, funktional korrekt.
+Die Seite gehört NICHT ins Design-Projekt (nur die 4 UI-Kern-Komponenten). Erkenntnisse aus dem Versuch, falls sie je wieder rein soll:
+
+- Die /powermieter-Seite war als Komponente `PowerExperience` (Gruppe »powermieter«, cardMode column) im Sync: via `extraEntries[1]` gebündelt + `componentSrcMap`-Pin. Die [EXPORT_COLLISION]-Warnung ist ein Pin-Artefakt — nur der extraEntry trägt das Binding, funktional korrekt.
 - `next/link` rendert OHNE Router in der Design-Runtime (Next 16, empirisch render-clean) — ButtonLink-CTAs in der Karte funktionieren als Links.
 - Hero-Medien (Still/Clip unter /media/…) existieren nur auf der Website; Karte und Design-Runtime zeigen den Noir-Void — dokumentiert im prompt.md/dtsPropsFor.
 - PowerExperience exportiert named + default (export * braucht named). Imports relativ statt @/-Alias (Bundle-Auflösung).
