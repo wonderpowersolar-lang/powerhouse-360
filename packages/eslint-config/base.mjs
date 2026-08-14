@@ -45,6 +45,7 @@ export default defineConfig([
     observability: [],
     events: ["@ph360/database"],
     notifications: ["@ph360/database", "@ph360/observability"],
+    documents: ["@ph360/database"],
     auth: ["@ph360/database", "@ph360/permissions", "@ph360/events"],
     // testing ist Dev-Harness und darf alles importieren → keine Regel
   }).map(([pkg, allowed]) => ({

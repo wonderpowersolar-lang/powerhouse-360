@@ -13,6 +13,10 @@ export const PERMISSIONS = [
   "customer.read",
   "object.import",
   "accessscope.manage",
+  "project.read",
+  "project.create",
+  "document.read",
+  "document.upload",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];

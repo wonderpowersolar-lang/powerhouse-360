@@ -25,9 +25,9 @@ const ALL: Permission[] = [...PERMISSIONS];
 /** Role → permissions (WP-1.2 scope). Empty = no capability until its feature ships. */
 export const ROLE_PERMISSIONS: Record<SystemRole, Permission[]> = {
   PLATFORM_ADMIN: ALL,
-  SALES: ["lead.read", "lead.update", "lead.qualify", "customer.read", "member.read", "organization.read"],
-  OPERATIONS: ["lead.read", "member.read", "organization.read", "object.read", "customer.read", "object.import"],
-  SERVICE: ["lead.read", "member.read", "organization.read"],
+  SALES: ["lead.read", "lead.update", "lead.qualify", "customer.read", "member.read", "organization.read", "project.read", "document.read", "document.upload"],
+  OPERATIONS: ["lead.read", "member.read", "organization.read", "object.read", "customer.read", "object.import", "project.read", "project.create", "document.read", "document.upload"],
+  SERVICE: ["lead.read", "member.read", "organization.read", "project.read", "document.read"],
   FINANCE: ["lead.read", "member.read", "organization.read"],
   PROPERTY_MANAGER: ["lead.read", "organization.read", "object.read"],
   OWNER_BOARD: ["organization.read"],
