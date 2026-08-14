@@ -76,7 +76,7 @@ export default async function AccessScopesPage() {
             </select>
           </label>
           <label>
-            Property (bei Typ „Objekt")
+            Property (bei Typ „Objekt“)
             <select name="propertyId" defaultValue="">
               <option value="">—</option>
               {properties.map((p) => (
@@ -87,7 +87,7 @@ export default async function AccessScopesPage() {
             </select>
           </label>
           <label>
-            Gebäude (bei Typ „Gebäude")
+            Gebäude (bei Typ „Gebäude“)
             <select name="buildingId" defaultValue="">
               <option value="">—</option>
               {buildings.map((b) => (

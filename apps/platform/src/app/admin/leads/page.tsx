@@ -17,6 +17,13 @@ const CUSTOMER_ORG_OPTIONS = [
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/** Status → Badge-Variante (globals.css): frisch = info, Erfolg = ok, raus = crit. */
+const STATUS_BADGE: Record<string, string> = {
+  NEW: "info",
+  CONVERTED: "ok",
+  DISQUALIFIED: "crit",
+};
+
 function fmt(d: Date): string {
   return new Intl.DateTimeFormat("de-DE", {
     dateStyle: "medium",
@@ -88,7 +95,9 @@ export default async function LeadsPage() {
                 </td>
                 <td>{lead.dwellingUnits ?? "—"}</td>
                 <td>
-                  <span className="badge">{lead.status}</span>
+                  <span className={`badge ${STATUS_BADGE[lead.status] ?? ""}`}>
+                    {lead.status}
+                  </span>
                 </td>
                 <td>
                   {lead.status === "CONVERTED" ? (

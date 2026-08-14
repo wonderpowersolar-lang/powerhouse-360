@@ -83,7 +83,9 @@ export default async function MembersPage() {
                   </form>
                 </td>
                 <td>
-                  <span className="badge">{m.status}</span>
+                  <span className={`badge ${m.status === "ACTIVE" ? "ok" : ""}`}>
+                    {m.status}
+                  </span>
                 </td>
                 <td className="muted">{fmt(m.createdAt)}</td>
               </tr>

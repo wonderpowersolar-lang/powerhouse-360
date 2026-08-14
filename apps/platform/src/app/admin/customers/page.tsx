@@ -38,7 +38,7 @@ export default async function CustomersPage() {
 
       {customers.length === 0 ? (
         <div className="empty">
-          Noch keine Kunden. Qualifiziere einen Lead unter „Leads", um den
+          Noch keine Kunden. Qualifiziere einen Lead unter „Leads“, um den
           ersten Kunden samt Organisation und Objekt anzulegen.
         </div>
       ) : (
