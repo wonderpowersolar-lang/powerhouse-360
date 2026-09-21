@@ -1,9 +1,11 @@
 # POWERHOUSE 360 — MASTERPLAN
 
 > **Einzige Quelle der Wahrheit** für Planung und Systemzustand (Masterprompt V2, §3).
-> Version 2.0 · Stand 2026-07-12 · Pflege: nach jedem Arbeitspaket (§14/§15).
+> Version 2.1 · Stand 2026-08-05 · Pflege: nach jedem Arbeitspaket (§14/§15).
 > Pflichtdokumente: dieser Masterplan · [IMPLEMENTATION_LOG.md](IMPLEMENTATION_LOG.md) (append-only) · [DECISIONS/](DECISIONS/) (ADRs). Ausgelagert mit Verweis: [DEPLOYMENT.md](DEPLOYMENT.md) (Betriebs-Runbook mit Serverdaten).
 > Statusmodell: ⚪ Nicht begonnen · 🔵 Analysiert · 🟡 In Arbeit · 🟠 Blockiert · 🟣 Implementiert, nicht verifiziert · 🟢 End-to-End verifiziert · 🔴 Fehlerhaft/zurückgerollt. 🟢 nur nach tatsächlich durchlaufenem Nutzerfluss (§12).
+
+> 📐 **Übergeordnete Produktverfassung:** [Founding Specification v2.0](FOUNDING-SPEC-v2.0.md) (seit 2026-08-05). Bauabfolge gemäß [ADR-012](DECISIONS/ADR-012-bauabfolge-commercial-first.md) **Commercial-first**; der Phasen-Neuschnitt ist in §10 umgesetzt (Mapping alt→neu dort). Abweichungen Spec ↔ Repo: [FOUNDING-SPEC-ABGLEICH.md](FOUNDING-SPEC-ABGLEICH.md).
 
 ---
 
@@ -11,18 +13,20 @@
 
 Powerhouse 360 wird das **Betriebssystem für Mehrfamilienhäuser**: eine gemeinsame, modulare Plattform, auf der Vertrieb, Kunden (HV/WEG/Eigentümer), Bewohner, Monteure und technischer Betrieb mit denselben Daten arbeiten — Lead → Qualifizierung → Angebot → Portal → Beauftragung → Vertrag (Documenso-Signatur) → Projekt → Onboarding → Planung → Installation → Hub-/Sensoraktivierung → Modulbetrieb → Service → Abrechnung → Rechnung (Lexoffice B2B / interne Billing-Engine). Kein Prozessschritt erfasst Stammdaten doppelt.
 
-**Verbindliche kommerzielle Priorisierung (steht über allen anderen Kapiteln):**
+**Verbindliche Priorisierung (steht über allen anderen Kapiteln; seit 2026-08-05 gemäß [ADR-012](DECISIONS/ADR-012-bauabfolge-commercial-first.md)):**
 
-> **P1-Ziel: Powermieter End-to-End produktiv, verifiziert am realen Pilotprojekt WEG Christinenstraße 36 / Lottumstraße 22, Berlin — Hausverwaltung Hennings, Betriebskonzept AKL Powerhouse 360, 21 Messstellen.**
+> **Nächstes Abschlussziel: der Commercial-Durchstich — Lead → Angebot → Vertrag → Projekt → Provisionierung → Operations aktiv** (Founding Spec §30, Woche-12-Zielbild), E2E verifiziert über F-22 / F-17 / F-05 / F-23 / F-24.
+>
+> **Danach: Powermieter als erste Modul-Nutzlast (Phase 8), verifiziert am realen Pilotprojekt WEG Christinenstraße 36 / Lottumstraße 22, Berlin** — Hausverwaltung Hennings, Betriebskonzept AKL Powerhouse 360, 21 Messstellen.
 
 | Modul | Klasse | Bedeutung |
 |---|---|---|
-| Powermieter | **P1 — Vollausbau** | einziges Modul mit Ziel 🟢 in den ersten Umsetzungsmonaten; Pilot = Abschlusskriterium |
+| Powermieter | **P1 — Vollausbau** | erste Modul-Nutzlast nach dem Commercial-Durchstich; Pilot = Abschlusskriterium der Phase 8 |
 | Smokemieter | **P2** | Beginn erst nach Powermieter-Aktivierung im Pilot |
 | Heatmieter | **P3 — nur Datenmodell** | Entitäten/Beziehungen/Modulgrenzen ja; keine UI, Fachlogik, Adapter bis Prioritätsanhebung |
 | Chargemieter | **P3 — nur Datenmodell** | wie Heatmieter |
 
-Jeder Plattformbereich außerhalb des kritischen Pfads „Lead → Vertrag → Projekt → Onboarding → Installation → Powermieter aktiv → Rechnung" wird auf das Minimum reduziert, das dieser Pfad braucht. **Arbeit an P2/P3 vor Erreichen des P1-Ziels ist eine Planabweichung und braucht ausdrückliche Freigabe.**
+Jeder Plattformbereich außerhalb des kritischen Pfads „Lead → Opportunity → Angebot → Vertrag → Projekt → Provisionierung → Operations" wird auf das Minimum reduziert, das dieser Pfad braucht. Hub/PWA (Phasen 6/7) sind nicht mehr Vorstufen des nächsten Abschlussziels, bleiben aber Voraussetzung der Modulphase 8 (Risikohinweis R-18). **Arbeit an P2/P3 vor Powermieter-Aktivierung bleibt eine Planabweichung und braucht ausdrückliche Freigabe.**
 
 Führende Systeme: Powerhouse 360 operativ (inkl. Vertragsinhalte/-erzeugung); **Documenso** für Signaturprozesse/-nachweise; **Lexoffice** für Rechnungsnummer/Belegstatus/Zahlungsstatus je Gesellschaftskonto.
 
@@ -59,16 +63,16 @@ packages/  database · permissions · auth · testing · domain/<context> · eve
            validation · api-client · documents · notifications · device-sdk ·
            documenso-adapter · lexoffice-adapter · pdf-pipeline-adapter · ui · observability
 Kontexte:  identity → realestate/platform → crm → commercial → contracts → projects →
-           onboarding · devices → module-{powermieter,smokemieter,heatmieter,chargemieter} → billing
+           onboarding → provisioning · devices → module-{powermieter,smokemieter,heatmieter,chargemieter} → billing
 ```
 
-**Prinzipien (verbindlich):** ein Repo · ein Datenmodell · eine Auth · ein Mandantenmodell (§4) · serverseitig erzwungene Berechtigungen · Bounded Contexts (eslint-boundaries; Fachmodule importieren nie einander; Cross-Kontext über Domain-Events) · stabile interne + versionierte externe APIs (`/api/v1`, Webhooks mit Signaturprüfung + `WebhookInbox`) · Adapter für alle Fremdsysteme (Documenso, Lexoffice, PDF-Pipeline, Geräteprotokolle) · echte Migrationen · vollständiges Audit-Logging · reproduzierbare Tests · keine Mock-Daten in Produktivflüssen (Testmandant, [ADR-006](DECISIONS/ADR-006-test-und-seed-mandant.md)) · keine stillen Datenkorrekturen · keine fest codierten Tarife/Vertragsinhalte · keine Schatten-DBs je Modul · **Rohmesswerte/Telemetrie append-only; Korrekturen = neue Datensätze mit Referenz** ([ADR-002](DECISIONS/ADR-002-telemetrie-zeitreihenspeicher.md)).
+**Prinzipien (verbindlich):** ein Repo · ein Datenmodell · eine Auth · ein Mandantenmodell (§4) · serverseitig erzwungene Berechtigungen · Bounded Contexts (eslint-boundaries; Fachmodule importieren nie einander; Cross-Kontext über Domain-Events) · stabile interne + versionierte externe APIs (`/api/v1`, Webhooks mit Signaturprüfung + `WebhookInbox`) · Adapter für alle Fremdsysteme (Documenso, Lexoffice, GoCardless, PDF-Pipeline, Geräteprotokolle) · echte Migrationen · vollständiges Audit-Logging · reproduzierbare Tests · keine Mock-Daten in Produktivflüssen (Testmandant, [ADR-006](DECISIONS/ADR-006-test-und-seed-mandant.md)) · keine stillen Datenkorrekturen · keine fest codierten Tarife/Vertragsinhalte · keine Schatten-DBs je Modul · **Rohmesswerte/Telemetrie append-only; Korrekturen = neue Datensätze mit Referenz** ([ADR-002](DECISIONS/ADR-002-telemetrie-zeitreihenspeicher.md)).
 
-**Events** ([ADR-001](DECISIONS/ADR-001-event-infrastruktur-outbox.md)): Transactional Outbox, Envelope mit `eventType/aggregate/organizationId/actor/correlationId/causationId/version/payload` (Zod-typisiert, IDs statt Objektkopien, keine sensiblen Daten). Katalog (Mindestbestand): `lead.created/qualified`, `offer.created/sent/accepted`, `contract.created/sent_to_documenso/signature_started/partially_signed/signed/failed`, `project.created/phase_changed`, `onboarding.started/step_completed/blocked/ready_for_activation`, `work_order.created/assigned/completed`, `hub.registered/online/offline`, `device.registered/assigned/installed/activated/replaced/telemetry_received/alert_created/alert_resolved`, `module.activated/suspended`, `invoice.requested/created/paid/overdue`. Verarbeitung: at-least-once, Handler-idempotent, pro Aggregat seriell, Dead-Letter sichtbar mit auditiertem manuellen Retry.
+**Events** ([ADR-001](DECISIONS/ADR-001-event-infrastruktur-outbox.md)): Transactional Outbox, Envelope mit `eventType/aggregate/organizationId/actor/correlationId/causationId/version/payload` (Zod-typisiert, IDs statt Objektkopien, keine sensiblen Daten). Katalog (Mindestbestand): `lead.created/qualified`, `offer.created/sent/accepted`, `contract.created/sent_to_documenso/signature_started/partially_signed/signed/failed`, `project.created/phase_changed`, `onboarding.started/step_completed/blocked/ready_for_activation`, `work_order.created/assigned/completed`, `hub.registered/online/offline`, `device.registered/assigned/installed/activated/replaced/telemetry_received/alert_created/alert_resolved`, `module.activated/suspended`, `invoice.requested/created/paid/overdue`, `opportunity.created/stage_changed/won`, `handoff.prepared/accepted`, `activation.manifest_approved/provisioned`. Verarbeitung: at-least-once, Handler-idempotent, pro Aggregat seriell, Dead-Letter sichtbar mit auditiertem manuellen Retry.
 
 **API-Regeln:** jede Route deklariert Permission + Org-Scope-Quelle + Zod-Schema (sonst kein Merge); Idempotenz für extern mutierende Endpunkte; Adapter-Aufrufe nur im Worker (Retry/Backoff), Fehlerzustände sichtbar mit manuellem Retry; Fremdsystem-Timeouts raten nie Zustände.
 
-**Laufzeit (Coolify, Hostinger-VPS, DE):** Container website · platform (`app.powerhouse360.de`) · worker · postgres (Phase 4: Timescale-Image) · documenso (`sign.powerhouse360.de`, Phase 3) · minio. Umgebungen dev (compose) / staging / prod mit getrennten Secrets. Runbook: [DEPLOYMENT.md](DEPLOYMENT.md).
+**Laufzeit (Coolify, Hostinger-VPS, DE):** Container website · platform (`app.powerhouse360.de`) · worker · postgres (Phase 6: Timescale-Image) · documenso (`sign.powerhouse360.de`, Phase 3) · minio. Umgebungen dev (compose) / staging / prod mit getrennten Secrets. Runbook: [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## 4. Mandanten- und Gesellschaftsmodell
 
@@ -89,21 +93,22 @@ Kontexte:  identity → realestate/platform → crm → commercial → contracts
 
 ## 5. Datenmodell
 
-**Grundprinzipien:** PostgreSQL (Phase 4: +Timescale-Extension) · Prisma-Migrationen · UUID · `organizationId` verpflichtend (globale Tabellen explizit registriert) · `createdAt/updatedAt` · Soft-Delete auf Kernobjekten + DSGVO-Löschprozess · versionierte Objekte append-only (Offer, Contract, Tariff, OnboardingTemplate) · Geld als Integer-Cent/`numeric`, Energie `numeric(14,3)` · externe IDs nur in Mapping-Tabellen/`*Reference` · **DB-Constraints statt UI-Validierung** (Seriennummern-Eindeutigkeit `(manufacturer, model, serialNumber)`, Idempotenzschlüssel unique).
+**Grundprinzipien:** PostgreSQL (Phase 6: +Timescale-Extension) · Prisma-Migrationen · UUID · `organizationId` verpflichtend (globale Tabellen explizit registriert) · `createdAt/updatedAt` · Soft-Delete auf Kernobjekten + DSGVO-Löschprozess · versionierte Objekte append-only (Offer, Contract, Tariff, OnboardingTemplate) · Geld als Integer-Cent/`numeric`, Energie `numeric(14,3)` · externe IDs nur in Mapping-Tabellen/`*Reference` · **DB-Constraints statt UI-Validierung** (Seriennummern-Eindeutigkeit `(manufacturer, model, serialNumber)`, Idempotenzschlüssel unique).
 
 **Domänen und Entitäten (Zielbild; implementiert wird je Phase nur, was der kritische Pfad braucht):**
 
 | Domäne | Entitäten |
 |---|---|
 | Identity | Organization, OrganizationMembership, User, Role, Permission, Team, Contact, Address, Invitation, AccessScope, **IssuingEntity** |
-| CRM | Lead ✅, LeadSource, LeadActivity ✅, Opportunity, Customer, CustomerContact, SalesStage, Note, Task, Communication, CampaignReference |
+| CRM | Lead ✅, LeadSource, LeadActivity ✅, Opportunity, Customer, CustomerContact, SalesStage, Note, Task, Communication, CampaignReference, ForecastItem (versioniert, Spec §9) |
 | Immobilien | Property, Building, BuildingSection, Entrance, Floor, Unit, Room, TechnicalRoom, ParkingArea, ParkingSpace, InstallationLocation, GridConnection |
-| Commercial | Product, ProductModule, ProductVersion, PriceBook, PriceRule, Offer, OfferVersion, OfferItem, OfferOption, OfferAcceptance, CommercialCondition |
+| Commercial | Product, ProductModule, ProductVersion, PriceBook, PriceRule, CostModel, Offer, OfferVersion, OfferItem, OfferOption, Assumption, Exclusion, ApprovalRequest, OfferAcceptance, CommercialCondition, DeliverableTemplate (Begriffsbrücke Spec §10: Offer = Quote, OfferVersion = eingefrorene Solution Configuration) |
 | Verträge | Contract, **ContractType (Pflichtfeld `signatureLevel`: TEXTFORM / SES / QES / WET_SIGNATURE)**, ContractVersion, ContractTemplate, ContractParticipant, ContractFieldMapping (nur Signatur-/Datums-/Identitätsfelder, ADR-003), ContractSignatureRequest, ContractStatus, ContractAuditEvent, DocumensoDocumentReference, DocumensoRecipientReference |
 | Projekt/Operations | Project, ProjectPhase, ProjectMilestone, WorkOrder, WorkOrderAssignment, InstallationTask, ServiceTicket, Appointment, Checklist, ChecklistResult, InstallationProtocol, HandoverProtocol, Attachment, Comment |
 | Hub/Geräte | Hub, HubModel, HubCredential, HubConfiguration, HubDeployment, Gateway, Device, DeviceModel, DeviceType, Sensor, Meter, DeviceAssignment, DeviceInstallation, **DeviceReading (append-only)**, **DeviceTelemetry (append-only, Zeitreihenspeicher)**, DeviceState, DeviceAlert, FirmwareVersion, FirmwareDeployment, ConnectivityStatus, BatteryStatus, SignalQuality |
 | Onboarding | OnboardingTemplate(+Version), OnboardingWorkflow, OnboardingStepDefinition/-Instance, OnboardingParticipant, OnboardingInvitation, OnboardingTask, OnboardingRequirement, OnboardingDocument, OnboardingConsent, OnboardingApproval, OnboardingForm/-Submission, OnboardingDependency, OnboardingTrigger, OnboardingDeadline/-Reminder, OnboardingException, OnboardingAuditEvent |
-| Abrechnung | BillingAccount, BillingPeriod, **Tariff, TariffVersion**, Charge, RecurringCharge, InvoiceRequest (unique `idempotencyKey`, Pflicht `issuingEntityId`), InvoiceReference, PaymentStatus, AccountingContactReference, AccountingSync, AccountingSyncError |
+| Abrechnung | BillingAccount, BillingPeriod, **Tariff, TariffVersion**, Charge, RecurringCharge, InvoiceRequest (unique `idempotencyKey`, Pflicht `issuingEntityId`), InvoiceReference, PaymentStatus, SepaMandateReference (GoCardless, Spec §11/§25), AccountingContactReference, AccountingSync, AccountingSyncError |
+| Provisionierung | ActivationManifest(+Version, Schema-validiert), ReadinessCheckResult, ProvisioningRun (idempotent), ProvisioningReport |
 | Module | ModuleSubscription, ModuleActivation, ModuleConfiguration, ModuleStatus, BuildingModule, UnitModule, DeviceModuleAssignment |
 | Plattform | Document, AuditEvent ✅, DomainEvent ✅ (Outbox), EventHandlerExecution, Notification, WebhookInbox |
 
@@ -127,7 +132,7 @@ Kontexte:  identity → realestate/platform → crm → commercial → contracts
 | Dynamischer Sonnenstrompreis: Preisformel + Nachweispflichten (O-P2) | ⚪ | PO/extern |
 | Lieferantenpflichten (EnWG-Meldungen, Stromkennzeichnung) — Plattform vs. Dienstleister (O-P3) | ⚪ | PO/extern |
 
-**MaKo-Zuständigkeitsmatrix Comgy ↔ Powerhouse 360 (vor Phase 6 auszufüllen):**
+**MaKo-Zuständigkeitsmatrix Comgy ↔ Powerhouse 360 (vor Phase 8 auszufüllen):**
 | Prozess | Comgy (wMSB) | PH360 | Status |
 |---|---|---|---|
 | Messstellenbetrieb, Zählerwechsel, Eichfristen | vermutl. ✔ | — | ⚪ |
@@ -152,17 +157,17 @@ Eichrechtskonforme Ladepunktabrechnung (signierte Messwerte, Transparenzsoftware
 |---|---|---|
 | **Signaturniveaus** | je `ContractType` Pflichtfeld TEXTFORM/SES/QES/WET_SIGNATURE; QES/Schriftform-Verträge werden nicht digital signierbar angeboten (O-03: QES-Bedarf je Vertragstyp klären) | 🔵 modelliert, ⚪ Zuordnung |
 | **E-Rechnungspflicht B2B** | XRechnung/ZUGFeRD empfangbar + gemäß Fristen ausstellbar; Lexoffice-Fähigkeit verifizieren (ADR-008-Kriterium) | ⚪ |
-| **DSGVO** | Verbrauchs-/Telemetriedaten = personenbezogen/verhaltensoffenbarend: Löschkonzept mit Fristen je Datenart, Auskunftsprozesse, AV-Verträge (Hostinger, Comgy, Lexoffice), Rollentrennung (HV ohne Einzelprofile), keine sensiblen Daten in Logs (Logger-Redaction) | ⚪ VVT vor Phase-6-Go-Live |
+| **DSGVO** | Verbrauchs-/Telemetriedaten = personenbezogen/verhaltensoffenbarend: Löschkonzept mit Fristen je Datenart, Auskunftsprozesse, AV-Verträge (Hostinger, Comgy, Lexoffice), Rollentrennung (HV ohne Einzelprofile), keine sensiblen Daten in Logs (Logger-Redaction) | ⚪ VVT vor Phase-8-Go-Live |
 | **Aufbewahrung** | steuer-/handelsrechtliche Fristen (Rechnungen/Verträge/Protokolle) vs. Löschkonzept explizit modelliert | ⚪ |
 
 ## 7. Modulübersicht mit Prioritätsklassen
 
 | Modul | Klasse | Kern (Kurzform) | Software | Marketing | Offene fachliche Entscheidungen |
 |---|---|---|---|---|---|
-| **Powermieter** | P1 | Mieterstromprojekt: Gebäude/Hausanschlüsse, PV/Speicher, Messkonzept+Messpunkte, Teilnehmer+Einheiten, Tarifversionen (dyn. Sonnenstrompreis), Stromverträge via Documenso, SEPA, Zählerwechsel, **Billing Readiness (§6)**, Energiezuordnung, Abrechnungsvorbereitung via interner Billing-Engine (ADR-005). Modell-Ergänzungen: PowerProject, PvSystem/StorageSystem, MeteringConcept(+Version), MeteringPoint, PowerTariff→Tariff/TariffVersion, PowerParticipant (Statuskette bis aktiv), MeterChange, BillingReadiness, EnergyAllocation | ⚪ (Phase 6, **Pilot = DoD**) | 🟡 keine eigene Seite | O-P1…O-P4 (§6) |
-| **Smokemieter** | P2 | RWM-Betrieb: Ferninspektion (InspectionRun/Record append-only), Batterie-/Funkstatus, Demontageerkennung → **garantierter Serviceprozess** (Alert→Ticket→WorkOrder→Prüfnachweis; kein kritischer Alarm ohne Ticket), Austauschplanung, Bewohnerkommunikation, Betreiber-/Serviceverträge | ⚪ (Phase 8) | 🟢 smokemieter.de | O-S1, O-S2 |
-| **Heatmieter** | P3 | nur Datenmodell: WMZ/HKV/Wasserzähler, Gerätewechsel, Nutzerwechsel (OccupancyChange), Fernablesung, Wertetrennung, EED-Verbrauchsinfo, Perioden/Kostenpositionen/Verteilerschlüssel, HeatStatement | ⚪ (Ph. 9 bei Anhebung) | 🟢 | O-H1…O-H3 |
-| **Chargemieter** | P3 | nur Datenmodell: Ladeinfrastruktur, Stellplätze, ChargePoint/Wallboxen, Lastmanagement, Berechtigungen (RFID/App), ChargingSession, Tarife, Förderung (FundingCase) | ⚪ (Ph. 10 bei Anhebung) | 🟢 chargemieter.de | O-C1…O-C3 |
+| **Powermieter** | P1 | Mieterstromprojekt: Gebäude/Hausanschlüsse, PV/Speicher, Messkonzept+Messpunkte, Teilnehmer+Einheiten, Tarifversionen (dyn. Sonnenstrompreis), Stromverträge via Documenso, SEPA, Zählerwechsel, **Billing Readiness (§6)**, Energiezuordnung, Abrechnungsvorbereitung via interner Billing-Engine (ADR-005). Modell-Ergänzungen: PowerProject, PvSystem/StorageSystem, MeteringConcept(+Version), MeteringPoint, PowerTariff→Tariff/TariffVersion, PowerParticipant (Statuskette bis aktiv), MeterChange, BillingReadiness, EnergyAllocation | ⚪ (Phase 8, **Pilot = DoD**) | 🟡 keine eigene Seite | O-P1…O-P4 (§6) |
+| **Smokemieter** | P2 | RWM-Betrieb: Ferninspektion (InspectionRun/Record append-only), Batterie-/Funkstatus, Demontageerkennung → **garantierter Serviceprozess** (Alert→Ticket→WorkOrder→Prüfnachweis; kein kritischer Alarm ohne Ticket), Austauschplanung, Bewohnerkommunikation, Betreiber-/Serviceverträge | ⚪ (Phase 9) | 🟢 smokemieter.de | O-S1, O-S2 |
+| **Heatmieter** | P3 | nur Datenmodell: WMZ/HKV/Wasserzähler, Gerätewechsel, Nutzerwechsel (OccupancyChange), Fernablesung, Wertetrennung, EED-Verbrauchsinfo, Perioden/Kostenpositionen/Verteilerschlüssel, HeatStatement | ⚪ (Ph. 10 bei Anhebung) | 🟢 | O-H1…O-H3 |
+| **Chargemieter** | P3 | nur Datenmodell: Ladeinfrastruktur, Stellplätze, ChargePoint/Wallboxen, Lastmanagement, Berechtigungen (RFID/App), ChargingSession, Tarife, Förderung (FundingCase) | ⚪ (Ph. 11 bei Anhebung) | 🟢 chargemieter.de | O-C1…O-C3 |
 
 **Onboarding-Engine (P1, Kernbereich):** versionierte Workflow-Templates statt fest codierter Formulare; Schritt-Typen form/document_upload/contract/consent/approval/internal_task/requirement/invitation; Workflow-Statusmodell Draft → … → Ready for Activation → Active (+Blocked/Cancelled); ein `contract`-Schritt gilt erst abgeschlossen, wenn (1) korrekter Vertrag aus richtiger Template-Version, (2) alle Unterzeichner eingeladen, (3) Documenso final bestätigt, (4) Dokument gespeichert/referenziert, (5) Status synchronisiert. **Projekt-Onboarding vor Bewohner-Onboarding** (Engine-erzwungen). Powermieter-Projekt-Onboarding-Kette gemäß V2 §14 (Organisation → … → Billing Readiness → Aktivierung).
 
@@ -176,13 +181,13 @@ Eichrechtskonforme Ladepunktabrechnung (signierte Messwerte, Transparenzsoftware
 
 | Bereich | Anforderung | Status / Verifikationsweg |
 |---|---|---|
-| Verfügbarkeit | Klassen je Bereich; **strengste: Smokemieter-Alarmkette** (Gerät→Hub→Plattform→Serviceprozess→Mensch) — ohne funktionierende, überwachte Kette **keine P2-Aktivierung**. Pilot-Phase Plattform: Best-Effort mit Monitoring; Ziele werden vor Phase 8 quantifiziert | ⚪ (Ziele Phase 8), Kette = E2E-Test F-13 |
-| Monitoring/Alerting | Plattform, Documenso-Server, Lexoffice-Sync, Hub-Flotte (Offline-Schwellwerte + Eskalation); Fehlerzustände der Adapter sichtbar mit manuellem Retry | ⚪ Grundausbau Phase 3/4 |
+| Verfügbarkeit | Klassen je Bereich; **strengste: Smokemieter-Alarmkette** (Gerät→Hub→Plattform→Serviceprozess→Mensch) — ohne funktionierende, überwachte Kette **keine P2-Aktivierung**. Pilot-Phase Plattform: Best-Effort mit Monitoring; Ziele werden vor Phase 9 quantifiziert | ⚪ (Ziele Phase 9), Kette = E2E-Test F-13 |
+| Monitoring/Alerting | Plattform, Documenso-Server, Lexoffice-Sync, Hub-Flotte (Offline-Schwellwerte + Eskalation); Fehlerzustände der Adapter sichtbar mit manuellem Retry | ⚪ Grundausbau Phase 3/6 |
 | Backup/Restore | dokumentierte Strategie mit RTO/RPO (Pilot-Vorschlag: RPO ≤ 24 h, RTO ≤ 4 h; ADR-007) für DB, MinIO-Dokumente, Documenso-Instanz; **Restore wird tatsächlich getestet — ungetestetes Backup gilt als nicht vorhanden** | ⚪ Pflicht vor ersten echten Kundendaten (WP-1.2/1.3) |
 | Hosting-Realität | kein Managed Postgres/Queues bei Hostinger → Bewertung + Entscheidung in [ADR-007](DECISIONS/ADR-007-stack-und-hosting.md) (VPS-Postgres + Off-Site-Backups vs. Managed-EU-DB; DSGVO/AVV als Kriterium) | 🟡 Entwurf liegt vor, Freigabe offen |
 | Security | Least-Privilege-Rollen (Tabelle unten), serverseitige Prüfung überall, Secrets nie im Repo (Coolify/Server-`.env`), TLS durchgängig, Hub-Credentials + Revocation (§7), Rate-Limits (Auth/Funnel/Webhooks), CSRF/Security-Header | 🔵 konzipiert; Umsetzung je WP |
 | Log-Hygiene | Verträge, SEPA, Verbrauchsprofile, Tokens erscheinen **nie** in Logs (zentrale Redaction in `packages/observability`) | ⚪ WP-1.4 |
-| Datenschutz-Betrieb | Löschkonzept, Auskunftsprozesse, AVV, Aufbewahrung (§6 Querschnitt) | ⚪ vor Phase-6-Go-Live |
+| Datenschutz-Betrieb | Löschkonzept, Auskunftsprozesse, AVV, Aufbewahrung (§6 Querschnitt) | ⚪ vor Phase-8-Go-Live |
 | Documenso-Betrieb | **Single Point of Failure des Vertriebsprozesses**: Backup-/Restore-Verfahren, Update-Prozess, Monitoring+Alarmierung, Verfügbarkeitsziel — **ohne Betriebskonzept kein Prod-Gang** | ⚪ Phase 3-Gate |
 
 **Rollenmodell (Least Privilege, Ist: 12 Systemrollen in `packages/permissions`):** PLATFORM_ADMIN · SALES · OPERATIONS · SERVICE · FINANCE · PROPERTY_MANAGER · OWNER_BOARD · BILLING_CONTACT · INSTALLER_PARTNER_ADMIN · INSTALLER · RESIDENT · PARKING_USER. Permission-Katalog wächst je Phase (`<domain>.<action>`, einzige Quelle: `packages/permissions`); 2FA (TOTP) für interne Rollen ab WP-1.2-Folgeausbau; Bewohner via Magic-Link-Einladung (später).
@@ -195,30 +200,34 @@ Kein produktives Altsystem mit führenden Daten — aber **benannte Quellen** f�
 |---|---|---|---|
 | **Zoho-Altbestand** | CRM-Altdaten (Kontakte, Leads, Historie) | Export (CSV/API) → idempotenter Import in Lead/Customer/Contact mit Dublettenprüfung (E-Mail), Probelauf-Modus, Fehlerbericht, Audit | ⚪ Exportzugang offen (PO) |
 | **Reonic** | PV-/Installations-/Planungsdaten | **Datenquelle, nicht Master**: gezielte Übernahme in PvSystem/Device-Stammdaten je Projekt; kein Live-Sync in Phase 1–6 | ⚪ Zugang/Format offen (PO) |
-| **Excel/manuell** | Bestandslisten, **Pilotdaten Christinenstraße (21 Messstellen, Einheiten, Teilnehmer)** | CSV-Import-Werkzeuge für Property/Building/Unit + MeteringPoint (WP-1.3/Phase 6); Pilotdaten = erster Realimport | ⚪ Listen anfordern (PO) |
+| **Excel/manuell** | Bestandslisten, **Pilotdaten Christinenstraße (21 Messstellen, Einheiten, Teilnehmer)** | CSV-Import-Werkzeuge für Property/Building/Unit + MeteringPoint (WP-1.3/Phase 8); Pilotdaten = erster Realimport | ⚪ Listen anfordern (PO) |
 | **Bestandscode** | Website-Funnels (Lead-Payload) | ✅ erledigt (WP-1.1: Proxy → Plattform, verlustfrei inkl. Original-Payload) | 🟢 dev |
 
 Regeln: jeder Import idempotent (natürliche Schlüssel) · Probelauf mit Abweichungsbericht · Audit-Event je Import · keine stillen Korrekturen. Repo-/Betriebsmigrationen (Monorepo, Staging, Backups, DNS) laufen als Phase-1-Arbeitspakete (§10) bzw. via [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## 10. Umsetzungsphasen und priorisierte Aufgaben
 
-Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert: **minimaler Angebots-/Annahmefluss wird aus Phase 7 in Phase 6 vorgezogen** (Powermieter-DoD „Lead → Angebot → Annahme" braucht ihn vor dem Commercial-Vollausbau).
+Reihenfolge folgt seit 2026-08-05 der [Founding Spec](FOUNDING-SPEC-v2.0.md) §29/§30 ([ADR-012](DECISIONS/ADR-012-bauabfolge-commercial-first.md)): **Commercial-Durchstich vor Modulbetrieb**. Der Spec-§30-Wochenplan gilt als Reihenfolge-, nicht als Kalendervorgabe (Woche 1–4 sind durch Phase 0/1 teilweise erledigt). Die frühere dokumentierte Abweichung — minimaler Angebots-/Annahmefluss in Phase 6 vorgezogen — **entfällt**: der volle Konfigurator (Phase 3) liegt jetzt ohnehin vor Powermieter (Phase 8).
+
+**Phasen-Mapping alt → neu (2026-08-05):** alt-2 Onboarding-Engine → **4** · alt-3 Documenso → **3** (Nummer unverändert, um Konfigurator erweitert) · alt-4 Hub/Device → **6** · alt-5 Monteur-PWA → **7** · alt-6 Powermieter+Pilot → **8** · alt-7 Commercial/Lexoffice → aufgeteilt in **3** (Konfigurator/Portal) und **4** (Projekterzeugung/Lexoffice) · alt-8 Smokemieter → **9** · alt-9/10 Heat/Charge → **10/11** · **neu:** 2 Commercial Core · 5 Provisionierung · 12 Agentische Skalierung. ADR-Umsetzungsvermerke (ADR-002/005/008) sind entsprechend angepasst.
 
 > **Step-by-Step-Abarbeitung:** Die operative Zerlegung jeder Phase in abhakbare Schritte (mit Voraussetzungen, WP-Grenzen und Gates) steht in der ausgelagerten [EXECUTION_ROADMAP.md](EXECUTION_ROADMAP.md). Diese Tabelle bleibt die strategische Sicht; die Roadmap ist das Arbeitsblatt.
 
 | Phase | Inhalt (Kurz) | Gates (§12) | Status |
 |---|---|---|---|
-| **0 — Bestandsaufnahme & Masterplan** | Audit + Plan V1 (2026-07-11); **WP-0.2 V2-Rebaseline** (2026-07-12: dieses Dokument, ADR-001…008, Doku-Konsolidierung) | — | 🟢 |
-| **1 — Core & Datenmigration** | s. WP-Tabelle unten: Identity/Mandanten/IssuingEntity, Immobilien, Projekte-Kern, Audit, Outbox, Testmandant, P3-Stubs | F-01 🟢 · F-02/F-03/F-19/F-20/F-21 | 🟡 |
-| **2 — Onboarding-Engine** | Templates+Versionierung, Schritte, Teilnehmer, Einladungen, Aufgaben, Dokumente, Verträge (Schnittstelle), Erinnerungen, Freigaben, Fortschritt, Aktivierungsbedingungen | F-04 | ⚪ |
-| **3 — Documenso-Integration** | self-hosted Server + **Betriebskonzept (Gate!)**, PDF-Übergabe gemäß ADR-003 (externe Pipeline integrieren), Signaturniveaus je ContractType, Empfänger/Reihenfolge, idempotente Webhooks, finale Dokumente, Audit, Retry | F-05, F-06 | ⚪ |
-| **4 — Hub- & Device-Registry** | Hubs, Geräte, Zuordnungen, Telemetrie im Zeitreihenspeicher (ADR-002, Timescale-Image), Status/Alarme→Tickets, zertifikats-/tokenbasierte Auth mit Revocation | F-07, F-08 | ⚪ |
-| **5 — Monteur-PWA** | Arbeitsaufträge, **Offline-First**-Provisionierung, Funktionstest (offline vormerkbar), Fotos, Protokolle, Konfliktauflösung, Sync | F-09, F-10 | ⚪ |
-| **6 — Powermieter inkl. Pilot** | Projekt-/Teilnehmer-Onboarding, SEPA, Documenso-Verträge, Tarife/Tarifversionen, Zählerstatus, MaKo-Zuständigkeiten mit Comgy, **Billing Readiness**, interne Billing-Engine (ADR-005/008), Betriebsdashboard, minimaler Angebots-/Annahmefluss. **Abschluss: Pilot Christinenstraße E2E verifiziert** | F-11, F-12 | ⚪ |
-| **7 — Commercial & Lexoffice** | Angebotskonfigurator (Powermieter-Umfang), Kundenportal-Vervollständigung, automatische Projekterzeugung, Rechnungsanforderungen, Lexoffice-Sync mit **Zwei-Konten-Routing je IssuingEntity** | F-17, F-18 | ⚪ |
-| **8 — Smokemieter (P2)** | Gerätebetrieb, Ferninspektion, Alarme mit überwachter Alarmierungskette (NFR-Gate), Serviceprozesse, revisionssichere Prüfhistorie, Berichte | F-13 | ⚪ |
-| **9 — Heatmieter** | nur bei Prioritätsanhebung | F-14, F-15 | ⚪ (P3) |
-| **10 — Chargemieter** | nur bei Prioritätsanhebung | F-16 | ⚪ (P3) |
+| **0 — Bestandsaufnahme & Masterplan** | Audit + Plan V1 (2026-07-11); **WP-0.2 V2-Rebaseline** (2026-07-12: dieses Dokument, ADR-001…008, Doku-Konsolidierung); **Founding-Spec-Rebaseline + Phasen-Neuschnitt** (2026-08-05: Spec v2.0, ADR-012, Abgleich) | — | 🟢 |
+| **1 — Core & Datenmigration** | s. WP-Tabelle unten: Identity/Mandanten/IssuingEntity, Immobilien, Projekte-Kern, Audit, Outbox, Testmandant, P3-Stubs | F-01/F-02/F-03/F-19/F-20 🟢 · F-21 🟣 (Route-Sweep offen) | 🟢 (2026-08-14; Restposten: F-21-Rest, [PO] VPS-Rollout) |
+| **2 — Commercial Core (CRM)** | Opportunities, konfigurierbare Pipeline mit Stufenkriterien, Aktivitäten-/Kommunikations-Timeline, Next Best Action (regelbasiert), Forecast (historisiert), zentrale Inbox + Dubletten, Zoho-Import | F-22 | ⚪ |
+| **3 — Angebotskonfigurator & Vertrag** | Produktkatalog/Preisbücher/Kostenmodelle, deklarative Regel-Engine (erklärt jede Regel), Varianten, Freigabematrix, Quote-Versionierung (Snapshot), PDF-Pipeline (ADR-003), Documenso self-hosted + **Betriebskonzept (Gate!)**, Signaturniveaus je ContractType, idempotente Webhooks, Portal-Annahme, DeliverableTemplates + Activation-Manifest-Entwurf | F-17, F-05, F-06 | ⚪ |
+| **4 — Contract-to-Delivery** | Onboarding-Engine (Templates+Versionierung, Schritt-Typen, Statusmodell, Aktivierungsbedingungen), Won-Deal-Handoff (Handoff-Packet + Acceptance), Customer-Success-Record, automatische Projektgenerierung aus Quote, Change Requests, GoCardless-SEPA (Spec §11), Rechnungsanforderungen + Lexoffice-Sync mit **Zwei-Konten-Routing je IssuingEntity** | F-04, F-23, F-18 | ⚪ |
+| **5 — Provisionierung & Activation** | Activation Manifest (versioniert, Schema-validiert), Readiness Checks, Dry Run, Freigabe nach Risikoklasse, idempotente Provisionierung, Provisioning Report, Go-Live-/Datenqualitätschecks (Spec §14) | F-24 | ⚪ |
+| **6 — Hub- & Device-Registry** | Hubs, Geräte, Zuordnungen, Telemetrie im Zeitreihenspeicher (ADR-002, Timescale-Image), Status/Alarme→Tickets, zertifikats-/tokenbasierte Auth mit Revocation | F-07, F-08 | ⚪ |
+| **7 — Monteur-PWA** | Arbeitsaufträge, **Offline-First**-Provisionierung, Funktionstest (offline vormerkbar), Fotos, Protokolle, Konfliktauflösung, Sync | F-09, F-10 | ⚪ |
+| **8 — Powermieter inkl. Pilot** ⭐ | Projekt-/Teilnehmer-Onboarding, Bewohner-SEPA, Documenso-Stromverträge, Tarife/Tarifversionen, Zählerstatus, MaKo-Zuständigkeiten mit Comgy, **Billing Readiness**, interne Billing-Engine (ADR-005/008), Bewohner-Belegweg (ADR-008), Betriebsdashboard. Angebotsfluss kommt vollständig aus Phase 3. **Abschluss: Pilot Christinenstraße E2E verifiziert = P1-Modulziel** | F-11, F-12 | ⚪ |
+| **9 — Smokemieter (P2)** | Gerätebetrieb, Ferninspektion, Alarme mit überwachter Alarmierungskette (NFR-Gate), Serviceprozesse, revisionssichere Prüfhistorie, Berichte | F-13 | ⚪ |
+| **10 — Heatmieter** | nur bei Prioritätsanhebung | F-14, F-15 | ⚪ (P3) |
+| **11 — Chargemieter** | nur bei Prioritätsanhebung | F-16 | ⚪ (P3) |
+| **12 — Agentische Skalierung** | Paula + Tool Registry, spezialisierte Agenten A0–A5, Evaluation/Budgets/Governance (Spec §19/§29 Phase 6); **Voraussetzung: E-09/K-07 entschieden + Agent-Security-Standard vor dem ersten Agenten** | t.b.d. bei Konkretisierung | ⚪ (gated) |
 
 **Phase-1-Arbeitspakete:**
 
@@ -227,9 +236,9 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 | WP-1.0 Repo-/Deploy-Fundament | Monorepo ✅, docker-compose ✅, Prod-Images verifiziert ✅; **offen:** Git-Remote (R-02), CI, VPS-Rollout ([DEPLOYMENT.md](DEPLOYMENT.md), beim PO), Website-Route-Sweep (F-21-Rest) | 🟣 |
 | WP-1.1 Lead-Persistenz | Lead-Kette komplett, F-01 🟢 dev; Prod nach Rollout | 🟢 dev |
 | WP-1.2 Auth/Rollen/Mandanten | better-auth (Auth) + eigene RBAC (OrganizationMembership/Invitation/SystemRole), Guards/Audit, Login/Invite/Accept/Members/Audit-UI, Bootstrap-Admin; ersetzt Interim-Basic-Auth (ADR-010). Tasks 1–13 committet, Suite grün (F-02/F-19/F-20) | 🟢 |
-| WP-1.3 Immobilien + CRM | **Kern (Objektbaum+Seed+Lesesicht) ✅ 2026-07** — Property/Building/Entrance/Unit/Address + AccessScope-Datenmodell-Stub (Migration `immobilien_kern`), idempotenter Pilotstruktur-Seed (ADR-006: 1 Property, 2 Gebäude, 21 Units), Permission `object.read`, `/admin/objects`-Lesesicht; **entblockt WP-APP-1** (Spec §8). **Rest offen:** CRM/CSV-Import (Pilotdaten!)/Zoho/AccessScope-Guards/Lead-Qualifizierung/IssuingEntity-Pflicht — F-03 bleibt offen | 🟡 |
-| WP-1.4 Events/Worker-Ausbau | pg-boss-Dauerdienst, `EventHandlerExecution`, Notification-Grundgerüst, Logger-Redaction, Idempotenz-/Berechtigungs-Testsuite (F-19/F-20) | 🟡 (Outbox+Dispatcher stehen) |
-| WP-1.5 Projekt-/Modul-/Dokumentstruktur | Project-Kern, Document-Objekt (MinIO), ModuleSubscription/-Activation-Gerüst, **P3-Datenmodell-Stubs (Heat/Charge)** | ⚪ |
+| WP-1.3 Immobilien + CRM | **Kern (Objektbaum+Seed+Lesesicht) ✅ 2026-07** — Property/Building/Entrance/Unit/Address + AccessScope-Datenmodell-Stub (Migration `immobilien_kern`), idempotenter Pilotstruktur-Seed (ADR-006: 1 Property, 2 Gebäude, 21 Units), Permission `object.read`, `/admin/objects`-Lesesicht; **entblockt WP-APP-1** (Spec §8). **Rest ✅ 2026-08-06** (`bd12531`…): CRM-Kern (Customer=Kunden-Org/Contact/Opportunity/Note/Task), Lead-Qualifizierung `qualifyLead` (F-03 🟢), AccessScope-Guard-Integration (PROPERTY/BUILDING-Teilbaum, Grant/Revoke auditiert), IssuingEntity-Stammdaten geseedet, CSV-Import-Werkzeug (`ph360:import-objects`, Probelauf/Fehlerbericht/Audit), Admin-UI `/admin/customers` + Qualifizieren-Aktion + `/admin/access-scopes`, Room/TechnicalRoom/GridConnection + `managedByOrganizationId`. **[!] beim PO (E-06):** Zoho-Adapter (kein Export) + Pilotdaten-Realimport; IssuingEntity-**Pflichtfeld** folgt mit Offer/Contract (Phase 3) | 🟢 ([!]-Posten E-06) |
+| WP-1.4 Events/Worker-Ausbau | **✅ 2026-08-06:** pg-boss-Dauerdienst (Outbox-Relay, Retry/Backoff, DEAD + auditierter Requeue; live verifiziert), `EventHandlerExecution`-Idempotenz, `packages/events` (Katalog/Publisher/Executor, Envelope +version/actor), `packages/notifications` (Zustellstatus, duplikatfrei), `packages/observability` (Logger-Redaction), Boundaries-Matrix (Lint + Test), CI-Workflow aktiv (R-02 zu) | 🟢 |
+| WP-1.5 Projekt-/Modul-/Dokumentstruktur | **✅ 2026-08-14:** Project-Kern (+`createProject` mit Audit/Outbox, Basis für F-23), Document + `packages/documents` (MinIO, sha256, Blob-Rollback; live verifiziert), Modul-Gerüst, **P3-Stubs (Heat/Charge)**, AccessScope-PROJECT-Scope, Permissions project.*/document.* | 🟢 |
 
 ## 11. Definition of Done
 
@@ -237,7 +246,8 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 
 **End-to-End (Kurzketten):**
 - *Vertragsprozess:* Vertragsdaten → Template → Signaturniveau prüfen → PDF rendern (eigene Pipeline) → Documenso-Dokument → Empfänger → Signatur → Webhook (idempotent, inkl. Duplikat-Replay) → Status → finales Dokument referenziert → Onboarding-Schritt zu.
-- *Powermieter (P1-Abschluss):* Lead → Angebot → Annahme → Vertrag (Documenso) → Projekt → HV-Onboarding → Bewohner-Einladung → SEPA → Stromvertrag (Documenso) → technische Freigabe → **Billing Readiness** → Modul aktiv — **verifiziert am Pilot Christinenstraße**.
+- *Commercial-Durchstich (nächstes Abschlussziel, ADR-012 / Spec §30):* Lead → Qualifizierung → Opportunity → Quote-Version (Regeln + Freigabe) → Portal-Annahme → Vertrag (Documenso) → Won-Handoff → Projekt automatisch → Activation Manifest → Dry Run → idempotente Provisionierung → Operations aktiv — F-22 / F-17 / F-05 / F-23 / F-24.
+- *Powermieter (Phase-8-Abschluss = P1-Modulziel):* Lead → Angebot → Annahme → Vertrag (Documenso) → Projekt → HV-Onboarding → Bewohner-Einladung → SEPA → Stromvertrag (Documenso) → technische Freigabe → **Billing Readiness** → Modul aktiv — **verifiziert am Pilot Christinenstraße**.
 - *Lexoffice:* Leistung → InvoiceRequest mit IssuingEntity → korrektes Konto → Rechnungsnummer → Belegstatus → Zahlungsstatus.
 - *Smokemieter (P2):* Projekt → Betreibervertrag → Planung → Installation → Funktionstest → Aktivierung **mit verifizierter Alarmierungskette** → Störung → Ticket → Austausch → Abschluss.
 - *Heat-/Chargemieter:* E2E-Kriterien bei Prioritätsanhebung; bis dahin: Datenmodell migriert, Modulgrenzen dokumentiert.
@@ -254,25 +264,28 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 |---|---|---|---|
 | F-01 | Lead-Eingang: Funnel → API → DB → CRM sichtbar → Benachrichtigung | 1 | 🟢 2026-07-11 (dev) |
 | F-02 | Mandant & Rollen inkl. Cross-Tenant-Negativtest | 1 | 🟢 (WP-1.2: Guard requirePermission+assertOrgScope; Cross-Tenant→AuthzError+Audit; itest) |
-| F-03 | Lead → Kunde/Objekt ohne Doppelerfassung | 1 | ⚪ |
-| F-04 | Onboarding generisch (Template→Instanz→Schritte→Blocked/Exception→Ready) | 2 | ⚪ |
+| F-03 | Lead → Kunde/Objekt ohne Doppelerfassung | 1 | 🟢 (2026-08-06 dev: qualifyLead-Transaktion, E-Mail-Dublette, Audit+Outbox; Browser-E2E + itest) |
+| F-04 | Onboarding generisch (Template→Instanz→Schritte→Blocked/Exception→Ready) | 4 | ⚪ |
 | F-05 | Vertragsprozess Documenso inkl. Webhook-Duplikat-Replay | 3 | ⚪ |
 | F-06 | Vertrags-Fehlerpfad (declined/expired → Task → Neustart) | 3 | ⚪ |
-| F-07 | Hub & Gerät (Enrollment→Dubletten-Negativ→Heartbeat→offline→Alarm→Ticket) | 4 | ⚪ |
-| F-08 | Ingest-Idempotenz + raw→validated-Kette | 4 | ⚪ |
-| F-09 | Monteur-Provisionierung inkl. Negativtest ohne Funktionstest | 5 | ⚪ |
-| F-10 | PWA offline → Sync → Konflikt sichtbar | 5 | ⚪ |
-| F-11 | **Powermieter komplett (Pilot)** | 6 | ⚪ |
-| F-12 | Powermieter Billing Readiness → Aktivierung | 6 | ⚪ |
-| F-13 | Smokemieter komplett inkl. Alarmierungskette | 8 | ⚪ |
-| F-14 | Heatmieter komplett | 9 (P3) | ⚪ |
-| F-15 | Heatmieter Nutzerwechsel | 9 (P3) | ⚪ |
-| F-16 | Chargemieter komplett | 10 (P3) | ⚪ |
-| F-17 | Angebot & Portal (Konfigurator→Annahme→Projekt automatisch) | 7 | ⚪ |
-| F-18 | Lexoffice inkl. Zwei-Konten-Routing + Doppelauslösungs-Negativtest | 7 | ⚪ |
+| F-07 | Hub & Gerät (Enrollment→Dubletten-Negativ→Heartbeat→offline→Alarm→Ticket) | 6 | ⚪ |
+| F-08 | Ingest-Idempotenz + raw→validated-Kette | 6 | ⚪ |
+| F-09 | Monteur-Provisionierung inkl. Negativtest ohne Funktionstest | 7 | ⚪ |
+| F-10 | PWA offline → Sync → Konflikt sichtbar | 7 | ⚪ |
+| F-11 | **Powermieter komplett (Pilot)** | 8 | ⚪ |
+| F-12 | Powermieter Billing Readiness → Aktivierung | 8 | ⚪ |
+| F-13 | Smokemieter komplett inkl. Alarmierungskette | 9 | ⚪ |
+| F-14 | Heatmieter komplett | 10 (P3) | ⚪ |
+| F-15 | Heatmieter Nutzerwechsel | 10 (P3) | ⚪ |
+| F-16 | Chargemieter komplett | 11 (P3) | ⚪ |
+| F-17 | Angebot & Portal (Konfigurator→Regel-Erklärung→Freigabe→Quote-Version→Portal-Annahme→Vertrag erzeugt) — *neu gefasst 2026-08-05; Projekterzeugung jetzt F-23* | 3 | ⚪ |
+| F-18 | Lexoffice inkl. Zwei-Konten-Routing + Doppelauslösungs-Negativtest | 4 | ⚪ |
 | F-19 | Audit-Vollständigkeit (Statuswechsel, Downloads, Rollen, Retries) | 1+ | 🟢 (WP-1.2: auth.login/member.*/authz.denied + Audit-UI /admin/audit) |
 | F-20 | Berechtigungs-Negativmatrix je Rolle | 1+ | 🟢 (WP-1.2: Unit-Matrix + Guard- + Route-Level-Negativtests) |
 | F-21 | Bestandsschutz Marketing-Site nach Monorepo-Umbau | 1 | 🟣 (Startseite+Funnel-Proxy ✅; Route-Sweep + Prod-Build-Smoke offen) |
+| F-22 🆕 | CRM-Kern: Lead → Qualifizierung → Opportunity → Stufenwechsel (Kriterien erzwungen) → Forecast sichtbar + Aktivitäten-Timeline vollständig | 2 | ⚪ |
+| F-23 🆕 | Won-Deal-Handoff: Annahme → Handoff-Packet → CS-Record → Projekt automatisch (Deliverables aus Quote) → Handoff Acceptance | 4 | ⚪ |
+| F-24 🆕 | Activation: Manifest → Readiness → Dry Run → Freigabe → idempotente Provisionierung (Doppellauf-Negativtest) → Operations aktiv | 5 | ⚪ |
 
 ## 13. Offene Entscheidungen und Risiken
 
@@ -280,23 +293,25 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 | ID | Entscheidung | Frist/Phase | Status |
 |---|---|---|---|
 | E-01 | [ADR-007 Stack & Hosting](DECISIONS/ADR-007-stack-und-hosting.md) freigeben (ersetzt alt O-01/O-02 — Stack ist implementiert, Freigabe formalisiert) | vor WP-1.2-Abschluss | 🟡 Entwurf liegt vor |
-| E-02 | [ADR-008 Bewohner-Belegweg](DECISIONS/ADR-008-bewohner-belegweg.md) entscheiden | vor Phase 6 | 🟡 Entwurf liegt vor |
+| E-02 | [ADR-008 Bewohner-Belegweg](DECISIONS/ADR-008-bewohner-belegweg.md) entscheiden | vor Phase 8 | 🟡 Entwurf liegt vor |
 | E-03 | QES-Bedarf je Vertragstyp (alt O-03) → `signatureLevel`-Zuordnung | Phase 3 | ⚪ |
 | E-04 | Medienstrategie Git/LFS für neue Kampagnen (alt O-04) | vor CI | ⚪ |
 | E-05 | PDF-Pipeline-Übergabe (Code/Repo/Zugang; ADR-003) | vor Phase 3 | ⚪ PO |
 | E-06 | Zoho-/Reonic-/Excel-Exporte + Pilotdaten (21 Messstellen) bereitstellen | vor WP-1.3 | ⚪ PO |
-| E-07 | MaKo-Zuständigkeitsmatrix mit Comgy (§6) | vor Phase 6 | ⚪ PO |
+| E-07 | MaKo-Zuständigkeitsmatrix mit Comgy (§6) | vor Phase 8 | ⚪ PO |
+| E-08 🆕 | Pilot-Zwischenstand Christinenstraße: Terminlage/vertragliche Bindung nach der Verschiebung durch ADR-012 klären | sofort | ⚪ PO |
+| E-09 🆕 | Abgleich-Entscheidungen K-02/K-03/K-06/K-07 ([FOUNDING-SPEC-ABGLEICH](FOUNDING-SPEC-ABGLEICH.md)); zusätzlich ADR-012-Begründung des PO nachtragen | K-02 vor Phase 3 · K-07 vor Phase 12 | ⚪ PO |
 | O-P1…P4 · O-S1…S2 · O-H1…H3 · O-C1…C3 | fachliche Modulentscheidungen (§6/§7) | je Modulphase | ⚪ |
 
 **Risikoregister:**
 | ID | Risiko | W'keit×Ausw. | Gegenmaßnahme | Status |
 |---|---|---|---|---|
 | R-01 | Lead-Verlust in Prod (alter console.log-Pfad live) | sicher×H | WP-1.1 ✅ dev; **schließt erst mit VPS-Rollout** | 🟡 dev behoben, Prod offen |
-| R-02 | Kein Git-Remote → kein Repo-Backup, keine CI | M×H | privates Remote + Push (PO-Freigabe) | 🔴 offen |
+| R-02 | Kein Git-Remote → kein Repo-Backup, keine CI | M×H | privates Remote + Push (PO-Freigabe) | 🟢 geschlossen 2026-08-06 (origin github.com/wonderpowersolar-lang/powerhouse-360; CI-Workflow im Repo — Restpunkt: lokale Commits regelmäßig pushen) |
 | R-03 | Greenfield-Verzettelung über Module | H×H | **V2-P1-Regel (§1)**, DoD je Phase, kein Modul-Hopping | mitigiert durch V2 |
-| R-04 | Powermieter-Regulatorik erzwingt Umbauten | M×H | §6-Klärungen vor Phase 6 (E-07, O-P1…P4), Messkonzept flexibel | offen |
+| R-04 | Powermieter-Regulatorik erzwingt Umbauten | M×H | §6-Klärungen vor Phase 8 (E-07, O-P1…P4), Messkonzept flexibel | offen |
 | R-05 | Documenso-Betrieb (SPOF Vertrieb): Updates, Zustellbarkeit | M×M | Betriebskonzept = Phase-3-Gate (§8), Staging zuerst, Version gepinnt | offen |
-| R-06 | Lexoffice-API-Limits/Lücken (E-Rechnung, Webhooks) | M×M | API-Spike vor Phase 7; Polling-Fallback; ADR-008-Kriterien | offen |
+| R-06 | Lexoffice-API-Limits/Lücken (E-Rechnung, Webhooks) | M×M | API-Spike vor Phase 4; Polling-Fallback; ADR-008-Kriterien | offen |
 | R-07 | Bus-Faktor Kleinstteam | H×M | Masterplan als externes Gedächtnis, ADRs, kleine PRs, CI-Gates | offen |
 | R-08 | Repo-Größe (Medien 200+ MB) | H×N–M | E-04; neue Medien nicht mehr ins Repo | offen |
 | R-09 | Geschäfts-PDFs unversioniert im Projektordner | M×N | in geschützte Ablage (DMS sobald vorhanden) | offen |
@@ -305,9 +320,10 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 | R-12 | Telemetrie-Volumen | N→M×M | ADR-002 (Timescale), Retention, materialisierte States | mitigiert im Design |
 | R-13 | OCPP/Wallbox-Komplexität | M×M | P3; Adapter-Grenze; ADR bei Anhebung | offen (P3) |
 | R-14 | Ein-VPS-Totalausfall (DB+Plattform+Documenso+Storage) | M×H | Off-Site-Backups + getesteter Restore (§8, ADR-007); zweite VPS ab Produktivkunden | offen |
-| R-15 | DSGVO-Pflichten bremsen Go-Lives | M×M | §6-Querschnitt als DoD-Checkpunkt; VVT vor Phase 6 | offen |
+| R-15 | DSGVO-Pflichten bremsen Go-Lives | M×M | §6-Querschnitt als DoD-Checkpunkt; VVT vor Phase 8 | offen |
 | R-16 | Marketing-Site-Regression durch Umbauten | M×M | F-21-Sweep, entkoppelte Deploys | offen |
-| R-17 | **Übergabe externe PDF-Pipeline ungeklärt** | M×M | E-05; Adapter-Schnittstelle wird unabhängig entworfen | 🆕 offen |
+| R-17 | **Übergabe externe PDF-Pipeline ungeklärt** — durch Neuschnitt jetzt früher Blocker (Phase 3) | M×H | E-05; Adapter-Schnittstelle wird unabhängig entworfen | offen, Dringlichkeit ↑ |
+| R-18 | **Pilot-/Realdaten-Verifikation rückt nach hinten (ADR-012):** Mess-/Billing-Kette und Hardware-Risiken (R-11, Hub-Security) werden spät validiert; fertige Bewohner-App wartet auf Backend | M×H | E-08 klären; Phasen 6/7 bei Kapazität parallel zu 2–5 ziehen; ADR-012-Revisit-Trigger überwachen | 🆕 offen |
 
 ## 14. Aktueller Fortschritt und nächste verbindliche Schritte
 
@@ -315,23 +331,24 @@ Reihenfolge folgt der kommerziellen Priorisierung (§1). Abweichung dokumentiert
 |---|---|
 | Masterplan & Pflichtdoku (V2-Struktur) | 🟢 (2026-07-12) |
 | Monorepo-/Deploy-Fundament | 🟣 (Images verifiziert; Rollout/Remote offen) |
-| 1 CRM — Lead-Kern | 🟢 dev (F-01); Qualifizierung ⚪ (WP-1.3) |
-| 17 Audit · 16 Notifications · Events/Outbox | 🟣 (Lead-Pfad live; Ausbau WP-1.4) |
+| 1 CRM — Lead-Kern | 🟢 dev (F-01); Qualifizierung 🟢 dev (F-03, 2026-08-06) |
+| 17 Audit · 16 Notifications · Events/Outbox | 🟢 (WP-1.4 2026-08-06: pg-boss, Idempotenz, Zustellstatus, Redaction; live verifiziert) |
 | 18 Identity/Rollen/Mandanten | 🟢 (Permissions + better-auth + Memberships/Invitations + Audit-UI; F-02/F-19/F-20 grün) |
 | 2 Konfigurator · 3 Portal · 4 Onboarding · 5 Hubs · 6 Registry · 7 PWA · 8 Documenso · 9 Lexoffice · 10 Powermieter · 14 Service · 15 DMS | ⚪ (konzipiert 🔵 in §3–§9) |
 | 11 Smokemieter (P2) · 12/13 Heat/Charge (P3) | ⚪ (P3: nur Datenmodell in WP-1.5) |
 | Marketing-Site + Funnels | 🟢 produktiv (Lead-Zustellung prod: nach Rollout) |
 
-**Nächste verbindliche Schritte (Reihenfolge):**
-1. **PO:** VPS-Rollout gemäß [DEPLOYMENT.md](DEPLOYMENT.md) (+ Secrets) → schließt R-01 prod; **Git-Remote** anlegen/pushen → schließt R-02, ermöglicht CI.
-2. **PO:** ADR-007 freigeben (E-01); E-05/E-06 anstoßen (PDF-Pipeline, Datenexporte, Pilotdaten).
-3. **Umsetzung: WP-1.2 fortsetzen** nach `docs/superpowers/plans/2026-07-11-wp-1.2-auth-rollen-mandanten.md` — Task 2 (better-auth-Tabellen + RBAC-Modelle + Migration `auth_and_rbac`) beginnt; **plus V2-Delta:** Testmandant-Seed (ADR-006) + IssuingEntity-Stammdaten.
-4. WP-1.3 → WP-1.4 → WP-1.5 (§10-Tabelle).
-5. Parallel ohne Implementierung: E-07/O-P1…P4-Klärungen terminieren (R-04).
+**Nächste verbindliche Schritte (Reihenfolge, Stand 2026-08-05):**
+1. **PO:** VPS-Rollout gemäß [DEPLOYMENT.md](DEPLOYMENT.md) (+ Secrets) → schließt R-01 prod; lokale Commits **pushen** (Remote existiert, R-02 zu — CI läuft ab dem ersten Push).
+2. **PO:** ADR-007 freigeben (E-01) · **E-05 PDF-Pipeline** (rückt vor: jetzt Phase-3-Blocker, R-17) · **E-06 Zoho-Export** (Phase-2-Blocker) + Pilotdatenliste · **E-08 Pilot-Zwischenstand** · **E-09 Abgleich-Entscheidungen** (K-02 vor Phase 3).
+3. ~~WP-1.3-Rest~~ ✅ · ~~WP-1.4~~ ✅ · ~~WP-1.5~~ **✅ 2026-08-14** — **Phase 1 abgeschlossen** (F-01/02/03/19/20 🟢).
+4. **Umsetzung: Phase 2 Commercial Core (F-22)** — Opportunities/Pipeline/Forecast/Zoho-Import (Roadmap-Phase 2) → danach Phase 3 Konfigurator & Vertrag (§10-Tabelle; [PO]-Blocker E-05/E-06 beachten).
+5. Parallel ohne Implementierung: E-07/O-P1…P4-Klärungen terminieren (Frist jetzt „vor Phase 8", R-04); Phasen 6/7 bei freier Kapazität vorziehen (R-18).
 
 ## 15. Änderungsverlauf
 
 | Datum | Version | Änderung | Begründung |
 |---|---|---|---|
 | 2026-07-11 | 1.0 | Erstfassung: Audit, Zielarchitektur, 20+ Konzeptdokumente, Phasenplan, ADR-001…005 (alt). Dokumentierte Auftragsabweichungen: 3 statt 7 Apps; Angebots-Minimal in Phase 6 vorgezogen | Phase-0-Auftrag (Masterprompt V1) |
+| 2026-08-05 | 2.1 | **Founding-Spec-Rebaseline + Phasen-Neuschnitt:** [Founding Spec v2.0](FOUNDING-SPEC-v2.0.md) als übergeordnete Produktverfassung aufgenommen; Bauabfolge Commercial-first ([ADR-012](DECISIONS/ADR-012-bauabfolge-commercial-first.md)). Neue Phasen: 2 Commercial Core · 3 Konfigurator & Vertrag (= alt-3 + Konfigurator aus alt-7) · 4 Contract-to-Delivery (= alt-2 Onboarding + Handoff/Projekterzeugung/Lexoffice aus alt-7) · 5 Provisionierung (neu) · 6/7 (= alt-4/5) · 8 (= alt-6 Powermieter+Pilot) · 9 (= alt-8) · 10/11 (= alt-9/10) · 12 Agentische Skalierung (neu, gated E-09/K-07). F-17 neu gefasst; F-22/F-23/F-24 ergänzt; E-08/E-09 + R-18 aufgenommen; R-17 hochgestuft; §1-Priorisierung auf Commercial-Durchstich; GoCardless als SEPA-Provider (Spec §25); §5 um ForecastItem/CostModel/ApprovalRequest/DeliverableTemplate/Provisionierungs-Entitäten ergänzt; Spec-§30-Wochenplan = Reihenfolge-, nicht Kalendervorgabe. Abweichungsprotokoll: [FOUNDING-SPEC-ABGLEICH](FOUNDING-SPEC-ABGLEICH.md) | ADR-012 (PO 2026-08-05) |
 | 2026-07-12 | 2.0 | **V2-Rebaseline:** Doku-Konsolidierung auf 3 Pflichtdokumente (16 Konzeptdokumente + 4 Moduldokumente als Kapitel absorbiert und gelöscht; DEPLOYMENT.md bleibt als verlinktes Runbook); **ADR-Neunummerierung nach V2-Vorgabe** — Mapping: alt-ADR-004(Outbox)→ADR-001 · alt-ADR-003(Documenso)→ADR-003 (erweitert um Signatur-Layer/externe PDF-Pipeline) · alt-ADR-001/002/005(Monorepo/Stack/Boundaries)→ADR-007 (Entwurf zur Freigabe) · neu: ADR-002 (Timescale), ADR-004 (Mandantenisolation), ADR-005 (Billing-Engine), ADR-006 (Testmandant), ADR-008 (Bewohner-Belegweg, Entwurf); Phasen-Neuschnitt (Commercial+Lexoffice = Phase 7 vor Smokemieter = Phase 8; Heat/Charge P3-gated); kommerzielle Priorisierung + Pilot-Anker (§1); neue Pflichtkapitel §4 Mandanten-/Gesellschaftsmodell (IssuingEntity), §6 Regulatorik, §8 NFR, §9 Quellsysteme; Statusstände (F-/R-/WP-) verlustfrei übernommen; R-17 + E-01…E-07 ergänzt | **Masterprompt V2** ersetzt V1 (2026-07-12); PO-Antworten: PDF-Pipeline extern vorhanden, Housekeeping ja, beide Lexoffice-Konten existieren |

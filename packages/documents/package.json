@@ -1,0 +1,23 @@
+{
+  "name": "@ph360/documents",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@ph360/database": "workspace:*",
+    "minio": "^8.0.5"
+  },
+  "devDependencies": {
+    "@ph360/eslint-config": "workspace:*",
+    "@types/node": "^20",
+    "eslint": "^9",
+    "typescript": "^5"
+  }
+}

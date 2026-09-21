@@ -129,3 +129,64 @@ Branch: `feat/platform-foundation`. Stack bestätigt durch Ausführungsauftrag (
 **Nächster Schritt:** WP-APP-1 (Messkern + Ingestion + Hub-Simulator) gemäß Programmplan; parallel PO-Punkte (Pilotdatenliste, Apple-Account, VPS/DNS, Git-Remote).
 
 ---
+
+## 2026-08-05 — Founding-Spec-Rebaseline + Phasen-Neuschnitt (ADR-012)
+
+**Getan:**
+- `docs/FOUNDING-SPEC-v2.0.md` aufgenommen (Gründungsdokument v2.0, 2026-08-02, als Markdown; wortverlustfrei geprüft) + `docs/FOUNDING-SPEC-ABGLEICH.md` (Konflikte K-01…K-10 gegen Masterplan/ADRs).
+- **ADR-012** (PO 2026-08-05): Bauabfolge Commercial-first — Commercial-Durchstich (Lead → Angebot → Vertrag → Projekt → Provisionierung → Operations) vor Powermieter-Pilot.
+- **Masterplan v2.0 → v2.1:** §1-Priorisierung auf Commercial-Durchstich; §10 neu geschnitten (2 Commercial Core · 3 Konfigurator & Vertrag · 4 Contract-to-Delivery · 5 Provisionierung · 6/7 Hub/PWA · 8 Powermieter+Pilot · 9 Smokemieter · 10/11 Heat/Charge · 12 Agenten) inkl. Mapping alt→neu; §12: F-17 neu gefasst, F-22/F-23/F-24 neu; §13: E-08/E-09, R-18 neu, R-17 hochgestuft, Fristen umgehängt; §5 um ForecastItem/CostModel/ApprovalRequest/DeliverableTemplate/Provisionierungs-Entitäten ergänzt; GoCardless als SEPA-Provider (Spec §25).
+- **EXECUTION_ROADMAP** vollständig auf die neue Reihenfolge umgestellt (Schrittinhalte der alten Phasen übernommen); WP-1.2 als abgeschlossen nachgeführt (IssuingEntity-Stammtabelle als offenes Delta nach WP-1.3 verschoben — im Schema nicht vorhanden, verifiziert).
+- ADR-002/005/008: Umsetzungs-Phasenvermerke auf neue Nummern angepasst (mit Alt-Vermerk).
+
+**Getestet:** interne Markdown-Links aller geänderten Dokumente per Skript geprüft (0 defekt); keine Codeänderung.
+**Nicht getestet / offen:** PO-Punkte E-08 (Pilot-Zwischenstand), E-09 (K-02/K-03/K-06/K-07 + ADR-012-Begründung); Spec v2.1 (Korrekturen K-02/K-03/K-04) steht aus.
+**Restrisiko:** R-18 — Pilot-/Realdaten-Verifikation und Hardware-Risiken rücken nach hinten; Gegensteuer: Phasen 6/7 bei Kapazität parallelisieren.
+**Nächster Schritt:** WP-1.3-Rest (kritischer Pfad zu Phase 2, F-03); PO-Parallel-Track gemäß Roadmap.
+
+## 2026-08-06 — WP-1.3-Rest: CRM-Kern, Lead-Qualifizierung (F-03), AccessScope-Guards, IssuingEntity, CSV-Import
+
+**Getan:**
+- Migration `wp13_rest_crm_issuing_immobilien`: Customer (Kunde = eigene Organization, Masterplan §4 Nr. 2; 1:1 `customerOrganizationId`), CustomerContact, Opportunity/Note/Task (Minimalkern; SalesStage/Forecast folgen Phase 2), IssuingEntity, Room/TechnicalRoom/GridConnection, `Property.managedByOrganizationId`, `Lead.convertedToCustomerId`. Bewusst keine Floor-Tabelle (`Unit.floor` bleibt einzige Etagen-Wahrheit). Migration `lead_activity_actor_text`: `LeadActivity.actorId` Uuid→Text (better-auth-IDs; gleiche Fehlerklasse wie AuditEvent-Fix WP-1.2).
+- Permissions: `lead.qualify` (SALES), `customer.read` (SALES/OPERATIONS), `object.import` (OPERATIONS), `accessscope.manage` (nur PLATFORM_ADMIN) — Unit-Matrix + Route-Guard-Tests erweitert.
+- `qualifyLead` (apps/platform/src/lib/crm.ts): transaktional Lead → Kunden-Org + Customer + Primärkontakt + optional Property (gehört der Kunden-Org); E-Mail-Dublette im Tenant nutzt Bestandskunden; idempotent bei erneutem Aufruf; LeadActivity + Audit `lead.qualified` + Outbox `lead.qualified` (Worker markiert unbekannte Typen als PROCESSED — verifiziert).
+- AccessScope-Guard-Integration (objects.ts): `resolvePropertyVisibility` = Memberships + PROPERTY-/BUILDING-Scopes; BUILDING-Scope liefert Teilbaum (nur gewährte Gebäude); Kern-API `readablePropertyOrgIds`/`getPropertyTreeForOrgIds` bleibt kompatibel. Grant/Revoke-Service auditiert (`accessscope.granted/revoked`), idempotenter Grant.
+- CSV-Import (`packages/database/src/import-objects.ts` + `pnpm ph360:import-objects`): Header objekt;gebaeude;strasse;hausnummer;plz;ort;eingang;einheit;etage, idempotent über natürliche Schlüssel, `--dry-run` mit Transaktions-Rollback + Bericht, Fehlerbericht je Zeile, Audit je Lauf (`object.import.completed` / `.dry_run`).
+- Seed: IssuingEntity-Stammdaten (WONDERPOWER, AKL_POWERHOUSE) idempotent; zweifacher `db:seed`-Lauf gegen Dev-DB mit identischen IDs verifiziert.
+- Admin-UI: `/admin/customers` (customer.read), Qualifizieren-Formular je Lead auf `/admin/leads` (nur mit lead.qualify sichtbar; CONVERTED verlinkt auf Kunden), `/admin/access-scopes` (accessscope.manage: Gewähren/Entziehen), Nav um Kunden/Zugriffe erweitert.
+
+**Getestet:** Suite grün — 14 Unit + 51 Integration (F-03-Kette inkl. Idempotenz/Dublette/Negativrechte, AccessScope-Sichtbarkeit+Audit, Import Probelauf/Idempotenz/Fehlerbericht, Guard-Matrix). Browser-E2E gegen Dev-Server (Statusregel §12): Login (frischer Verifikations-Admin) → /admin/leads → Qualifizieren (Formular, Objekt „Verwalterstraße 1") → Lead CONVERTED → /admin/customers zeigt Kunde+Kontakt → /admin/objects zeigt Kundenobjekt + Pilotstruktur → /admin/access-scopes: PROPERTY-Grant HV→Pilot-Property (Cross-Tenant) via UI. DB-Nachweis: Property gehört Kunden-Org, Audits `lead.qualified`/`accessscope.granted` mit echtem actorId, Outbox PENDING.
+**Nicht getestet / offen:** Zoho-Adapter [!] (kein Export, E-06) · Pilotdaten-Realimport [!] (Liste fehlt, E-06) · IssuingEntity-Pflichtfeld folgt mit Offer/Contract (Phase 3) · Projekt-Scope der AccessScopes folgt mit Project-Modell (WP-1.5) · Select-Type-ahead im Browser-Pane unzuverlässig (Grant-Formular per JS-Submit verifiziert, Logik itest-gedeckt).
+**Restrisiko:** Dev-DB enthält Verifikationsdaten (wp13rest-Admin, Testkunde) — unkritisch, kein Prod. Vitest-Integration-Glob erfasst `.next/standalone`-Duplikat (Task-Chip gespawnt).
+**Nächster Schritt:** WP-1.4 (pg-boss, Events/Notifications/Observability) → WP-1.5 → Phase 2 (F-22).
+
+## 2026-08-06 — WP-1.4: pg-boss-Dauerdienst, Events-/Notifications-/Observability-Packages, Boundaries, CI
+
+**Getan:**
+- Migration `events_worker_ausbau`: `DomainEvent` +`version`/`actorId` (Envelope-Vervollständigung §3), `EventHandlerExecution` (Unique eventId+handlerName = Idempotenz-Garantie), `Notification` (Zustellstatus; Unique Event+Vorlage+Empfänger).
+- `packages/events`: Katalog mit Zod-Schemata (bekannte Typen konkret; §3-Mindestbestand inkl. opportunity.*/handoff.*/activation.* registriert, Schärfung je Kontext), strikter `publishEvent` (unbekannte Typen abgelehnt), `executeHandler` (Skip bei SUCCEEDED, attempts-Zählung, ab 5 Versuchen Event DEAD), `finalizeEventIfComplete`, `requeueDeadEvent` (auditierter manueller Retry, Audit `event.requeued`). Producer umgestellt: leads.ts, crm.ts, auth/email.ts → publishEvent.
+- `packages/notifications`: Vorlagenregister (lead.created.notify, auth.*), SMTP-Transport (aus apps/worker/mailer.ts gezogen), `notifyViaEmail` mit Zustellstatus PENDING/SENT/FAILED — Handler-Retries stellen dieselbe Zeile zu, keine Doppelzustellung.
+- `packages/observability`: JSON-Zeilen-Logger + zentrale Redaction (§8 Log-Hygiene): sensible Schlüssel voll (Token/Secret/IBAN/SEPA), PII partiell (E-Mail/Name/Telefon), Mustererkennung in freien Strings (IBAN/Bearer/JWT/E-Mail).
+- `apps/worker` neu: Outbox-Poll-Relay → pg-boss-Queue `domain-events` (singletonKey `${eventId}:${handlerName}` dedupliziert Einreihung), Retry/Backoff via pg-boss (fachliche Grenze zieht der Executor), Events ohne Handler → PROCESSED, DEAD ohne Rethrow, strukturierte Logs, gracefuler Shutdown. Verarbeitung sequentiell (batchSize 1) = grobkörnig „pro Aggregat seriell" wie bisher.
+- Boundaries (§3) — dokumentierte Abweichung: statt eslint-plugin-boundaries eine `no-restricted-imports`-Matrix in `eslint-config/base.mjs` + harte Matrix-Prüfung `boundaries.test.ts` (package.json-Deps UND Quell-Imports; Apps importieren nie Apps; neue Pakete müssen registriert sein). Gleiche Wirkung, weniger Maschinerie; `module-*`-Regeln folgen bei Entstehung. Neue Pakete mit eslint.config.mjs; BOM-Literal-Lintfehler in import-objects.ts behoben.
+- CI `.github/workflows/ci.yml` (aktiv — Remote github.com/wonderpowersolar-lang/powerhouse-360 existiert, **R-02 geschlossen**): install → prisma generate → lint (continue-on-error wegen bekannter platform-Flat-Config-Lücke) → typecheck → unit → integration (Postgres-Service, Migrationen via globalSetup) → build; e2e-Job folgt mit erster automatisierter Journey.
+- vitest.config: unit-Projekt auf alle packages-Tests erweitert, `.next`/`generated`-Excludes (behebt den doppelten objects.itest-Lauf aus dem Standalone-Build).
+
+**Getestet:** Suite grün — 27 Unit (Redaction, Boundary-Matrix, Permissions) + 54 Integration (Executor-Idempotenz: Duplikat → genau eine Wirkung; DEAD nach 5 Versuchen; finalize erst wenn alle Handler grün; Requeue auditiert + Negativfall; Publisher-Validierung; Notification-Duplikatfreiheit + FAILED→SENT-Retry; Bestand unverändert). **Dauerdienst live verifiziert** (Dev-DB): 4 PENDING-Events (inkl. Backlog aus WP-1.3) → dispatcht → Handler SUCCEEDED → 5/5 PROCESSED, 3 Notifications SENT (SMTP lokal), Executions je 1 Versuch, SIGTERM-Shutdown sauber.
+**Nicht getestet / offen:** pg-boss-Verhalten unter Last/Mehrinstanz (eine Worker-Instanz = Ist-Zustand) · echter DEAD→Requeue-Durchlauf nur itest-seitig (live nur Erfolgspfad) · Lint-Lücke apps/platform (bekannter Chip) · Log-Redaction ist im Worker aktiv, Platform-Routen folgen.
+**Restrisiko:** gering — Fallback bei pg-boss-Problemen wäre der alte Poll-Executor (Git-Historie). CI läuft erst ab dem nächsten Push (PO).
+**Nächster Schritt:** WP-1.5 (Projekt-/Dokument-/Modulgerüst + P3-Stubs) → Phase 2 Commercial Core (F-22).
+
+## 2026-08-14 — WP-1.5: Projekt-/Dokument-/Modulgerüst + P3-Stubs — Phase 1 abgeschlossen
+
+**Getan:**
+- Migrationen `wp15_projekt_dokument_module_p3stubs` + `wp15_access_scope_project_shape` (getrennt: Postgres erlaubt neuen Enum-Wert und seine Verwendung nicht in einer Transaktion): Project/ProjectPhase/ProjectMilestone/WorkOrder (Grundgerüst, Tenant-Anker = Kunden-Org wie Property), Document (Metadaten+sha256+storageKey; Blob im Objektspeicher), ModuleSubscription/ModuleActivation/ModuleConfiguration (Gerüst ohne Fachlogik), P3-Stubs Heat (HeatProject, ReadingSchedule, OccupancyChange, HeatStatement, AllocationKey) + Charge (ChargingProject, ChargePoint, ChargingSession numeric(14,3), LoadManagementPlan, ChargingAuthorization, FundingCase) — null Fachlogik/UI/Adapter; AccessScope um PROJECT-Scope erweitert (Shape-CHECK + partieller Unique fortgeschrieben; Sichtbarkeits-Auflösung folgt mit erster Projekt-Lesesicht).
+- `packages/documents`: ObjectStorage-Abstraktion (MinIO-Impl mit ensureBucket + MemoryStorage für Tests), `storeDocumentContent` (sha256, storageKey ohne Dateinamen/PII, Blob-Rollback bei Insert-Fehler), `loadDocumentContent` mit Integritätsprüfung; in Boundary-Matrix registriert (documents → database).
+- Permissions: `project.read/create`, `document.read/upload` (+ Rollen SALES/OPERATIONS/SERVICE, Matrix-Unit-Test).
+- Platform-Services: `createProject` (Guard project.create im POWERHOUSE-Mandanten, Default-Phasen, Audit + Outbox `project.created` — wird in Phase 4 von der automatischen Projekterzeugung F-23 genutzt), `listProjects`, `uploadDocument`/`readDocument` (Guards, Audit `document.uploaded`, Storage injizierbar).
+- Dev-DB-Drift behoben: `access_scope_propertyId_idx`/`buildingId_idx`/`unit_entranceId_idx` fehlten in der Dev-DB (Migrationshistorie hatte sie) — direkt nachgezogen und alle FK-Indexe jetzt im Schema deklariert (`prisma migrate diff` = leer; künftig kein Drift/Prompt mehr).
+
+**Getestet:** Suite grün — 32 Unit + 63 Integration (Projekt-Anlage inkl. Phasen/Milestone/WorkOrder + Guard-Negativ + Unique; Dokument-Upload mit Hash/Audit/Roundtrip/Integritätsfehler/Blob-Rollback + Guard-Negativ; Modul-Gerüst-Uniques; P3-Stubs anlegbar; PROJECT-Scope-Shape positiv/negativ). **MinIO live verifiziert** (ph360-minio: store→load-Roundtrip, sha256 identisch, Bucket auto-angelegt).
+**Nicht getestet / offen:** PROJECT-Scope-Sichtbarkeit (kommt mit erster Projekt-Lesesicht) · Virenprüfung vor Fremd-Uploads (vor Portal-Uploads) · MinIO-Betrieb (Backup der Buckets) gehört zum NFR-Backup-Konzept (ADR-007-Freigabe).
+**Restrisiko:** gering; Dev-DB enthält ein Verifikationsdokument (wp15-verify.txt im POWERHOUSE-Mandanten).
+**Nächster Schritt:** **Phase 1 ist abgeschlossen** (F-01/02/03/19/20 🟢; Restposten: F-21-Route-Sweep + VPS-Rollout beim PO) → **Phase 2 Commercial Core (F-22)**.

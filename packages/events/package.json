@@ -1,0 +1,22 @@
+{
+  "name": "@ph360/events",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@ph360/database": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@ph360/eslint-config": "workspace:*",
+    "eslint": "^9",
+    "typescript": "^5"
+  }
+}

@@ -2,7 +2,9 @@
 
 > Operatives Arbeitsdokument zum [Masterplan](POWERHOUSE_360_MASTER_PLAN.md) (§10). Der Masterplan sagt **was & warum**, diese Roadmap sagt **tu dies, dann dies** — zum Abhaken.
 > Status je Schritt: `- [ ]` offen · `- [x]` erledigt · `- [~]` in Arbeit · `- [!]` blockiert (Grund dahinter).
-> Reihenfolge ist der kritische Pfad zum P1-Ziel (Powermieter-Pilot Christinenstraße). **P2/P3 erst nach P1-Aktivierung** (Masterplan §1).
+> Reihenfolge ist der kritische Pfad zum **Commercial-Durchstich** ([ADR-012](DECISIONS/ADR-012-bauabfolge-commercial-first.md): Lead → Angebot → Vertrag → Projekt → Provisionierung → Operations aktiv). Der Powermieter-Pilot Christinenstraße folgt als Phase 8 (P1-Modulziel). **P2/P3 erst nach Powermieter-Aktivierung** (Masterplan §1).
+
+> 🔀 **Neuschnitt 2026-08-05** (ADR-012 / Founding Spec §29–§30): Phasen 2–12 neu geschnitten — Mapping alt→neu im [Masterplan §10](POWERHOUSE_360_MASTER_PLAN.md). Die Schrittinhalte der alten Phasen sind vollständig übernommen, nur neu angeordnet.
 
 ## Wie du das abarbeitest
 
@@ -17,98 +19,103 @@
 
 ## Parallel-Track [PO] — Blocker früh auflösen
 
-Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge nach Dringlichkeit:
+Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge nach Dringlichkeit (Neuschnitt hat PDF-Pipeline/Documenso/Zoho nach vorn gezogen):
 
 - [ ] **VPS-Rollout** gemäß [DEPLOYMENT.md](DEPLOYMENT.md) (Secrets in Server-`.env`, `git archive|scp`, `docker compose … up -d`, Domains umhängen). → schließt **R-01 in Prod** (Lead-Verlust) · *blockiert: produktiver Lead-Eingang*
-- [ ] **Git-Remote** anlegen + pushen (privat). → schließt **R-02**, ermöglicht CI · *blockiert: CI-Gate der Teststrategie*
-- [ ] **ADR-007 (Stack & Hosting) freigeben** — bestätigt den Ist-Stack + Datenbank-Hosting-Option (VPS-Postgres + getesteter Restore vs. Managed-EU-DB). [ADR-007](DECISIONS/ADR-007-stack-und-hosting.md) · *blockiert nichts hart, aber Grundsatz*
-- [ ] **PDF-Pipeline übergeben** (Repo/Code/Zugang der externen WeasyPrint-Pipeline). [ADR-003](DECISIONS/ADR-003-dokumentenerzeugung-vs-signatur.md), R-17 · *blockiert: Phase 3*
-- [ ] **ADR-008 (Bewohner-Belegweg) entscheiden** (Lexoffice vs. interner Belegpfad; Kriterien in [ADR-008](DECISIONS/ADR-008-bewohner-belegweg.md)). · *blockiert: Phase 6 Billing-Detail*
-- [ ] **Pilotdaten bereitstellen:** Christinenstraße 36 / Lottumstraße 22 — Gebäude, Einheiten, 21 Messstellen, Teilnehmer (Excel/CSV). · *blockiert: WP-1.3-Import + Phase 6*
-- [ ] **Datenexporte:** Zoho-Altbestand (CRM), Reonic (PV/Installation) — Zugang + Format klären. · *blockiert: WP-1.3-Migration*
-- [ ] **MaKo-Klärung mit Comgy:** Zuständigkeitsmatrix ausfüllen (Masterplan §6). · *blockiert: Phase 6 Billing Readiness*
+- [x] **Git-Remote** ✅ (github.com/wonderpowersolar-lang/powerhouse-360) — R-02 zu; CI-Workflow liegt im Repo und läuft ab dem nächsten Push. *Offen bleibt nur der Push-Rhythmus (lokale Commits regelmäßig pushen).*
+- [ ] **Datenexporte:** Zoho-Altbestand (CRM), Reonic (PV/Installation) — Zugang + Format klären (E-06). · *blockiert: WP-1.3-Migration + Phase-2-Import*
+- [ ] **PDF-Pipeline übergeben** (Repo/Code/Zugang der externen WeasyPrint-Pipeline). [ADR-003](DECISIONS/ADR-003-dokumentenerzeugung-vs-signatur.md), R-17 (**Dringlichkeit ↑** — Phase 3 liegt jetzt früh) · *blockiert: Phase 3*
 - [ ] **Documenso-Betriebsentscheidung:** gefundenes `documenso-powermieter`-Setup sichten — weiterverwenden oder frisch aufsetzen? · *blockiert: Phase 3*
+- [ ] **Abgleich-Entscheidungen (E-09):** K-02 Documenso-Lesart bestätigen (*vor Phase 3*), K-03 native App in Spec v2.1, K-06 PowerWRX, K-07 Agentensystem (*vor Phase 12*) — [FOUNDING-SPEC-ABGLEICH](FOUNDING-SPEC-ABGLEICH.md); dabei **ADR-012-Begründung nachtragen**
+- [ ] **Pilot-Zwischenstand klären (E-08):** Terminlage/vertragliche Bindung Christinenstraße nach der Verschiebung durch ADR-012. · *bestimmt: R-18-Bewertung + ggf. ADR-012-Revision*
+- [ ] **ADR-007 (Stack & Hosting) freigeben** — bestätigt den Ist-Stack + Datenbank-Hosting-Option (VPS-Postgres + getesteter Restore vs. Managed-EU-DB). [ADR-007](DECISIONS/ADR-007-stack-und-hosting.md) · *blockiert nichts hart, aber Grundsatz*
+- [ ] **ADR-008 (Bewohner-Belegweg) entscheiden** (Lexoffice vs. interner Belegpfad; Kriterien in [ADR-008](DECISIONS/ADR-008-bewohner-belegweg.md)). · *blockiert: Phase 8 Billing-Detail*
+- [ ] **Pilotdaten bereitstellen:** Christinenstraße 36 / Lottumstraße 22 — Gebäude, Einheiten, 21 Messstellen, Teilnehmer (Excel/CSV). · *blockiert: WP-1.3-Import + Phase 8*
+- [ ] **MaKo-Klärung mit Comgy:** Zuständigkeitsmatrix ausfüllen (Masterplan §6, E-07). · *blockiert: Phase 8 Billing Readiness*
 
 ---
 
-## PHASE 1 — Core & Datenmigration  🟡 (aktiv)
+## PHASE 1 — Core & Datenmigration  🟢 (abgeschlossen 2026-08-14)
 
 **Ziel:** tragfähiges Fundament — Auth, Mandanten, Rollen, Immobilienstruktur, CRM-Qualifizierung, Events/Worker, Projekt-/Modulgerüst, Testmandant.
-**Gates:** F-02, F-03, F-19, F-20 🟢 (F-01, F-21 bereits erreicht).
+**Gates:** F-01/F-02/F-03/F-19/F-20 🟢 · Restposten: F-21-Route-Sweep (🟣, WP-1.0) + [PO] VPS-Rollout.
 
-### WP-1.2 — Auth, Rollen & Mandanten  🟡
-> **Detailplan vorhanden:** `docs/superpowers/plans/2026-07-11-wp-1.2-auth-rollen-mandanten.md` (13 Tasks) — dieser ist maßgeblich; hier nur die Grobschritte + V2-Deltas.
-- [x] Task 1 — `packages/permissions` (Katalog, Rollen-Map, Resolver, Unit-Tests) — *committet `3588b7f`*
-- [ ] Task 2 — Prisma-Schema + Migration `auth_and_rbac` (better-auth-Tabellen `user/session/account/verification` + RBAC-Modelle `OrganizationMembership`, `Invitation`, Enums `SystemRole/MembershipStatus/InvitationStatus` + Org-Rück-Relationen)
-- [ ] **V2-Delta A:** im selben Schritt `IssuingEntity`-Stammtabelle anlegen (Wonderpower GmbH, AKL Powerhouse 360 GmbH) — Masterplan §4
-- [ ] Task 3 — `packages/testing` (Real-Postgres-Vitest-Harness gegen `ph360_test` auf :5433, Factories, Root-Test-Scripts)
-- [ ] **V2-Delta B:** Seed um **Testmandant** (ADR-006, gekennzeichnete Org + realistische Struktur) + IssuingEntity-Grunddaten erweitern
-- [ ] Task 4 — `packages/auth` (better-auth-Instanz, `getAuthContext`, Guards `requirePermission`/`assertOrgScope`, Audit-Events, Auth-Mails)
-- [ ] Task 5 — Worker-Handler für Auth-Mails (`auth.email_verification`, `auth.password_reset`, `auth.member_invited`)
-- [ ] Task 6 — apps/platform: better-auth-Route, Client, **Middleware von Basic-Auth auf Session-Check umstellen**
-- [ ] Task 7–10 — Login-Seite, Admin-Shell + Members-UI + Invitation-Flow, Audit-UI
-- [ ] Task 11 — Admin-Bootstrap-Script (`scripts/create-admin.ts`, ersetzt `ADMIN_BASIC_*`)
-- [ ] Task 12 — volle Gate-Abdeckung: **F-02** (Mandant/Rollen + Cross-Tenant-Negativtest), **F-19** (Audit), **F-20** (Berechtigungs-Negativmatrix je Rolle) als grüne Vitest-Suite
-- [ ] Task 13 — Browser-E2E + Doku-Pflege (Masterplan §10/§12/§14, Log, ggf. ADR-Notiz)
-- **Gate:** F-02 🟢 · F-19 🟢 · F-20 🟢 · Interim-Basic-Auth entfernt
+### WP-1.2 — Auth, Rollen & Mandanten  🟢 (2026-07 abgeschlossen)
+> Detailplan `docs/superpowers/plans/2026-07-11-wp-1.2-auth-rollen-mandanten.md`; Details im [IMPLEMENTATION_LOG](IMPLEMENTATION_LOG.md).
+- [x] Tasks 1–13 committet (`3588b7f`…`d237b87`): better-auth + eigene RBAC ([ADR-010](DECISIONS/ADR-010-better-auth-und-eigene-rbac.md)), Guards `requirePermission`/`assertOrgScope`, Login/Invite/Accept/Members/Audit-UI, Bootstrap-Admin, Interim-Basic-Auth entfernt; Testmandant-Seed via WP-1.3-Kern (ADR-006)
+- [ ] **Rest-Delta:** `IssuingEntity`-Stammtabelle (Wonderpower GmbH, AKL Powerhouse 360 GmbH — Masterplan §4) ist **noch nicht migriert** → wandert in WP-1.3 („IssuingEntity-Pflicht")
+- **Gate erreicht:** F-02 🟢 · F-19 🟢 · F-20 🟢
 
-### WP-1.3 — Immobilienstruktur & CRM-Qualifizierung  🟡
-> **Voraussetzung:** WP-1.2 (Mandanten/Guards stehen). [PO]: Pilotdaten + Zoho-Export.
-> **Kern erledigt 2026-07 (WP-1.3-Kern):** Property/Building/Entrance/Unit/Address + AccessScope-Tabelle (Stub, ohne Guard-Integration) + idempotenter Pilotstruktur-Seed (Testmandant ADR-006: 1 Property, 2 Gebäude, 21 Units) — **WP-APP-1 damit entblockt** (Spec §8). Offen: `Floor`/`Room`/`TechnicalRoom`/`GridConnection`, `Property.managedByOrganizationId`, Guard-Integration.
-- [ ] Prisma: Immobilien-Domäne (`Property`, `Building`, `Floor`, `Unit`, `Room`, `TechnicalRoom`, `GridConnection`, `Address`) + Migration; `Property.managedByOrganizationId` (HV) + Eigentümer-Org — *Kern erledigt: Property/Building/Entrance/Unit/Address + AccessScope-Tabelle; Rest offen*
-- [ ] Prisma: CRM-Ausbau (`Customer`, `CustomerContact`, `Opportunity`, `Note`, `Task`) + Migration
-- [ ] `AccessScope`-Modell + Auflösung (Property-/Building-/Projekt-Scope) in Guards integrieren — Cross-Tenant der HV auditierbar
-- [ ] IssuingEntity-**Pflichtfeld** auf Außenwirkungs-Entitäten vorbereiten (Offer/Contract/InvoiceRequest/Document — soweit vorhanden)
-- [ ] Domain-Service: Lead **qualifizieren** → `Customer` + `Property` erzeugen (Daten wandern mit, kein Doppel; `Lead.convertedToCustomerId`)
-- [ ] CSV-Import-Werkzeug Property→Building→Unit (idempotent, Probelauf, Fehlerbericht, Audit) — **Pilotdaten Christinenstraße als erster Realimport**
-- [ ] Admin-UI: Kunden-/Objektliste + Lead-Qualifizierungs-Aktion; AccessScope-Verwaltung (Basis) — *Objektliste (Lesesicht `/admin/objects` hinter `object.read`) ✅*
-- [ ] Zoho-Import-Adapter (Kontakte/Leads) — sofern Export vorliegt; sonst als [!] parken
-- [ ] Tests: F-03 (Lead→Kunde/Objekt ohne Doppelerfassung + Audit) + Scope-Negativtests
-- **Gate:** F-03 🟢 · Pilotobjekt-Struktur importiert
+### WP-1.3 — Immobilienstruktur & CRM-Qualifizierung  🟢 (Rest 2026-08-06; zwei [!]-Posten beim PO)
+> **Kern 2026-07 (`b5d5a80`…`20bbf11`):** Objektbaum + AccessScope-Stub + Pilotstruktur-Seed. **Rest 2026-08-06 (`bd12531`…):** Migrationen `wp13_rest_crm_issuing_immobilien` + `lead_activity_actor_text`.
+- [x] Prisma: Immobilien-Domäne vervollständigt — `Room`/`TechnicalRoom`/`GridConnection` + `Property.managedByOrganizationId` (HV); **bewusst keine `Floor`-Tabelle** (`Unit.floor` bleibt einzige Etagen-Wahrheit, im Schema dokumentiert)
+- [x] Prisma: CRM-Ausbau (`Customer` [Kunde = Organization, Masterplan §4 Nr. 2], `CustomerContact`, `Opportunity`, `Note`, `Task`) + `Lead.convertedToCustomerId`
+- [x] `AccessScope`-Auflösung in der Sichtbarkeit (`resolvePropertyVisibility`: PROPERTY-/BUILDING-Teilbaum; Projekt-Scope folgt mit Project-Modell in WP-1.5) + Grant/Revoke-Service auditiert (`accessscope.granted/revoked`)
+- [x] `IssuingEntity`-Stammtabelle + idempotenter Seed (WONDERPOWER, AKL_POWERHOUSE); Pflichtfeld folgt mit den Außenwirkungs-Entitäten (Phase 3+)
+- [x] Domain-Service `qualifyLead`: Lead → Kunden-Org + Customer + Kontakt + optional Property, transaktional; E-Mail-Dublette nutzt Bestandskunden; idempotent; Audit + Outbox `lead.qualified`
+- [x] CSV-Import-Werkzeug (`pnpm ph360:import-objects`): idempotent, `--dry-run`-Probelauf mit Rollback, Fehlerbericht je Zeile, Audit je Lauf — [!] **Pilotdaten-Realimport wartet auf Liste (E-06, PO)**
+- [x] Admin-UI: `/admin/customers` (Kundenliste), Lead-Qualifizierungs-Aktion auf `/admin/leads`, `/admin/access-scopes` (Basis: Gewähren/Entziehen)
+- [!] Zoho-Import-Adapter — **geparkt: kein Export (E-06, PO)**; CSV-Werkzeug existiert als Grundlage
+- [x] Tests: F-03-Kette + Scope-Negativtests + Guard-Matrix (Suite: 14 Unit + 51 Integration grün)
+- **Gate:** F-03 🟢 (2026-08-06 dev: Browser-E2E Login → Qualifizieren → Kunde/Objekt/Audit/Outbox + itest) · Pilotstruktur per Seed importiert; Realdaten-Import [!] E-06
 
-### WP-1.4 — Events, Worker-Dauerdienst & Testabsicherung  🟡
-> **Voraussetzung:** WP-1.2 (Audit/Events-Kontext). Läuft teils parallel zu 1.3.
-- [ ] Outbox-Dispatcher auf **pg-boss** umstellen (ADR-001) + `EventHandlerExecution`-Unique (Idempotenz) — als Dauerdienst-Container
-- [ ] `packages/events` — Event-Envelope + Zod-Schemata je `eventType` (Masterplan §3-Katalog), Publisher, Handler-Registry
-- [ ] `packages/notifications` — E-Mail/Portal-Templates, Zustellstatus
-- [ ] `packages/observability` — Logger mit **Redaction** (IBAN, E-Mail, Tokens, Namen), Request-Kontext
-- [ ] eslint-boundaries-Regeln aktivieren (Fachmodule importieren nie einander; Adapter-Grenzen)
-- [ ] Idempotenz-Tests: doppeltes Event / doppelter Job → genau eine Wirkung
-- [ ] CI-Pipeline-Datei (lint→typecheck→unit→integration→build→e2e) — **aktiv, sobald Git-Remote existiert** ([PO]/R-02), sonst als Vorlage ablegen
-- **Gate:** Idempotenz- + Berechtigungs-Suite grün; F-19/F-20 dauerhaft abgesichert
+### WP-1.4 — Events, Worker-Dauerdienst & Testabsicherung  🟢 (2026-08-06)
+> Migration `events_worker_ausbau` (DomainEvent +version/actorId, EventHandlerExecution, Notification).
+- [x] Outbox-Dispatcher auf **pg-boss** umgestellt (ADR-001): Poll-Relay Outbox → Queue `domain-events` (singletonKey dedupliziert), pg-boss-Retry/Backoff; `EventHandlerExecution`-Unique = Idempotenz-Garantie; ab MAX_HANDLER_ATTEMPTS wird das Event DEAD; **auditierter manueller Retry** via `requeueDeadEvent` — Dauerdienst live verifiziert (4 Events dispatcht → Handler → PROCESSED, sauberer SIGTERM-Shutdown)
+- [x] `packages/events` — Envelope vervollständigt (version/actor, Masterplan §3), Katalog mit Zod-Schemata (bekannte Typen konkret, §3-Mindestbestand inkl. `opportunity.*`/`handoff.*`/`activation.*` registriert), strikter Publisher (unbekannte Typen abgelehnt), Executor, Requeue; Producer (leads/crm/auth-Mails) auf `publishEvent` umgestellt
+- [x] `packages/notifications` — Vorlagen (lead.created.notify, auth.*), SMTP-Transport (aus Worker gezogen), `Notification`-Zustellstatus PENDING/SENT/FAILED; Unique (Event, Vorlage, Empfänger) = keine Doppelzustellung bei Retries
+- [x] `packages/observability` — JSON-Zeilen-Logger mit **zentraler Redaction** (Tokens/IBAN/SEPA voll, E-Mail/Name/Telefon partiell, Muster in freien Strings); Worker läuft komplett darüber
+- [x] Boundaries aktiviert — *dokumentierte Abweichung:* statt eslint-plugin-boundaries eine `no-restricted-imports`-Matrix in `eslint-config/base.mjs` **plus** harte Matrix-Prüfung `packages/testing/src/boundaries.test.ts` (Deps + echte Imports; Apps importieren nie Apps); gleiche Wirkung, weniger Maschinerie — Fachmodul-Regeln werden bei Entstehung von `module-*` ergänzt
+- [x] Idempotenz-Tests: doppelte Zustellung → genau eine Wirkung; Fehlversuche → DEAD; finalize erst wenn alle Handler grün; Requeue auditiert (events.itest) + Notification-Duplikatfreiheit (notifications.itest)
+- [x] CI-Pipeline `.github/workflows/ci.yml` — **aktiv** (Remote existiert, R-02 zu): lint→typecheck→unit→integration (Postgres-Service, echte Migrationen)→build; e2e-Job folgt mit erster automatisierter Journey
+- **Gate erreicht:** Suite 27 Unit + 54 Integration grün; F-19/F-20 dauerhaft abgesichert (Guard-/Idempotenz-Suite in CI)
 
-### WP-1.5 — Projekt-, Dokument- & Modulgerüst + P3-Stubs  ⚪
-> **Voraussetzung:** WP-1.3.
-- [ ] Prisma: `Project`, `ProjectPhase`, `ProjectMilestone`, `WorkOrder` (Grundgerüst) + Migration
-- [ ] `Document`-Objekt + Storage-Abstraktion gegen **MinIO** (Upload, Hash, Berechtigungskontext)
-- [ ] `ModuleSubscription` / `ModuleActivation` / `ModuleConfiguration` / `ModuleStatus` (Gerüst, ohne Fachlogik)
-- [ ] **P3-Datenmodell-Stubs**: Heat- & Chargemieter-Entitäten (Masterplan §5) als Migration — **null Fachlogik/UI/Adapter**
-- [ ] Tests: Projekt-Anlage + Dokument-Upload mit Berechtigung
-- **Gate:** Projekt/Document/Module-Gerüst nutzbar; P3-Schema migriert
+### WP-1.5 — Projekt-, Dokument- & Modulgerüst + P3-Stubs  🟢 (2026-08-14)
+> Migrationen `wp15_projekt_dokument_module_p3stubs` + `wp15_access_scope_project_shape`.
+- [x] Prisma: `Project`/`ProjectPhase`/`ProjectMilestone`/`WorkOrder` (Grundgerüst; Tenant-Anker = Kunden-Org) + `createProject`-Service (Guard `project.create`, Audit + Outbox `project.created` — Basis für die automatische Projekterzeugung in Phase 4/F-23)
+- [x] `Document` + Storage-Abstraktion gegen **MinIO** (`packages/documents`: sha256, storageKey ohne PII, Blob-Rollback, Integritätsprüfung beim Lesen; MemoryStorage für Tests) — **live gegen ph360-minio verifiziert**
+- [x] `ModuleSubscription`/`ModuleActivation`/`ModuleConfiguration` (Gerüst ohne Fachlogik; Status als Enums)
+- [x] **P3-Stubs** Heat (HeatProject/ReadingSchedule/OccupancyChange/HeatStatement/AllocationKey) + Charge (ChargingProject/ChargePoint/ChargingSession numeric(14,3)/LoadManagementPlan/ChargingAuthorization/FundingCase) — null Fachlogik/UI/Adapter
+- [x] Bonus: AccessScope **PROJECT-Scope** (Datenmodell + Shape-CHECK; Sichtbarkeit folgt mit erster Projekt-Lesesicht) · Permissions `project.read/create`, `document.read/upload` · Dev-DB-Index-Drift behoben (FK-Indexe jetzt im Schema deklariert)
+- [x] Tests: Projekt-Anlage + Dokument-Upload mit Berechtigung (Suite: 32 Unit + 63 Integration grün)
+- **Gate erreicht:** Projekt/Document/Module-Gerüst nutzbar · P3-Schema migriert
 
-**➡️ Phase-1-Abschluss:** F-02, F-03, F-19, F-20 🟢 · Fundament trägt alle Folgephasen.
+**➡️ Phase-1-Abschluss erreicht (2026-08-14):** F-01/F-02/F-03/F-19/F-20 🟢 · Fundament trägt alle Folgephasen. Restposten außerhalb des kritischen Pfads: F-21-Route-Sweep (🟣) + VPS-Rollout/ADR-007 beim PO (Parallel-Track). **Weiter mit PHASE 2 — Commercial Core (F-22).**
 
 ---
 
-## PHASE 2 — Onboarding-Engine  ⚪
-**Ziel:** versionierte Workflow-Engine (keine fest codierten Formulare). **Gate:** F-04.
-> **Voraussetzung:** Phase 1 abgeschlossen.
-- [ ] Prisma: Onboarding-Domäne (`OnboardingTemplate(+Version)`, `StepDefinition`, `Workflow`, `StepInstance`, `Participant`, `Invitation`, `Task`, `Requirement`, `Document`, `Consent`, `Approval`, `Form/Submission`, `Dependency`, `Trigger`, `Deadline/Reminder`, `Exception`, `AuditEvent`)
-- [ ] Engine-Kern: Schritt-Typen `form / document_upload / contract / consent / approval / internal_task / requirement / invitation` mit je definierter Abschlussbedingung
-- [ ] Statusmaschine Workflow (Draft → … → Ready for Activation → Active, +Blocked/Cancelled) — aus Schritten abgeleitet
-- [ ] **Reihenfolge-Erzwingung:** Projekt-Onboarding vor Bewohner-Onboarding (Abhängigkeit zwischen Workflow-Ebenen)
-- [ ] Trigger-Verarbeitung über Event-Handler (idempotent); Fristen/Erinnerungen über Scheduler → Notification
-- [ ] Exceptions (dokumentiertes Überspringen, Permission `onboarding.approve_exception`, Audit)
-- [ ] Erstes Template: **generisches Projekt-Onboarding** (Organisation → Vertragspartner → Gebäude → Modul konfigurieren → Vertragsvorlagen → techn. Voraussetzungen → Kommunikationsmaterial → Freigabe Teilnehmer-Onboarding)
-- [ ] Admin-UI: Workflow-Fortschritt (Ampel/%), Aufgabenliste
-- [ ] Tests: F-04 (Template→Instanz→Schritte→Blocked/Exception→Ready for Activation)
-- **Gate:** F-04 🟢
+## PHASE 2 — Commercial Core (CRM)  ⚪  🆕
+**Ziel:** steuerndes CRM-Kernstück — Opportunities, Pipeline, Aktivitäten, Forecast, Alt-Lead-Import (Spec §9, §29 Phase 1). **Gate:** F-22.
+> **Voraussetzung:** Phase 1 (insb. WP-1.3: Qualifizierung + AccessScope-Guards) · [PO]: Zoho-Export (E-06), sonst Import als [!] parken.
+- [ ] Prisma: CRM-Vollausbau (`SalesStage` konfigurierbar, `Communication`, `CampaignReference`, `ForecastItem` versioniert) + Migration — Opportunity/Note/Task aus WP-1.3
+- [ ] Lead-Intake-Ausbau: zentrale Inbox über alle Marken/Funnels, Source Attribution vervollständigen; Dubletten über Organisation/Adresse/Domain/Telefon/Objektbezug (Spec §9)
+- [ ] Opportunity-Management: Anlage aus qualifiziertem Lead (Kunde/Objekt referenziert, kein Doppel); **jede Stufe mit Eintritts-/Austrittskriterien, erzwungen**; Statushistorie mit Gründen
+- [ ] Aktivitäten-/Kommunikations-Timeline am Kontext (E-Mail/Call/Meeting/Notiz/Formular/Systemereignis); Kanal = Transport, nicht Quelle der Wahrheit (Spec §22)
+- [ ] **Next Best Action regelbasiert** (Begründung + Frist + Verantwortlicher + erwartete Wirkung); ausdrücklich **kein Agent** — Agenten erst Phase 12 nach E-09/K-07
+- [ ] Forecast: gewichtet/Commit/Best Case/Risiko, Änderungen historisiert mit Grund (`ForecastItem`)
+- [ ] Zoho-Altbestand-Import: idempotent (natürliche Schlüssel/E-Mail), Probelauf-Modus, Dublettenprüfung, Fehlerbericht, Audit (Masterplan §9-Regeln)
+- [ ] Admin-UI: Pipeline-Board, Opportunity-Detail mit Timeline, Forecast-Sicht
+- [ ] Tests: **F-22** (Lead → Qualifizierung → Opportunity → Stufenwechsel mit erzwungenen Kriterien → Forecast sichtbar → Timeline vollständig) + Berechtigungs-Negativtests
+- **Gate:** F-22 🟢
 
 ---
 
-## PHASE 3 — Documenso-Integration (Signatur-Layer)  ⚪
-**Ziel:** Verträge erzeugen (eigene PDF-Pipeline) → über self-hosted Documenso signieren. **Gates:** F-05, F-06.
-> **Voraussetzung:** Phase 2 · [PO]: PDF-Pipeline übergeben (R-17), Documenso-Betriebsentscheidung.
+## PHASE 3 — Angebotskonfigurator & Vertrag  ⚪  (alt-3 + Konfigurator aus alt-7)
+**Ziel:** regelbasierter Konfigurator (Powermieter-Umfang) → versionierte Quote → eigene PDF-Erzeugung → Documenso-Signatur → Portal-Annahme. **Gates:** F-17, F-05, F-06.
+> **Voraussetzung:** Phase 2 · [PO]: PDF-Pipeline übergeben (R-17/E-05), Documenso-Betriebsentscheidung, K-02-Freigabe (E-09).
+> **Begriffsbrücke (Spec §10):** Offer = Quote · OfferVersion = eingefrorene Solution Configuration.
+
+**Konfigurator & Quote:**
+- [ ] Prisma: Commercial-Domäne (`Product/ProductModule/ProductVersion`, `PriceBook/PriceRule`, `CostModel`, `Offer/OfferVersion/OfferItem/OfferOption`, `Assumption/Exclusion`, `ApprovalRequest`, `OfferAcceptance`, `CommercialCondition`, `DeliverableTemplate`) + Migration
+- [ ] Produktkatalog + Preisbücher + Kostenmodelle: versioniert, zeitlich gültig; Powermieter-Umfang (Modul, Hub-Infrastruktur, Installation, Planung, Wartung/Service); jedes Angebot trägt **`IssuingEntity`**
+- [ ] Regel-Engine: deklarative, versionierte, testbare Regeln (Kompatibilität, Voraussetzung, Ausschluss, Mindestmenge); **jede automatische Ergänzung/Ablehnung erklärt die auslösende Regel** (Spec §10)
+- [ ] Mengenableitung aus Objektstruktur (Einheiten/Gebäude/Zählpunkte) · Varianten (Good/Better/Best, Kauf/Miete) · Annahmen/Ausschlüsse explizit (`Assumption`/`Exclusion`, nicht validierte Annahmen → Risikopuffer/Freigabepflicht)
+- [ ] Freigabematrix (Spec §10): Rabatt-/Margen-/Risiko-Trigger → `ApprovalRequest` mit Verantwortlichem; Rabatt braucht Grund
+- [ ] Quote-Versionierung: finale Angebotsversion **friert Regeln, Preisbuch, Steuern, Texte, Kalkulation als Snapshot ein** (append-only)
+- [ ] Kundenportal (Basis): Angebot ansehen/vergleichen/**annehmen**, Signaturstatus; Annahme → `offer.accepted` (Portal wird ab Phase 4 Projekt-/Betriebsportal)
+- [ ] Delivery-Übersetzung: `DeliverableTemplate` je Position + **Activation-Manifest-Entwurf** (Datenstruktur; Provisionierung erst Phase 5 — Spec §29 Phase 2)
+
+**Vertrag & Signatur (alt-Phase 3, unverändert):**
 - [ ] **Betriebskonzept-Gate zuerst:** Documenso-Server (Staging `sign-staging…`) + Backup/Restore-Verfahren + Monitoring + Update-Prozess dokumentiert (Masterplan §8 — ohne das kein Prod-Gang)
 - [ ] `packages/pdf-pipeline-adapter` — Anbindung der externen WeasyPrint-Pipeline (fertiges PDF aus versioniertem `ContractTemplate` + Feldwerte-Snapshot)
 - [ ] Prisma: Verträge-Domäne (`Contract`, `ContractType` mit **`signatureLevel`**, `ContractVersion`, `ContractTemplate(+Version)`, `ContractParticipant`, `ContractFieldMapping` (nur Signatur/Datum/Identität), `ContractSignatureRequest`, `ContractAuditEvent`, `DocumensoDocument/RecipientReference`) + `WebhookInbox`
@@ -116,15 +123,62 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 - [ ] ContractType-Stammdaten + `signatureLevel`-Zuordnung (E-03: QES/Schriftform nie digital anbieten)
 - [ ] Webhook-Route `/api/webhooks/documenso` → Signaturprüfung → `WebhookInbox` (idempotent) → Worker; `signed` **nur nach Verifikations-Read + PDF-Übernahme (Hash)**
 - [ ] Statusmaschine mit legalen Übergängen; Out-of-Order-/Duplikat-Webhooks unschädlich; Poll-Fallback ≥ 24 h
-- [ ] Onboarding-Kopplung: `contract`-Schritt schließt erst bei bestätigtem DB-Status
-- [ ] Tests: **F-05** (Vertrag → 2 Unterzeichner in Reihenfolge → Webhook inkl. **Duplikat-Replay** → signed → Dokument → Onboarding-Schritt zu) · **F-06** (declined/expired → Task → Neustart)
-- **Gate:** F-05 🟢 · F-06 🟢 · Documenso-Betriebskonzept steht
+- [ ] Vertragserzeugung aus angenommener Quote (Feldwerte aus OfferVersion-Snapshot; kein manuelles Neuerfassen)
+- [ ] Tests: **F-17** (Konfigurator → Regel-Erklärung → Freigabe → Quote-Version → Portal-Annahme → Vertrag erzeugt) · **F-05** (Vertrag → 2 Unterzeichner in Reihenfolge → Webhook inkl. **Duplikat-Replay** → signed → finales Dokument) · **F-06** (declined/expired → Task → Neustart)
+- **Gate:** F-17 🟢 · F-05 🟢 · F-06 🟢 · Documenso-Betriebskonzept steht
 
 ---
 
-## PHASE 4 — Hub- & Device-Registry  ⚪
+## PHASE 4 — Contract-to-Delivery  ⚪  (alt-2 Onboarding + Handoff/Projekterzeugung/Lexoffice aus alt-7)
+**Ziel:** angenommene Angebote kontrolliert in Onboarding/Projekte überführen; Zahlungs- und B2B-Belegweg. **Gates:** F-04, F-23, F-18.
+> **Voraussetzung:** Phase 3 · [PO]: GoCardless-Zugang; ADR-008 blockiert nur Bewohner-Belegdetails (Phase 8), nicht den B2B-Weg.
+
+**Onboarding-Engine (alt-Phase 2, unverändert):**
+- [ ] Prisma: Onboarding-Domäne (`OnboardingTemplate(+Version)`, `StepDefinition`, `Workflow`, `StepInstance`, `Participant`, `Invitation`, `Task`, `Requirement`, `Document`, `Consent`, `Approval`, `Form/Submission`, `Dependency`, `Trigger`, `Deadline/Reminder`, `Exception`, `AuditEvent`)
+- [ ] Engine-Kern: Schritt-Typen `form / document_upload / contract / consent / approval / internal_task / requirement / invitation` mit je definierter Abschlussbedingung
+- [ ] Statusmaschine Workflow (Draft → … → Ready for Activation → Active, +Blocked/Cancelled) — aus Schritten abgeleitet
+- [ ] **Reihenfolge-Erzwingung:** Projekt-Onboarding vor Bewohner-Onboarding (Abhängigkeit zwischen Workflow-Ebenen)
+- [ ] Onboarding-Kopplung Vertrag: `contract`-Schritt schließt erst bei bestätigtem DB-Status (aus Phase 3)
+- [ ] Trigger-Verarbeitung über Event-Handler (idempotent); Fristen/Erinnerungen über Scheduler → Notification
+- [ ] Exceptions (dokumentiertes Überspringen, Permission `onboarding.approve_exception`, Audit)
+- [ ] Erstes Template: **generisches Projekt-Onboarding** (Organisation → Vertragspartner → Gebäude → Modul konfigurieren → Vertragsvorlagen → techn. Voraussetzungen → Kommunikationsmaterial → Freigabe Teilnehmer-Onboarding)
+- [ ] Admin-UI: Workflow-Fortschritt (Ampel/%), Aufgabenliste
+
+**Won-Deal-Handoff & Projektgenerierung (Spec §8/§12/§13):**
+- [ ] Won-Deal-Handoff: **Handoff-Packet** (Scope, Annahmen, Ausschlüsse, Verantwortliche, Risiken, offene Punkte, Termine, kommerzielle Parameter) versioniert; Empfänger nimmt an / mit Auflagen / weist zurück — **kein stilles Won-Label**, fehlende Voraussetzungen erzeugen sichtbare Ausnahme
+- [ ] Customer-Success-Record: Ziele/Outcomes, verkaufte Module, Ansprechpartner, offene Voraussetzungen, Onboarding-Plan (Spec §12)
+- [ ] Automatische Projektgenerierung aus OfferVersion + `DeliverableTemplate`s: Project/Phasen/Milestones/WorkOrder-Gerüst, geplante Positionen als Deliverables — Projektleitung startet nie mit leerem Board (Spec §13)
+- [ ] Change Requests: Ursache + Auswirkung auf Preis/Marge/Termin/Scope; nach Freigabe aktualisieren sie Projekt und Quote/Amendment (Spec §13)
+
+**Zahlungs- & B2B-Belegweg (GoCardless neu per Spec §11/§25; Lexoffice aus alt-7):**
+- [ ] `packages/gocardless-adapter` — SEPA-Mandate, Einzüge, Rücklastschriften als **Provider-Events**; interner Zahlungszustand getrennt geführt und abgeglichen, nie blind übernommen (`SepaMandateReference`); Bewohner-SEPA folgt in Phase 8 (O-P4)
+- [ ] `packages/lexoffice-adapter` — `upsertContact`, `createInvoice`, `getInvoiceStatus`, `createCreditNote`; **Zwei-Konten-Routing je `IssuingEntity`** (Wonderpower/AKL), getrennte ID-Mappings; Anforderung ohne Gesellschaft → Ablehnung
+- [ ] Billing → `InvoiceRequest` (unique `idempotencyKey`) → Worker → Lexoffice → `InvoiceReference`; zyklischer Status-Sync → `PaymentStatus` (`invoice.paid/overdue`)
+- [ ] E-Rechnung (XRechnung/ZUGFeRD) — Lexoffice-Fähigkeit verifizieren (ADR-008-Kriterium, R-06-Spike)
+- [ ] Tests: **F-04** (Template→Instanz→Schritte→Blocked/Exception→Ready) · **F-23** (Won → Handoff-Packet → Annahme → CS-Record → Projekt automatisch inkl. Deliverables → Handoff Acceptance) · **F-18** (Leistung→Rechnung→Nummer/Status; **Zwei-Konten-Routing** + Doppelauslösungs-Negativtest + Fehlerpfad/manueller Retry)
+- **Gate:** F-04 🟢 · F-23 🟢 · F-18 🟢
+
+---
+
+## PHASE 5 — Provisionierung & Activation  ⚪  🆕
+**Ziel:** kontrollierte Aktivierung operativer Strukturen aus dem Activation Manifest (Spec §14). **Gate:** F-24.
+> **Voraussetzung:** Phase 4.
+- [ ] Prisma: `ActivationManifest(+Version)` (maschinenlesbar, gegen Schema validiert), `ReadinessCheckResult`, `ProvisioningRun`, `ProvisioningReport` + Migration
+- [ ] Readiness Checks (Spec §14): Vertrag + Zahlungsgrundlage aktiv · vertretungsberechtigte Rollen verifiziert · Gebäude-/Einheitenstruktur geprüft · Module bestätigt · technische Grunddaten/Messkonzept geklärt · Datenschutz/AV geklärt · Betriebsverantwortung festgelegt · kritische Blocker geschlossen oder ausdrücklich akzeptiert
+- [ ] **Dry Run:** Dubletten, Rechte, Konflikte, fehlende Referenzen prüfen — Bericht ohne Seiteneffekte
+- [ ] Menschliche Freigabe nach Risikoklasse → `activation.manifest_approved`
+- [ ] **Idempotenter Provisionierungs-Command:** Organisation, Gebäude, Einheiten, Rollen, Module anlegen **oder aktivieren** (nutzt `ModuleSubscription/Activation` aus WP-1.5; referenziert, kopiert nicht); Doppellauf ohne Doppelwirkung
+- [ ] Provisioning Report + Audit-Events; Operations-Verantwortliche + Customer Success informieren; Go-Live-Checks + erste Datenqualitätsprüfung
+- [ ] Tests: **F-24** (Manifest → Readiness → Dry Run → Freigabe → Provisionierung → **Doppellauf-Negativtest** → Operations aktiv)
+- **Gate:** F-24 🟢
+
+**➡️ Commercial-Durchstich erreicht,** wenn F-22, F-17, F-05, F-23, F-24 🟢 — das nächste Abschlussziel nach Masterplan §1/ADR-012.
+
+---
+
+## PHASE 6 — Hub- & Device-Registry  ⚪  (= alt-4)
 **Ziel:** zentrale Geräteverwaltung + sicherer Ingest. **Gates:** F-07, F-08.
-> **Voraussetzung:** Phase 1 (kann parallel zu 2/3 laufen, sobald Core steht).
+> **Voraussetzung:** Phase 1. **Nicht auf dem kritischen Pfad des Durchstichs** — kann bei freier Kapazität parallel zu Phasen 2–5 laufen (R-18: früh starten entschärft späte Hardware-Risiken).
 - [ ] Postgres-Image auf **TimescaleDB** umstellen (ADR-002) + Extension/Hypertables-Migration
 - [ ] Prisma: Hub-/Device-Domäne (`Hub`, `HubModel/Credential/Configuration/Deployment`, `Device`, `DeviceModel/Type`, `DeviceAssignment/Installation`, `DeviceReading` append-only, `DeviceTelemetry` append-only, `DeviceState`, `DeviceAlert`, Firmware) — **DB-Constraint `(manufacturer, model, serialNumber)` unique**
 - [ ] Ingest-API `/api/v1/hubs/{id}/heartbeat|readings|alerts` + `GET /config` — **Hub-Credential-Auth**, idempotente Batches (Batch-ID)
@@ -136,9 +190,9 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 
 ---
 
-## PHASE 5 — Monteur-PWA (Offline-First)  ⚪
+## PHASE 7 — Monteur-PWA (Offline-First)  ⚪  (= alt-5)
 **Ziel:** installierbare PWA für Provisionierung. **Gates:** F-09, F-10.
-> **Voraussetzung:** Phase 4 (Registry stabil).
+> **Voraussetzung:** Phase 6 (Registry stabil).
 - [ ] PWA-Grundgerüst (installierbar, Service-Worker, Auth via Session) in apps/platform Route-Group `(installer)`
 - [ ] WorkOrder-/Assignment-Ausbau + Monteur-Auftragsansichten (Tag/Woche), Gebäudestruktur, Checklisten (versioniert)
 - [ ] Provisionierung: QR-/Barcode-Scan → Dublettenprüfung → Modellvalidierung → Einbauort → Kommunikationstest (**oder offline vormerken**) → Messwert → Foto → Checkliste → Bestätigung
@@ -150,40 +204,27 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 
 ---
 
-## PHASE 6 — Powermieter + PILOT  ⚪  ⭐ P1-Abschlussziel
+## PHASE 8 — Powermieter + PILOT  ⚪  ⭐ P1-Modulziel  (= alt-6)
 **Ziel:** Powermieter End-to-End, **verifiziert am Pilot Christinenstraße / Lottumstraße**. **Gates:** F-11, F-12.
-> **Voraussetzung:** Phasen 2–5 · [PO]: MaKo-Klärung Comgy (E-07), ADR-008, Pilotdaten, Regulatorik O-P1…P4.
+> **Voraussetzung:** Phasen 2–7 · [PO]: MaKo-Klärung Comgy (E-07), ADR-008, Pilotdaten, Regulatorik O-P1…P4, E-08 geklärt.
+> Der Angebots-/Annahmefluss kommt vollständig aus Phase 3 (voller Konfigurator) — der früher hierher vorgezogene Minimalfluss entfällt.
 - [ ] Prisma: Powermieter-Domäne (`PowerProject`, `PvSystem/StorageSystem`, `MeteringConcept(+Version)`, `MeteringPoint`, `Tariff/TariffVersion`, `PowerParticipant`, `MeterChange`, `BillingReadiness`, `EnergyAllocation`)
-- [ ] **Minimaler Angebots-/Annahmefluss** (aus Phase 7 vorgezogen): `Offer/OfferVersion/OfferAcceptance` + Kundenportal-Annahme → `offer.accepted` → Projekt automatisch
 - [ ] Projekt-Onboarding-Template Powermieter (Masterplan §7): Gebäude/Hausanschlüsse → PV/Speicher → Messkonzept → Einheiten-Import → Tarifversion → Vertragsvorlage + Feldmapping → Kommunikationsmaterial
-- [ ] Teilnehmer-Onboarding je `PowerParticipant`: Einladung → Daten → **SEPA** (O-P4) → **Stromvertrag via Documenso** → Zählerwechsel/MaKo verfolgen
+- [ ] Teilnehmer-Onboarding je `PowerParticipant`: Einladung → Daten → **SEPA via GoCardless** (O-P4) → **Stromvertrag via Documenso** → Zählerwechsel/MaKo verfolgen
 - [ ] MaKo-Anbindung Comgy (Messwertbezug über Adapter; Zuständigkeiten gemäß §6-Matrix)
 - [ ] **Interne Billing-Engine** (ADR-005): Tarifberechnung (dyn. Sonnenstrompreis, O-P2), `EnergyAllocation` je Periode → `Charge`
+- [ ] Bewohner-Belegweg gemäß **ADR-008**-Entscheidung umsetzen (Belegpfad hinter Adapter-Grenze)
 - [ ] **Billing Readiness** als harte Aktivierungsbedingung (Messkonzept vollständig · Messstellen eichrechtskonform · Tarifversion aktiv · Vertrag signiert · SEPA gültig · MaKo geklärt) → `module.activated`
 - [ ] Betriebsdashboard (Teilnehmerquote, Zählerstatus, offene Onboardings, Erzeugung/Verbrauch)
 - [ ] **PILOT-Durchlauf** am realen Objekt (21 Messstellen): kompletter Fluss ohne manuelle DB-Eingriffe; erste Abrechnungsperiode fehlerfrei vorbereitet
 - [ ] Tests: **F-11** (Lead→…→Modul aktiv, am Pilot) · **F-12** (Billing Readiness → Aktivierung)
-- **Gate:** F-11 🟢 · F-12 🟢 · **Pilot produktiv** → P1-Ziel erreicht ⭐
+- **Gate:** F-11 🟢 · F-12 🟢 · **Pilot produktiv** → P1-Modulziel erreicht ⭐
 
 ---
 
-## PHASE 7 — Commercial-Vollausbau & Lexoffice  ⚪
-**Ziel:** Angebotskonfigurator + Kundenportal + B2B-Rechnungsweg. **Gates:** F-17, F-18.
-> **Voraussetzung:** Phase 6 (Powermieter-Produkte existieren).
-- [ ] Angebotskonfigurator (Powermieter-Umfang: Modul, Hub-Infrastruktur, Installation, Planung, Wartung/Service) + Preisbücher/Regeln; jedes Angebot trägt **`IssuingEntity`**
-- [ ] Kundenportal-Vervollständigung (Varianten vergleichen, annehmen, Signaturstatus, Projektstatus, Dokumente, Rechnungen, Servicefälle); Angebotsportal → Projekt-/Betriebsportal
-- [ ] `packages/lexoffice-adapter` — `upsertContact`, `createInvoice`, `getInvoiceStatus`, `createCreditNote`; **Zwei-Konten-Routing je `IssuingEntity`** (Wonderpower/AKL), getrennte ID-Mappings; Anforderung ohne Gesellschaft → Ablehnung
-- [ ] Billing → `InvoiceRequest` (unique `idempotencyKey`) → Worker → Lexoffice → `InvoiceReference`; zyklischer Status-Sync → `PaymentStatus` (`invoice.paid/overdue`)
-- [ ] E-Rechnung (XRechnung/ZUGFeRD) — Lexoffice-Fähigkeit verifizieren (ADR-008-Kriterium)
-- [ ] Bewohner-Belegweg gemäß **ADR-008**-Entscheidung umsetzen
-- [ ] Tests: **F-17** (Konfigurator→Annahme→Projekt automatisch) · **F-18** (Leistung→Rechnung→Nummer/Status; **Zwei-Konten-Routing** + Doppelauslösungs-Negativtest + Fehlerpfad/manueller Retry)
-- **Gate:** F-17 🟢 · F-18 🟢
-
----
-
-## PHASE 8 — Smokemieter (P2)  ⚪
+## PHASE 9 — Smokemieter (P2)  ⚪  (= alt-8)
 **Ziel:** RWM-Betrieb + garantierter Serviceprozess. **Gate:** F-13.
-> **Voraussetzung:** P1-Ziel erreicht (Phase 6) + Freigabe · Phasen 4/5 (Registry+PWA).
+> **Voraussetzung:** P1-Modulziel erreicht (Phase 8) + Freigabe · Phasen 6/7 (Registry+PWA).
 - [ ] **NFR-Gate zuerst:** überwachte Alarmierungskette (Gerät→Hub→Plattform→Serviceprozess→Mensch) mit Verfügbarkeitszielen — Aktivierungsvoraussetzung
 - [ ] Prisma: Smokemieter-Domäne (`SmokeProject`, `InspectionRun/Record` append-only, `ReplacementPlan`, `ResidentNotice`) + Betreibervertrag via Documenso
 - [ ] Geräteplanung/-installation (PWA, Funktionstest) · Ferninspektion periodisch · Prüfhistorie (DIN 14676, revisionssicher)
@@ -194,7 +235,7 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 
 ---
 
-## PHASE 9 — Heatmieter (P3)  ⚪  · PHASE 10 — Chargemieter (P3)  ⚪
+## PHASE 10 — Heatmieter (P3)  ⚪  · PHASE 11 — Chargemieter (P3)  ⚪  (= alt-9/10)
 > **Nur bei ausdrücklicher Prioritätsanhebung** (Masterplan §1). Bis dahin: **nur Datenmodell** (WP-1.5-Stubs), keine Fachlogik/UI/Adapter.
 - [ ] [bei Anhebung] Heatmieter: Geräteverwaltung, Messwert-Validierung mit Wertetrennung, Nutzerwechsel, EED-Verbrauchsinfo, Abrechnungsvorbereitung → **F-14, F-15**; fachliche Klärung O-H1…O-H3
 - [ ] [bei Anhebung] Chargemieter: Planung, Ladepunkte, **eichrechtskonforme Abrechnung**, Nutzer-Onboarding, Documenso-Verträge, Ladevorgänge, Förderung → **F-16**; OCPP-ADR (O-C1) zuerst
@@ -202,16 +243,28 @@ Diese Punkte blockieren spätere Phasen; je früher, desto besser. Reihenfolge n
 
 ---
 
+## PHASE 12 — Agentische Skalierung  ⚪  🆕 (gated)
+**Ziel:** Paula + spezialisierte Agenten auf gemeinsamer Tool-Registry, Autonomiestufen A0–A5, Evaluation/Budgets (Spec §19, §29 Phase 6).
+> **Voraussetzung (hart):** E-09/K-07 entschieden · **Agent-Security-Standard steht VOR dem ersten Agenten** (Spec §19: authentifizierte/auditierbare Tool-Aufrufe, Schreibrechte feiner als Leserechte, Prompt-Inhalte nie Autoritätsquelle, Schema-validierte Outputs, Kosten-/Tool-Budgets, Offline-Evaluationen) · stabiler Commercial-Durchstich (Phase 5 🟢).
+- [ ] [bei Freigabe] `Agents & Automation`-Kontext: Agentenidentitäten im Berechtigungsmodell, Tool Registry, Model Gateway nach Datenschutzklasse (Spec §16/§23)
+- [ ] [bei Freigabe] Erste Agenten im Commercial-Bereich (Lead/Sales/Proposal/Approval) — Start A0–A2 (Observe/Draft/Recommend), A3/A4 nur mit Freigabepfaden
+- [ ] [bei Freigabe] Evaluationssätze/Goldens je Agent + Agent-KPIs (Acceptance/Correction Rate, Policy Violations — Spec §27)
+- **Gate:** wird bei Konkretisierung definiert (kein F-Fluss vergeben; Masterplan §12 dann ergänzen)
+
+---
+
 ## Gate-Übersicht (Phase → E2E-Flüsse, Masterplan §12)
 
 | Phase | Gates | Aktueller Status |
 |---|---|---|
-| 1 | F-01, F-02, F-03, F-19, F-20, F-21 | F-01 🟢 · F-21 🟣 · Rest ⚪ |
-| 2 | F-04 | ⚪ |
-| 3 | F-05, F-06 | ⚪ |
-| 4 | F-07, F-08 | ⚪ |
-| 5 | F-09, F-10 | ⚪ |
-| 6 ⭐ | F-11, F-12 | ⚪ |
-| 7 | F-17, F-18 | ⚪ |
-| 8 | F-13 | ⚪ |
-| 9/10 (P3) | F-14, F-15, F-16 | ⚪ (gated) |
+| 1 | F-01, F-02, F-03, F-19, F-20, F-21 | F-01/F-02/F-03/F-19/F-20 🟢 · F-21 🟣 |
+| 2 🆕 | F-22 | ⚪ |
+| 3 | F-17, F-05, F-06 | ⚪ |
+| 4 | F-04, F-23, F-18 | ⚪ |
+| 5 🆕 | F-24 | ⚪ |
+| 6 | F-07, F-08 | ⚪ |
+| 7 | F-09, F-10 | ⚪ |
+| 8 ⭐ | F-11, F-12 | ⚪ |
+| 9 | F-13 | ⚪ |
+| 10/11 (P3) | F-14, F-15, F-16 | ⚪ (gated) |
+| 12 🆕 | t.b.d. | ⚪ (gated E-09/K-07) |

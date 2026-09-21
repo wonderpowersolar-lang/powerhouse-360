@@ -11,12 +11,14 @@
   },
   "dependencies": {
     "@ph360/database": "workspace:*",
-    "nodemailer": "^6.9.16"
+    "@ph360/events": "workspace:*",
+    "@ph360/notifications": "workspace:*",
+    "@ph360/observability": "workspace:*",
+    "pg-boss": "^10.3.2"
   },
   "devDependencies": {
     "@ph360/eslint-config": "workspace:*",
     "@types/node": "^20",
-    "@types/nodemailer": "^6.4.17",
     "eslint": "^9",
     "tsx": "^4.19.2",
     "typescript": "^5"

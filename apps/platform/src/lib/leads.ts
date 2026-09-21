@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { prisma, Prisma, type ModuleKey } from "@ph360/database";
+import { publishEvent } from "@ph360/events";
 
 const MODULE_MAP: Record<string, ModuleKey> = {
   powermieter: "POWERMIETER",
@@ -128,21 +129,19 @@ export async function createLead(input: LeadInput, requestId: string) {
       },
     });
 
-    await tx.domainEvent.create({
-      data: {
-        eventType: "lead.created",
-        aggregateType: "Lead",
-        aggregateId: lead.id,
-        organizationId,
-        correlationId: requestId,
-        payload: {
-          leadId: lead.id,
-          leadType: lead.leadType,
-          email: lead.email,
-          name: `${lead.firstName} ${lead.lastName}`,
-          modules: lead.modules,
-          source: lead.source,
-        } as Prisma.InputJsonValue,
+    await publishEvent(tx, {
+      eventType: "lead.created",
+      aggregateType: "Lead",
+      aggregateId: lead.id,
+      organizationId,
+      correlationId: requestId,
+      payload: {
+        leadId: lead.id,
+        leadType: lead.leadType,
+        email: lead.email,
+        name: `${lead.firstName} ${lead.lastName}`,
+        modules: lead.modules,
+        source: lead.source,
       },
     });
 

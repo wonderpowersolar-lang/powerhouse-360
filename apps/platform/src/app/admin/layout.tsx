@@ -2,6 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getAuthContext } from "@ph360/auth";
+import { AppLogo } from "../../components/AppLogo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,14 +20,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
   return (
     <div className="admin">
-      <nav className="admin-nav">
-        <strong>Powerhouse 360</strong>
+      <nav className="admin-nav" aria-label="Hauptnavigation">
+        <AppLogo />
         <Link href="/admin/leads">Leads</Link>
+        <Link href="/admin/customers">Kunden</Link>
         <Link href="/admin/objects">Objekte</Link>
+        <Link href="/admin/access-scopes">Zugriffe</Link>
         <Link href="/admin/members">Mitglieder</Link>
         <Link href="/admin/audit">Audit</Link>
         <span className="spacer" />
-        <span className="muted">{ctx.email}</span>
+        <span className="who">{ctx.email}</span>
       </nav>
       {children}
     </div>

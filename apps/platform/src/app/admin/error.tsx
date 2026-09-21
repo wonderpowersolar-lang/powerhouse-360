@@ -16,7 +16,7 @@ export default function AdminError({ reset }: { error: Error; reset: () => void 
         wende dich an eine Administratorin oder einen Administrator.
       </p>
       <p style={{ marginTop: "1.5rem", display: "flex", gap: "1rem" }}>
-        <Link href="/admin/leads">Zu den Leads</Link>
+        <Link href="/admin">Zum Dashboard</Link>
         <button type="button" onClick={reset} className="linklike">
           Erneut versuchen
         </button>

@@ -5,7 +5,7 @@ import { authClient } from "@ph360/auth/client";
 
 export function LoginForm() {
   const router = useRouter();
-  const next = useSearchParams().get("next") ?? "/admin/leads";
+  const next = useSearchParams().get("next") ?? "/admin";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

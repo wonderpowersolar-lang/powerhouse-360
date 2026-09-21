@@ -4,22 +4,42 @@
     {
       "name": "ph360-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3005,
       "autoPort": true
     },
     {
       "name": "ph360-prod",
       "runtimeExecutable": "node",
-      "runtimeArgs": [".next/standalone/server.js"],
+      "runtimeArgs": [
+        ".next/standalone/server.js"
+      ],
       "port": 3200,
       "autoPort": true
     },
     {
       "name": "platform-dev",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@ph360/platform", "dev"],
+      "runtimeArgs": [
+        "--filter",
+        "@ph360/platform",
+        "dev"
+      ],
       "port": 3100
+    },
+    {
+      "name": "website-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@ph360/website",
+        "dev"
+      ],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }

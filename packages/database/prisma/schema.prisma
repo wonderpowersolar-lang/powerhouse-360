@@ -46,6 +46,24 @@ model Organization {
   properties   Property[]
   accessScopes AccessScope[]
 
+  // WP-1.3-Rest
+  managedProperties Property[]    @relation("PropertyManagedBy")
+  customerRecords   Customer[]    @relation("CustomerTenant")
+  customerRecord    Customer?     @relation("CustomerOrganization")
+  opportunities     Opportunity[]
+  crmNotes          Note[]
+  crmTasks          Task[]
+  notifications     Notification[]
+
+  // WP-1.5
+  projects            Project[]
+  workOrders          WorkOrder[]
+  documents           Document[]
+  moduleSubscriptions ModuleSubscription[]
+  heatProjects        HeatProject[]
+  chargingProjects    ChargingProject[]
+  fundingCases        FundingCase[]
+
   @@map("organization")
 }
 
@@ -116,6 +134,11 @@ model Lead {
   // Lossless original payload for audit/replay.
   payload Json
 
+  // WP-1.3-Rest: gesetzt bei Qualifizierung/Konversion (F-03) — die Daten
+  // wandern in Customer/CustomerContact/Property, der Lead bleibt als Quelle.
+  convertedToCustomerId String?   @db.Uuid
+  convertedToCustomer   Customer? @relation(fields: [convertedToCustomerId], references: [id], onDelete: SetNull)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -123,6 +146,7 @@ model Lead {
 
   @@index([status, createdAt])
   @@index([email])
+  @@index([convertedToCustomerId])
   @@map("lead")
 }
 
@@ -134,7 +158,7 @@ model LeadActivity {
   type      LeadActivityType
   message   String?
   actorType AuditActorType   @default(SYSTEM)
-  actorId   String?          @db.Uuid
+  actorId   String? // better-auth user id (non-UUID) — wie AuditEvent.actorId
   payload   Json?
   createdAt DateTime         @default(now())
 
@@ -181,13 +205,18 @@ enum DomainEventStatus {
 }
 
 /// Transactional outbox. Written in the same transaction as the state change;
-/// drained by apps/worker. See docs/POWERHOUSE_360_MASTER_PLAN.md §3 + ADR-001.
+/// drained by apps/worker (WP-1.4: pg-boss-Dispatcher + EventHandlerExecution).
+/// See docs/POWERHOUSE_360_MASTER_PLAN.md §3 + ADR-001.
 model DomainEvent {
   id            String            @id @default(uuid()) @db.Uuid
   eventType     String // e.g. "lead.created"
   aggregateType String // e.g. "Lead"
   aggregateId   String
   organizationId String?          @db.Uuid
+  // WP-1.4: Envelope-Vervollständigung (Masterplan §3) — Schema-Version des
+  // Event-Payloads + auslösender Akteur (better-auth-ID oder null für SYSTEM).
+  version       Int               @default(1)
+  actorId       String?
   payload       Json
   status        DomainEventStatus @default(PENDING)
   attempts      Int               @default(0)
@@ -198,8 +227,74 @@ model DomainEvent {
   causationId   String?
   createdAt     DateTime          @default(now())
 
+  handlerExecutions EventHandlerExecution[]
+  notifications     Notification[]
+
   @@index([status, availableAt])
   @@map("domain_event")
+}
+
+enum HandlerExecutionStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+/// WP-1.4 (ADR-001): genau eine Wirkung je (Event, Handler) — der Unique-
+/// Constraint ist die Idempotenz-Garantie bei at-least-once-Zustellung.
+/// `attempts` zählt echte Ausführungsversuche; ab MAX_ATTEMPTS wird das
+/// Event DEAD (Dead-Letter sichtbar, manueller Retry auditiert).
+model EventHandlerExecution {
+  id          String                 @id @default(uuid()) @db.Uuid
+  eventId     String                 @db.Uuid
+  event       DomainEvent            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  handlerName String
+  status      HandlerExecutionStatus @default(RUNNING)
+  attempts    Int                    @default(0)
+  lastError   String?
+  completedAt DateTime?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  @@unique([eventId, handlerName])
+  @@index([status])
+  @@map("event_handler_execution")
+}
+
+enum NotificationChannel {
+  EMAIL
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+/// WP-1.4: Benachrichtigung mit Zustellstatus (packages/notifications).
+/// Unique (eventId, templateKey, recipient): ein Event erzeugt je Empfänger
+/// und Vorlage höchstens eine Benachrichtigung — Handler-Retries erzeugen
+/// keine Duplikate, sondern stellen die bestehende Zeile erneut zu.
+model Notification {
+  id             String              @id @default(uuid()) @db.Uuid
+  organizationId String?             @db.Uuid
+  organization   Organization?       @relation(fields: [organizationId], references: [id])
+  eventId        String?             @db.Uuid
+  event          DomainEvent?        @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  channel        NotificationChannel @default(EMAIL)
+  recipient      String
+  templateKey    String
+  payload        Json?
+  subject        String?
+  status         NotificationStatus  @default(PENDING)
+  error          String?
+  sentAt         DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@unique([eventId, templateKey, recipient])
+  @@index([status, createdAt])
+  @@map("notification")
 }
 
 // ---------------------------------------------------------------------------
@@ -358,14 +453,26 @@ model Property {
   organizationId String       @db.Uuid
   organization   Organization @relation(fields: [organizationId], references: [id])
   name           String
+  // WP-1.3-Rest: verwaltende Hausverwaltung (Masterplan §4 Nr. 2) —
+  // Eigentum bleibt bei `organizationId`, Verwaltung ist eine eigene Beziehung.
+  managedByOrganizationId String?       @db.Uuid
+  managedBy               Organization? @relation("PropertyManagedBy", fields: [managedByOrganizationId], references: [id], onDelete: SetNull)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  buildings    Building[]
-  accessScopes AccessScope[]
+  buildings     Building[]
+  accessScopes  AccessScope[]
+  opportunities Opportunity[]
+
+  // WP-1.5
+  projects          Project[]
+  moduleActivations ModuleActivation[]
+  heatProjects      HeatProject[]
+  chargingProjects  ChargingProject[]
 
   @@unique([organizationId, name])
   @@index([organizationId])
+  @@index([managedByOrganizationId])
   @@map("property")
 }
 
@@ -379,9 +486,12 @@ model Building {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  entrances    Entrance[]
-  units        Unit[]
-  accessScopes AccessScope[]
+  entrances         Entrance[]
+  units             Unit[]
+  accessScopes      AccessScope[]
+  technicalRooms    TechnicalRoom[]
+  gridConnections   GridConnection[]
+  moduleActivations ModuleActivation[]
 
   @@unique([propertyId, name])
   @@map("building")
@@ -412,14 +522,19 @@ model Unit {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
+  rooms            Room[]
+  occupancyChanges OccupancyChange[]
+
   @@unique([buildingId, label])
   @@index([buildingId])
+  @@index([entranceId])
   @@map("unit")
 }
 
 enum AccessScopeType {
   PROPERTY
   BUILDING
+  PROJECT
 }
 
 /// WP-1.3-Kern: reiner Datenmodell-Stub (ADR-004, Masterplan §4). Die
@@ -438,10 +553,555 @@ model AccessScope {
   property       Property?       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   buildingId     String?         @db.Uuid
   building       Building?       @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  // WP-1.5: Projekt-Scope (angekündigt in WP-1.3-Rest; Sichtbarkeits-Auflösung
+  // folgt mit der ersten Projekt-Lesesicht — bis dahin nur Datenmodell + Shape-CHECK).
+  projectId      String?         @db.Uuid
+  project        Project?        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   grantedById    String? // User-ID (better-auth String-ID); im Stub bewusst ohne Relation
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
   @@index([organizationId])
+  @@index([propertyId])
+  @@index([buildingId])
+  @@index([projectId])
   @@map("access_scope")
+}
+
+// ---------------------------------------------------------------------------
+// immobilien — Rest (WP-1.3-Rest): Räume, Technikräume, Hausanschlüsse.
+// Bewusst keine eigene Floor-Tabelle: `Unit.floor` (Int) bleibt die einzige
+// Etagen-Wahrheit, bis ein realer Bedarf (z. B. Etagenpläne) eine Entität
+// rechtfertigt — zwei Quellen wären schlechter als eine (Masterplan §5:
+// implementiert wird, was der kritische Pfad braucht).
+// ---------------------------------------------------------------------------
+
+model Room {
+  id        String   @id @default(uuid()) @db.Uuid
+  unitId    String   @db.Uuid
+  unit      Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  label     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([unitId, label])
+  @@map("room")
+}
+
+model TechnicalRoom {
+  id         String   @id @default(uuid()) @db.Uuid
+  buildingId String   @db.Uuid
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  label      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([buildingId, label])
+  @@map("technical_room")
+}
+
+/// Hausanschluss (struktureller Stub; MaLo/MeLo-Kennungen kommen mit dem
+/// Powermieter-Messkonzept in Phase 8, nicht hier).
+model GridConnection {
+  id         String   @id @default(uuid()) @db.Uuid
+  buildingId String   @db.Uuid
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  label      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([buildingId, label])
+  @@map("grid_connection")
+}
+
+// ---------------------------------------------------------------------------
+// commercial — IssuingEntity (Masterplan §4): getrennte Rechtsträger, ein
+// System. Pflicht-FK auf Außenwirkungs-Entitäten (Offer/Contract/
+// InvoiceRequest/Document) folgt, sobald diese Entitäten existieren (Phase 3+).
+// Stammdaten werden idempotent geseedet (seed.ts), nie hart codiert.
+// ---------------------------------------------------------------------------
+
+model IssuingEntity {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String   @unique // stabiler technischer Schlüssel, z. B. "WONDERPOWER"
+  name      String   @unique // eingetragener Firmenname
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("issuing_entity")
+}
+
+// ---------------------------------------------------------------------------
+// crm — Kundenkern (WP-1.3-Rest). Kunden SIND Organisationen (Masterplan §4
+// Nr. 2: WEG/Eigentümer = Kunden-Organization, Properties gehören der
+// Eigentümer-Org). `Customer` ist der CRM-Datensatz des POWERHOUSE-Mandanten
+// über diese Kunden-Org — Name/Typ leben ausschließlich auf der Organization
+// (eine Wahrheit, keine Kopie). SalesStage/Forecast/Communication folgen in
+// Phase 2 (Commercial Core).
+// ---------------------------------------------------------------------------
+
+model Customer {
+  id             String       @id @default(uuid()) @db.Uuid
+  /// Tenant-Anker (ADR-004): die POWERHOUSE-Org, der der CRM-Datensatz gehört.
+  organizationId String       @db.Uuid
+  organization   Organization @relation("CustomerTenant", fields: [organizationId], references: [id])
+  /// Die Kunden-Organisation (WEG/HV/Eigentümer …) — 1:1, bei Qualifizierung angelegt.
+  customerOrganizationId String       @unique @db.Uuid
+  customerOrganization   Organization @relation("CustomerOrganization", fields: [customerOrganizationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  contacts       CustomerContact[]
+  opportunities  Opportunity[]
+  notes          Note[]
+  tasks          Task[]
+  convertedLeads Lead[]
+  projects       Project[]
+
+  @@index([organizationId])
+  @@map("customer")
+}
+
+model CustomerContact {
+  id         String   @id @default(uuid()) @db.Uuid
+  customerId String   @db.Uuid
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  firstName  String
+  lastName   String
+  email      String
+  phone      String?
+  role       String? // Funktion beim Kunden, z. B. "Verwalter", "Beirat"
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([customerId, email])
+  @@index([email])
+  @@map("customer_contact")
+}
+
+enum OpportunityStatus {
+  OPEN
+  WON
+  LOST
+}
+
+/// Minimaler Opportunity-Kern (WP-1.3-Rest). Konfigurierbare SalesStage mit
+/// Eintritts-/Austrittskriterien, Forecast und Pipeline-Board kommen in
+/// Phase 2 (Commercial Core, F-22) — hier nur das Datenmodell-Fundament.
+model Opportunity {
+  id             String            @id @default(uuid()) @db.Uuid
+  organizationId String            @db.Uuid
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  customerId     String            @db.Uuid
+  customer       Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  propertyId     String?           @db.Uuid
+  property       Property?         @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  title          String
+  status         OpportunityStatus @default(OPEN)
+  amountCents    Int? // Geld als Integer-Cent (Masterplan §5)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  notes Note[]
+  tasks Task[]
+
+  @@index([organizationId, status])
+  @@index([customerId])
+  @@map("opportunity")
+}
+
+model Note {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  customerId     String?      @db.Uuid
+  customer       Customer?    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  opportunityId  String?      @db.Uuid
+  opportunity    Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  authorId       String? // better-auth User-ID
+  body           String
+  createdAt      DateTime     @default(now())
+
+  @@index([customerId])
+  @@index([opportunityId])
+  @@map("note")
+}
+
+enum TaskStatus {
+  OPEN
+  DONE
+}
+
+model Task {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  customerId     String?      @db.Uuid
+  customer       Customer?    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  opportunityId  String?      @db.Uuid
+  opportunity    Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  title          String
+  status         TaskStatus   @default(OPEN)
+  assigneeId     String? // better-auth User-ID
+  dueAt          DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId, status])
+  @@map("task")
+}
+
+// ---------------------------------------------------------------------------
+// projekte — Grundgerüst (WP-1.5; Masterplan §5 Projekt/Operations, Auszug).
+// Automatische Projekterzeugung aus der Quote kommt in Phase 4 (F-23);
+// WorkOrderAssignment/InstallationTask/ServiceTicket etc. folgen mit ihren
+// Phasen (6/7). Tenant-Anker = Kunden-Organisation (wie Property).
+// ---------------------------------------------------------------------------
+
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+model Project {
+  id             String        @id @default(uuid()) @db.Uuid
+  organizationId String        @db.Uuid
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  customerId     String?       @db.Uuid
+  customer       Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  propertyId     String?       @db.Uuid
+  property       Property?     @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  name           String
+  status         ProjectStatus @default(DRAFT)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  phases       ProjectPhase[]
+  milestones   ProjectMilestone[]
+  workOrders   WorkOrder[]
+  documents    Document[]
+  accessScopes AccessScope[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId, status])
+  @@map("project")
+}
+
+enum ProjectPhaseStatus {
+  PENDING
+  ACTIVE
+  DONE
+}
+
+model ProjectPhase {
+  id        String             @id @default(uuid()) @db.Uuid
+  projectId String             @db.Uuid
+  project   Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  label     String
+  position  Int
+  status    ProjectPhaseStatus @default(PENDING)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@unique([projectId, position])
+  @@unique([projectId, label])
+  @@map("project_phase")
+}
+
+model ProjectMilestone {
+  id          String    @id @default(uuid()) @db.Uuid
+  projectId   String    @db.Uuid
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  label       String
+  dueAt       DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([projectId, label])
+  @@map("project_milestone")
+}
+
+enum WorkOrderStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+model WorkOrder {
+  id             String          @id @default(uuid()) @db.Uuid
+  organizationId String          @db.Uuid
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  projectId      String?         @db.Uuid
+  project        Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  title          String
+  status         WorkOrderStatus @default(OPEN)
+  assigneeId     String? // better-auth User-ID
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([organizationId, status])
+  @@index([projectId])
+  @@map("work_order")
+}
+
+// ---------------------------------------------------------------------------
+// dokumente (WP-1.5): Metadaten in Postgres, Inhalt im Objektspeicher (MinIO).
+// storageKey ist der einzige Zeiger auf den Blob; sha256 sichert Integrität
+// (Masterplan §3 Files: Metadaten, Hash, Zugriffskontrolle). Virenprüfung
+// folgt als eigener Schritt vor Prod-Uploads fremder Nutzer.
+// ---------------------------------------------------------------------------
+
+model Document {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  projectId      String?      @db.Uuid
+  project        Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  uploaderId     String? // better-auth User-ID
+  fileName       String
+  contentType    String
+  sizeBytes      Int
+  sha256         String
+  storageKey     String       @unique
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId, createdAt])
+  @@index([projectId])
+  @@map("document")
+}
+
+// ---------------------------------------------------------------------------
+// module — Gerüst ohne Fachlogik (WP-1.5). Aktivierungsbedingungen (z. B.
+// Billing Readiness, Phase 8) und BuildingModule/UnitModule/Device-Zuordnung
+// folgen mit den Modulphasen.
+// ---------------------------------------------------------------------------
+
+enum ModuleSubscriptionStatus {
+  PLANNED
+  ACTIVE
+  SUSPENDED
+  ENDED
+}
+
+model ModuleSubscription {
+  id             String                   @id @default(uuid()) @db.Uuid
+  organizationId String                   @db.Uuid
+  organization   Organization             @relation(fields: [organizationId], references: [id])
+  moduleKey      ModuleKey
+  status         ModuleSubscriptionStatus @default(PLANNED)
+  startedAt      DateTime?
+  endedAt        DateTime?
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+
+  activations    ModuleActivation[]
+  configurations ModuleConfiguration[]
+
+  @@unique([organizationId, moduleKey])
+  @@map("module_subscription")
+}
+
+enum ModuleActivationStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+model ModuleActivation {
+  id             String                 @id @default(uuid()) @db.Uuid
+  subscriptionId String                 @db.Uuid
+  subscription   ModuleSubscription     @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  propertyId     String?                @db.Uuid
+  property       Property?              @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  buildingId     String?                @db.Uuid
+  building       Building?              @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  status         ModuleActivationStatus @default(PENDING)
+  activatedAt    DateTime?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@index([subscriptionId])
+  @@map("module_activation")
+}
+
+model ModuleConfiguration {
+  id             String             @id @default(uuid()) @db.Uuid
+  subscriptionId String             @db.Uuid
+  subscription   ModuleSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  version        Int                @default(1)
+  config         Json
+  createdAt      DateTime           @default(now())
+
+  @@unique([subscriptionId, version])
+  @@map("module_configuration")
+}
+
+// ---------------------------------------------------------------------------
+// P3-DATENMODELL-STUBS (WP-1.5; Masterplan §5 P3-Politik): Heat- und
+// Chargemieter existieren NUR als Tabellen — null Fachlogik, UI oder Adapter
+// bis zur Prioritätsanhebung (Phasen 10/11). Felder bewusst minimal;
+// fachliche Schärfung (Statusmaschinen, Wertetrennung, Eichrecht) kommt mit
+// der jeweiligen Phase. Geräte-/Zählerbezüge folgen mit der Device-Registry
+// (Phase 6) — hier keine Geräde-FKs.
+// ---------------------------------------------------------------------------
+
+model HeatProject {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  propertyId     String?      @db.Uuid
+  property       Property?    @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  name           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  readingSchedules ReadingSchedule[]
+  statements       HeatStatement[]
+  allocationKeys   AllocationKey[]
+
+  @@unique([organizationId, name])
+  @@map("heat_project")
+}
+
+model ReadingSchedule {
+  id            String      @id @default(uuid()) @db.Uuid
+  heatProjectId String      @db.Uuid
+  heatProject   HeatProject @relation(fields: [heatProjectId], references: [id], onDelete: Cascade)
+  label         String
+  intervalDays  Int?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([heatProjectId, label])
+  @@map("reading_schedule")
+}
+
+model OccupancyChange {
+  id         String   @id @default(uuid()) @db.Uuid
+  unitId     String   @db.Uuid
+  unit       Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  occurredAt DateTime
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([unitId, occurredAt])
+  @@map("occupancy_change")
+}
+
+model HeatStatement {
+  id            String      @id @default(uuid()) @db.Uuid
+  heatProjectId String      @db.Uuid
+  heatProject   HeatProject @relation(fields: [heatProjectId], references: [id], onDelete: Cascade)
+  periodStart   DateTime
+  periodEnd     DateTime
+  createdAt     DateTime    @default(now())
+
+  @@index([heatProjectId, periodStart])
+  @@map("heat_statement")
+}
+
+model AllocationKey {
+  id            String      @id @default(uuid()) @db.Uuid
+  heatProjectId String      @db.Uuid
+  heatProject   HeatProject @relation(fields: [heatProjectId], references: [id], onDelete: Cascade)
+  key           String
+  description   String?
+  createdAt     DateTime    @default(now())
+
+  @@unique([heatProjectId, key])
+  @@map("allocation_key")
+}
+
+model ChargingProject {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  propertyId     String?      @db.Uuid
+  property       Property?    @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  name           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  chargePoints        ChargePoint[]
+  loadManagementPlans LoadManagementPlan[]
+  authorizations      ChargingAuthorization[]
+  fundingCases        FundingCase[]
+
+  @@unique([organizationId, name])
+  @@map("charging_project")
+}
+
+model ChargePoint {
+  id                String          @id @default(uuid()) @db.Uuid
+  chargingProjectId String          @db.Uuid
+  chargingProject   ChargingProject @relation(fields: [chargingProjectId], references: [id], onDelete: Cascade)
+  label             String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  sessions ChargingSession[]
+
+  @@unique([chargingProjectId, label])
+  @@map("charge_point")
+}
+
+model ChargingSession {
+  id            String      @id @default(uuid()) @db.Uuid
+  chargePointId String      @db.Uuid
+  chargePoint   ChargePoint @relation(fields: [chargePointId], references: [id], onDelete: Cascade)
+  startedAt     DateTime
+  endedAt       DateTime?
+  energyKwh     Decimal?    @db.Decimal(14, 3) // §5: Energie numeric(14,3)
+  createdAt     DateTime    @default(now())
+
+  @@index([chargePointId, startedAt])
+  @@map("charging_session")
+}
+
+model LoadManagementPlan {
+  id                String          @id @default(uuid()) @db.Uuid
+  chargingProjectId String          @db.Uuid
+  chargingProject   ChargingProject @relation(fields: [chargingProjectId], references: [id], onDelete: Cascade)
+  name              String
+  config            Json?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([chargingProjectId, name])
+  @@map("load_management_plan")
+}
+
+model ChargingAuthorization {
+  id                String          @id @default(uuid()) @db.Uuid
+  chargingProjectId String          @db.Uuid
+  chargingProject   ChargingProject @relation(fields: [chargingProjectId], references: [id], onDelete: Cascade)
+  kind              String // z. B. RFID, APP — Enum folgt mit Fachphase
+  identifier        String
+  createdAt         DateTime        @default(now())
+
+  @@unique([chargingProjectId, kind, identifier])
+  @@map("charging_authorization")
+}
+
+model FundingCase {
+  id                String           @id @default(uuid()) @db.Uuid
+  organizationId    String           @db.Uuid
+  organization      Organization     @relation(fields: [organizationId], references: [id])
+  chargingProjectId String?          @db.Uuid
+  chargingProject   ChargingProject? @relation(fields: [chargingProjectId], references: [id], onDelete: SetNull)
+  program           String
+  reference         String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@index([organizationId])
+  @@map("funding_case")
 }

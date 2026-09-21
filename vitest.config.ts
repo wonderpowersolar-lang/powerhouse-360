@@ -10,7 +10,8 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: ["packages/permissions/**/*.{test,spec}.ts"],
+          include: ["packages/**/*.{test,spec}.ts"],
+          exclude: ["**/node_modules/**", "**/.next/**", "**/generated/**"],
         },
       },
       {
@@ -18,6 +19,7 @@ export default defineConfig({
           name: "integration",
           environment: "node",
           include: ["packages/**/*.itest.ts", "apps/**/*.itest.ts"],
+          exclude: ["**/node_modules/**", "**/.next/**", "**/generated/**"],
           globalSetup: ["./packages/testing/src/global-setup.ts"],
           setupFiles: ["./packages/testing/src/setup.ts"],
           env: TEST_DB

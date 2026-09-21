@@ -1,5 +1,6 @@
 import { PrismaClient } from "../generated/client/index.js";
 import { seedPilotStructure } from "./seed-objects.js";
+import { seedIssuingEntities } from "./seed-issuing-entities.js";
 
 const prisma = new PrismaClient();
 
@@ -7,6 +8,7 @@ const prisma = new PrismaClient();
  * Idempotent seed: ensures the Powerhouse 360 tenant exists. This is the
  * organization that receives inbound leads (WP-1.1). Re-runnable.
  * WP-1.3-Kern: + Pilotstruktur im ADR-006-Testmandanten.
+ * WP-1.3-Rest: + IssuingEntity-Stammdaten (Masterplan §4).
  */
 async function main() {
   const existing = await prisma.organization.findFirst({
@@ -20,6 +22,11 @@ async function main() {
     }));
 
   console.log(`[seed] Powerhouse organization: ${org.id} (${org.name})`);
+
+  const issuing = await seedIssuingEntities(prisma);
+  console.log(
+    `[seed] IssuingEntities: ${issuing.map((e) => `${e.key}=${e.id}`).join(", ")}`,
+  );
 
   const pilot = await seedPilotStructure(prisma);
   console.log(

@@ -6,7 +6,7 @@
  * `tone` picks the surface: "dark" = glass chip over the dark panel theme,
  * "light" = white chip over light panels / the dashboard app window.
  */
-export default function MetricCard({
+export function MetricCard({
   label,
   value,
   bar,
@@ -41,7 +41,10 @@ export default function MetricCard({
       </p>
       <p
         className={`mt-0.5 text-base font-bold tabular-nums ${
-          light ? "text-navy-900" : "text-ink"
+          // fester Hexwert statt text-navy-900: navy-900 flippt im
+          // .theme-light-Scope auf hell — der Wert wäre dort unlesbar
+          // (gleiches Muster wie Button tone="light").
+          light ? "text-[#16243a]" : "text-ink"
         }`}
       >
         {value}
@@ -69,3 +72,8 @@ export default function MetricCard({
     </div>
   );
 }
+
+// Default-Export bleibt für bestehende `import MetricCard from …`-Stellen;
+// der Named Export macht die Komponente für `export *`-Bundles (design-sync)
+// und Named Imports erreichbar.
+export default MetricCard;

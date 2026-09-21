@@ -1,10 +1,28 @@
 import { headers } from "next/headers";
 import { prisma } from "@ph360/database";
 import { getAuthContext, requirePermission } from "@ph360/auth";
+import { canAny } from "@ph360/permissions";
 import { getPowerhouseOrgId } from "../../../lib/org";
+import { qualifyLeadAction } from "./actions";
+
+const CUSTOMER_ORG_OPTIONS = [
+  ["PROPERTY_MANAGER", "Hausverwaltung"],
+  ["WEG", "WEG"],
+  ["OWNER", "Eigentümer"],
+  ["ASSET_HOLDER", "Bestandshalter"],
+  ["COOPERATIVE", "Genossenschaft"],
+  ["OTHER", "Sonstige"],
+] as const;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/** Status → Badge-Variante (globals.css): frisch = info, Erfolg = ok, raus = crit. */
+const STATUS_BADGE: Record<string, string> = {
+  NEW: "info",
+  CONVERTED: "ok",
+  DISQUALIFIED: "crit",
+};
 
 function fmt(d: Date): string {
   return new Intl.DateTimeFormat("de-DE", {
@@ -17,6 +35,9 @@ export default async function LeadsPage() {
   const ctx = await getAuthContext(await headers());
   const organizationId = await getPowerhouseOrgId();
   await requirePermission(ctx, "lead.read", { organizationId });
+  const mayQualify = ctx!.memberships.some(
+    (m) => m.organizationId === organizationId && canAny([m.role], "lead.qualify"),
+  );
 
   const where = { organizationId };
   const [leads, total] = await Promise.all([
@@ -47,6 +68,7 @@ export default async function LeadsPage() {
               <th>Module</th>
               <th>Einheiten</th>
               <th>Status</th>
+              <th>Aktion</th>
             </tr>
           </thead>
           <tbody>
@@ -73,7 +95,48 @@ export default async function LeadsPage() {
                 </td>
                 <td>{lead.dwellingUnits ?? "—"}</td>
                 <td>
-                  <span className="badge">{lead.status}</span>
+                  <span className={`badge ${STATUS_BADGE[lead.status] ?? ""}`}>
+                    {lead.status}
+                  </span>
+                </td>
+                <td>
+                  {lead.status === "CONVERTED" ? (
+                    <a href="/admin/customers">→ Kunde</a>
+                  ) : mayQualify ? (
+                    <details>
+                      <summary>Qualifizieren</summary>
+                      {/* F-03: Lead → Kunde/Objekt ohne Doppelerfassung — Kontaktdaten wandern automatisch mit. */}
+                      <form action={qualifyLeadAction} className="form-row">
+                        <input type="hidden" name="leadId" value={lead.id} />
+                        <label>
+                          Organisationstyp
+                          <select name="organizationType" required defaultValue="WEG">
+                            {CUSTOMER_ORG_OPTIONS.map(([value, label]) => (
+                              <option key={value} value={value}>
+                                {label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          Organisation
+                          <input
+                            name="organizationName"
+                            required
+                            defaultValue={lead.company ?? ""}
+                            placeholder="z. B. WEG Christinenstraße 36"
+                          />
+                        </label>
+                        <label>
+                          Objekt (optional)
+                          <input name="propertyName" placeholder="Objektname" />
+                        </label>
+                        <button type="submit">Übernehmen</button>
+                      </form>
+                    </details>
+                  ) : (
+                    "—"
+                  )}
                 </td>
               </tr>
             ))}
